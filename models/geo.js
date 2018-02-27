@@ -1,8 +1,8 @@
 var geoip = require('geoip-lite'),
     requestify = require('requestify');
 
-module.exports={
-    list_ips:list_ips,
+module.exports = {
+    list_ips: list_ips,
     lookup: lookup
 };
 
@@ -10,21 +10,21 @@ module.exports={
  * Returns a list of ip addresses on the metaverse network.
  * @returns {} 
  */
-function list_ips (){
+function list_ips() {
     return requestify.get('http://vpn2.viewfin.com:9999/monitorPeer')
-        .then((response)=>{
-            if(response.getBody().success){
-                let seedlist=[];
+        .then((response) => {
+            if (response.getBody().success) {
+                let seedlist = [];
                 let seeds = response.getBody().dataWrapper.seeds;
-                if(Array.isArray(seeds)&&seeds.length){
-                    seeds.forEach((seed)=>{
-                        if(seed.status !=-1){
+                if (Array.isArray(seeds) && seeds.length) {
+                    seeds.forEach((seed) => {
+                        if (seed.status != -1) {
                             seedlist.push(seed.host);
                         }
                     });
                 }
                 return seedlist;
-            } else{
+            } else {
                 throw Error('ERR_NODELIST_RESULT');
             }
         });
@@ -35,9 +35,9 @@ function list_ips (){
  * @param {String} ip
  * @returns {} 
  */
-function lookup(ip){
-    return new Promise((resolve,reject)=>{
-        let info=geoip.lookup(ip);
+function lookup(ip) {
+    return new Promise((resolve, reject) => {
+        let info = geoip.lookup(ip);
         resolve({
             country: info.country,
             city: info.city,

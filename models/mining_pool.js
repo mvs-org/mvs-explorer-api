@@ -1,4 +1,4 @@
-let requestify=require('requestify');
+let requestify = require('requestify');
 
 //Set up database
 var mysql = require('mysql');
@@ -7,7 +7,7 @@ var connection = mysql.createConnection(config.db);
 
 module.exports = {
     stats: stats,
-	partofcake: partofcake
+    partofcake: partofcake
 };
 
 function stats() {
@@ -19,34 +19,17 @@ function stats() {
     });
 }
 
-function partofcake(number_of_blocks, start_height){
-     return new Promise( (resolve, reject) => {
-var sql = "SELECT miner_address.name, miner.url, miner.origin , count(*) as counter FROM (SELECT address.id, address.address FROM explorer.block JOIN tx ON tx.block_height = block.number JOIN tx_output ON tx.id = tx_output.tx_id JOIN address on tx_output.address_id=address.id WHERE block.number < ? AND block.number > ? AND tx_output.output_index=0 GROUP BY block.number) as t1 LEFT JOIN miner_address ON t1.id = miner_address.address_id JOIN miner ON miner_address.name = miner.name GROUP BY miner_address.name ORDER BY count(*) DESC;";
-/*
-         var sql = "SELECT `name`, `origin`, `url`, COUNT(*) AS `counter` FROM (SELECT " + 
-			   "      address.address, `miner`.`origin`, `miner`.`name`, `miner`.`url` " +
-			   "  FROM " +
-			   "      `miner` " +
-			   "  JOIN `miner_address` ON `miner`.`name` = `miner_address`.`name` " + 
-			   "  JOIN `address` ON `miner_address`.`address_id` = `address`.`id` " +
-			   "  JOIN `tx_output` ON `tx_output`.`address_id` = `address`.`id` " + 
-			   "  JOIN `tx` ON `tx`.`id` = `tx_output`.`tx_id` " +
-			   "  JOIN `block` ON `block`.`merkle_tree_hash` = `tx`.`hash` " +
-         "  WHERE `block`.`number`<= ? AND `tx_output`.`output_index`=0 AND `block`.`number`>?" +
-			   "  ORDER BY `block`.`number` DESC " +
-			   "  ) AS t1 " +
-	   "  GROUP BY `name` " +
-	   "  ORDER BY counter DESC " +
-	   "  LIMIT 10;";
-*/
-         connection.query(sql, [number_of_blocks+start_height,start_height], (error, result, fields) => {
-               if (error) {
-                    console.log(error);
-                    reject(Error("ERR_PART_OF_CAKE"));
-               } else {
-                    resolve(result);
-               }
-          });
-     });
+function partofcake(number_of_blocks, start_height) {
+    return new Promise((resolve, reject) => {
+        var sql = "SELECT miner_address.name, miner.url, miner.origin , count(*) as counter FROM (SELECT address.id, address.address FROM explorer.block JOIN tx ON tx.block_height = block.number JOIN tx_output ON tx.id = tx_output.tx_id JOIN address on tx_output.address_id=address.id WHERE block.number < ? AND block.number > ? AND tx_output.output_index=0 GROUP BY block.number) as t1 LEFT JOIN miner_address ON t1.id = miner_address.address_id JOIN miner ON miner_address.name = miner.name GROUP BY miner_address.name ORDER BY count(*) DESC;";
+
+        connection.query(sql, [number_of_blocks + start_height, start_height], (error, result, fields) => {
+            if (error) {
+                console.log(error);
+                reject(Error("ERR_PART_OF_CAKE"));
+            } else {
+                resolve(result);
+            }
+        });
+    });
 }
-	

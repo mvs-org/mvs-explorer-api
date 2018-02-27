@@ -16,7 +16,7 @@ exports.Info = Info;
 function ListTxs(req, res) {
     var address = req.params.address;
     var page = parseInt(req.query.page) | 0;
-    var items_per_page = (req.query.items_per_page)?parseInt(req.query.items_per_page):10;
+    var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 10;
     Address.listTxsDataCounted(address, page, items_per_page)
         .then((txs_data) => {
             res.json(Message(1, undefined, {

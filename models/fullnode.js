@@ -1,7 +1,10 @@
-module.exports={
-    version:version
+module.exports = {
+    version: version
 };
 
-function version (){
-return Promise.resolve({current: "0.7.3",support: "0.0.1"});
+function version() {
+    return Promise.resolve({
+        current: "0.7.3",
+        support: "0.0.1"
+    });
 }

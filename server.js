@@ -10,7 +10,7 @@ let options = {
         info: {
             description: 'MVS explorer api documentation',
             title: 'API Docs',
-            version: '1.0.0',
+            version: '1.0.0'
         },
         host: 'explorer.mvs.org',
         basePath: '/api',
@@ -22,7 +22,7 @@ let options = {
     basedir: __dirname, //app absolute path
     files: ['./controllers/index.js'] //Path to the API handle folder
 };
-expressSwagger(options)
+expressSwagger(options);
 
 //Load app config file
 var config = require('./config/config.js');
@@ -63,7 +63,7 @@ if (config.app.logging.enable) {
 app.use(router.routes);
 
 //Provide webserver for static files on public dir
-let path=require('path');
+let path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Strartup the services
