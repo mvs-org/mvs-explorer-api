@@ -1,0 +1,10 @@
+{
+  "name": "metaverse-explorer",
+  "version": "0.3.0",
+  "description": "Metaverse Blockchain Explorer",
+  "title": "MVS Explorer",
+  "template": {
+    "withCompare": false,
+    "withGenerator": false
+  }
+}
