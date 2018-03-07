@@ -12,7 +12,7 @@ module.exports = {
 
 function stats() {
     return new Promise((resolve, reject) => {
-        requestify.get('http://pool.mvs.live/api/stats')
+        requestify.get('http://112.74.84.61/api/stats')
             .then(function(response) {
                 resolve(response.getBody());
             });
