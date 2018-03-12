@@ -9,6 +9,7 @@ let AddressCtrl = require('./AddressCtrl.js'),
     GeoCtrl = require('./GeoCtrl.js'),
     FullnodeCtrl = require('./FullnodeCtrl.js'),
     TxCtrl = require('./TxCtrl.js');
+    AssetCtrl = require('./AssetCtrl.js');
 
 //Caching
 let apicache = require('apicache'),
@@ -80,6 +81,14 @@ router.get('/blocks/:page', shortCacheSuccess, BlockCtrl.ListBlocks);
  * @returns {object} 200 - Block data
  */
 router.get('/block/:block_no', longCacheSuccess, BlockCtrl.Fetch);
+
+/**
+ * This function returns the list of all the assets.
+ * @route GET /assets
+ * @group general - General operations
+ * @returns {object} 200 - List of assets
+ */
+router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
 
 /**
  * This function returns number of coins in circulation.
