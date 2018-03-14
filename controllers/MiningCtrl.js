@@ -11,12 +11,12 @@ module.exports = {
 
 function info(req, res) {
     Block.height()
-        .then((height) => Promise.all([Block.fetch_mongo(height), Block.fetch_mongo(Math.min(height, 1))])
+        .then((height) => Promise.all([Block.fetch_mongo(height), Block.fetch_mongo(Math.max(height-100, 1))])
             .then((blocks) => {
                 return {
                     height: height,
                     difficulty: blocks[0].bits,
-                    hashrate: blocks[0].bits / (blocks[0].time_stamp - blocks[1].time_stamp)
+                    hashrate: blocks[0].bits / (blocks[0].time_stamp - blocks[1].time_stamp) * 100
                 };
             }))
             .then((mining_info) => res.json(Message(1, undefined, mining_info)))
