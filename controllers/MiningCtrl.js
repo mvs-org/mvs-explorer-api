@@ -15,10 +15,10 @@ function info(req, res) {
             .then((blocks) => {
                 return {
                     height: height,
-                    difficulty: blocks[0].difficulty,
-                    hashrate: blocks[0].difficulty / (blocks[0].time_stamp - blocks[1].time_stamp)
+                    difficulty: blocks[0].bits,
+                    hashrate: blocks[0].bits / (blocks[0].time_stamp - blocks[1].time_stamp)
                 };
-            })
+            }))
             .then((mining_info) => res.json(Message(1, undefined, mining_info)))
             .catch((error) => res.status(404).json(Message(0, error.message)));
         }
