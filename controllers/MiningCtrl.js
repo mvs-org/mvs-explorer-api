@@ -15,7 +15,7 @@ function info(req, res) {
             .then((blocks) => {
                 return {
                     height: height,
-                    difficulty: blocks[0].bits,
+                    difficulty: parseInt(blocks[0].bits),
                     hashrate: blocks[0].bits / (blocks[0].time_stamp - blocks[1].time_stamp) * 100
                 };
             }))
