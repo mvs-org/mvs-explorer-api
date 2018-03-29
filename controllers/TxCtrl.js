@@ -31,7 +31,6 @@ function locksum(req, res) {
 function fetch(req, res) {
     var hash = req.params.hash;
     Transaction.fetch(hash)
-        .then((tx) => Transaction.includeTransactionData(tx))
         .then((tx) => res.json(Message(1, undefined, tx)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_TX')));
 };
