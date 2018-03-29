@@ -107,7 +107,7 @@ router.get('/circulation', mediumCacheSuccess, BlockCtrl.FetchCirculation);
 router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
 
 router.get('/inouts', shortCacheSuccess, AddressCtrl.listInOuts);
-router.get('/mining', shortCacheSuccess, MiningCtrl.info);
+router.get('/mining', longCacheSuccess, MiningCtrl.info);
 router.get('/part-of-cake', longCacheSuccess, MiningCtrl.partofcake);
 
 /**

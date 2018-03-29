@@ -11,7 +11,6 @@ exports.list = list;
 exports.circulation = circulation;
 exports.fetch = fetch;
 exports.list_block_txs = list_block_txs;
-exports.fetch_mongo = fetch_mongo;
 
 function circulation(number) {
     return new Promise((resolve, reject) => {
@@ -26,26 +25,8 @@ function circulation(number) {
         });
     });
 }
-/**
- * Get block by height
- * @param {} number Height
- * @returns {} 
- */
-function fetch(number) {
-    return new Promise((resolve, reject) => {
-        var sql = "SELECT * FROM `block` WHERE `number`= ?;";
-        connection.query(sql, [number], (error, result, fields) => {
-            if (error || result.length !== 1) {
-                console.log(error);
-                reject(Error("ERR_FETCH_BLOCK"));
-            } else {
-                resolve(result[0]);
-            }
-        });
-    });
-}
 
-function fetch_mongo(number) {
+function fetch(number) {
     return new Promise((resolve, reject) => {
         mongo.connect()
             .then((db) => {
@@ -96,19 +77,18 @@ function list_block_txs(height) {
  */
 function list(page, num) {
     return new Promise((resolve, reject) => {
-        if (typeof num === 'undefined')
-            num = 20;
-        if (typeof page === 'undefined')
-            page = 0;
-        var sql = "SELECT * FROM `block` ORDER BY `number` DESC LIMIT ?,?;";
-        connection.query(sql, [num * page, num], (error, result, fields) => {
-            if (error) {
-                console.log(error);
-                reject(Error("ERR_FETCH_BLOCK"));
-            } else {
-                resolve(result);
-            }
-        });
+        mongo.connect()
+            .then((db) => {
+                return db.collection('block').find({orphan: 0}, {
+                    "_id": 0
+                }).skip(page*num).limit(num).toArray((err, blocks) => {
+                    if (err) {
+                        console.error(err);
+                        throw Error("ERR_FETCH_BLOCKS");
+                    } else
+                        resolve(blocks);
+                });
+            });
     });
 }
 
@@ -118,14 +98,21 @@ function list(page, num) {
  */
 function height() {
     return new Promise((resolve, reject) => {
-        var sql = "SELECT `number` FROM `block` ORDER BY `number` DESC LIMIT 1;";
-        connection.query(sql, (error, result, fields) => {
-            if (error) {
-                console.log(error);
-                reject(Error("ERR_FETCH_BLOCK"));
-            } else {
-                resolve(result[0].number);
-            }
-        });
+        mongo.connect()
+            .then((db) => {
+                db.collection('block')
+                    .find()
+                    .sort({
+                        number: -1
+                    })
+                    .limit(1)
+                    .toArray((err, docs) => {
+                        if (err || docs.length !== 1) {
+                            console.error(err);
+                            throw Error("ERR_FETCH_HEIGHT");
+                        } else
+                            resolve(docs[0].number);
+                    });
+            });
     });
 }
