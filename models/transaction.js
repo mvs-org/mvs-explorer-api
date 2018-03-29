@@ -173,7 +173,7 @@ function locksum(height) {
                 db.collection('tx').mapReduce(function() {
                     this.outputs.forEach((output) => {
                         if (this.height + output.lock_height > height && this.height < height) emit(output.asset.symbol, parseInt(output.quantity));
-                    })
+                    });
                 }, function(name, quantity) {
                     return Array.sum(quantity);
                 }, {
@@ -183,10 +183,10 @@ function locksum(height) {
                             $gt: 0
                         }
                     }
-                })
+                });
                 db.collection('locksum').find().toArray((err, docs) => {
                     if (err || docs.length !== 1) {
-                        console.error(err, number);
+                        console.error(err);
                         throw Error("ERROR_FETCH_LOCKSUM");
                     } else
                         resolve(docs[0].value);
@@ -205,7 +205,7 @@ function rewards(height) {
                             if (this.height + output.lock_height > height && this.height < height) emit('locked', parseInt(output.quantity));
                             else if (output.lock_height > 0) emit('unlocked', parseInt(output.quantity));
                         }
-                    })
+                    });
                 }, function(name, quantity) {
                     return Array.sum(quantity);
                 }, {
@@ -215,7 +215,7 @@ function rewards(height) {
                             $gt: 0
                         }
                     }
-                })
+                });
                 db.collection('rewards').find().toArray((err, docs) => {
                     if (err) {
                         console.error(err);
@@ -224,7 +224,7 @@ function rewards(height) {
                         let res = {};
                         if (docs.length)
                             docs.forEach((e) => {
-                                res[e._id] = e.value
+                                res[e._id] = e.value;
                             });
                         resolve(res);
                     }

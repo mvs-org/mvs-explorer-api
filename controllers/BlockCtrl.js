@@ -17,14 +17,15 @@ exports.FetchCirculation = FetchCirculation;
  */
 function FetchBlock(req, res) {
     var number = req.params.block_no;
-    Promise.all([Block.fetch_mongo(parseInt(number)), Block.list_block_txs(parseInt(number))])
-        .then((block_data) => {
-            let block = block_data[0];
-            block.txs = undefined;
-            block.transactions = block_data[1];
-            res.json(Message(1, undefined, block));
-        })
-        .catch((error) => res.status(404).json(Message(0, error.message)));
+    Block.fetch(parseInt(number))
+        .then((block)=>{
+            return Block.list_block_txs(block.hash)
+                .then((transactions) => {
+                    block.transactions = transactions;
+                    res.json(Message(1, undefined, block));
+                })
+                .catch((error) => res.status(404).json(Message(0, error.message)));
+        });
 }
 
 /**

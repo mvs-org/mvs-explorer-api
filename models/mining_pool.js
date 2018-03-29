@@ -6,18 +6,8 @@ var config = require('../config/mysql.js');
 var connection = mysql.createConnection(config.db);
 
 module.exports = {
-    stats: stats,
     partofcake: partofcake
 };
-
-function stats() {
-    return new Promise((resolve, reject) => {
-        requestify.get('http://112.74.84.61/api/stats')
-            .then(function(response) {
-                resolve(response.getBody());
-            });
-    });
-}
 
 function partofcake(number_of_blocks, start_height) {
     return new Promise((resolve, reject) => {

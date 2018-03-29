@@ -46,12 +46,13 @@ function fetch(number) {
 }
 
 
-function list_block_txs(height) {
+function list_block_txs(blockhash) {
     return new Promise((resolve, reject) => {
         mongo.connect()
             .then((db) => {
                 return db.collection('tx').find({
-                    "height": height
+                    "block": blockhash,
+                    orphan: 0
                 }, {
                     "_id": 0,
                     "id": 0,
