@@ -51,8 +51,7 @@ function list_block_txs(blockhash) {
         mongo.connect()
             .then((db) => {
                 return db.collection('tx').find({
-                    "block": blockhash,
-                    orphan: 0
+                    "block": blockhash
                 }, {
                     "_id": 0,
                     "id": 0,
