@@ -13,7 +13,6 @@ module.exports = {
     listOutputsByTx: listOutputsByTx,
     listInputsByTx: listInputsByTx,
     fetch: fetch,
-    fetch_mongo: fetch_mongo,
     locksum: locksum,
     rewards: rewards,
     includeTransactionData: includeTransactionData
@@ -22,26 +21,30 @@ module.exports = {
 /**
  * Get transaction data for given hash
  * @param {} hash
- * @returns {} 
+ * @returns {}
  */
-function fetch(hash) {
-    return new Promise((resolve, reject) => {
-        var sql = "SELECT `tx`.`id`,`tx`.`block_height`,`tx`.`hash` FROM `tx` WHERE `hash`= ?;";
-        connection.query(sql, [hash], (error, result) => {
-            if (error || result.length !== 1) {
-                console.log(error);
-                reject(Error("ERR_FETCH_TRANSACTION"));
-            } else {
-                resolve(result[0]);
-            }
-        });
-    });
-}
+ function fetch(hash) {
+     return new Promise((resolve, reject) => {
+         mongo.connect()
+             .then((db) => {
+                 db.collection('tx').find({
+                     "hash": hash
+                 }).toArray((err, docs) => {
+                     if (err || docs.length !== 1) {
+                         console.error(err, number);
+                         throw Error("ERROR_FETCH_TX");
+                     } else {
+                         resolve(docs[0]);
+                     }
+                 });
+             });
+     });
+ }
 
 /**
  * List all transactions of given block
  * @param {} block_no Height of block
- * @returns {} 
+ * @returns {}
  */
 function listTxsByBlockMongo(block_no) {
     return new Promise((resolve, reject) => {
@@ -59,7 +62,7 @@ function listTxsByBlockMongo(block_no) {
 /**
  * List all transactions of given block
  * @param {} block_no Height of block
- * @returns {} 
+ * @returns {}
  */
 function listTxsByBlock(block_no) {
     return new Promise((resolve, reject) => {
@@ -78,7 +81,7 @@ function listTxsByBlock(block_no) {
 /**
  * List inputs of given transaction
  * @param {} tx_id Transaction id
- * @returns {} 
+ * @returns {}
  */
 function listInputsByTx(tx_id) {
     return new Promise((resolve, reject) => {
@@ -97,7 +100,7 @@ function listInputsByTx(tx_id) {
 /**
  * List inputs of given transaction
  * @param {} tx_id
- * @returns {} 
+ * @returns {}
  */
 function listOutputsByTx(tx_id) {
     return new Promise((resolve, reject) => {
@@ -117,7 +120,7 @@ function listOutputsByTx(tx_id) {
 /**
  * List transactions of given address
  * @param {} address
- * @returns {} 
+ * @returns {}
  */
 function listTxsByAddress(address, page, num) {
     return new Promise((resolve, reject) => {
@@ -154,6 +157,7 @@ function includeTransactionData(tx) {
     return new Promise((resolve, reject) => {
         Promise.all([listInputsByTx(tx.id), listOutputsByTx(tx.id)])
             .then((results) => {
+                console.log("includeTransactionData:" + tx)
                 tx.inputs = results[0];
                 tx.outputs = results[1];
                 resolve(tx);
@@ -224,23 +228,6 @@ function rewards(height) {
                             });
                         resolve(res);
                     }
-                });
-            });
-    });
-}
-
-function fetch_mongo(hash) {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('tx').find({
-                    "hash": hash
-                }).toArray((err, docs) => {
-                    if (err || docs.length !== 1) {
-                        console.error(err, number);
-                        throw Error("ERROR_FETCH_TX");
-                    } else
-                        resolve(docs[0]);
                 });
             });
     });

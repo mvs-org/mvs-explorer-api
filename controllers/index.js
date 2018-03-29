@@ -8,7 +8,7 @@ let AddressCtrl = require('./AddressCtrl.js'),
     MiningCtrl = require('./MiningCtrl.js'),
     GeoCtrl = require('./GeoCtrl.js'),
     FullnodeCtrl = require('./FullnodeCtrl.js'),
-    TxCtrl = require('./TxCtrl.js');
+    TxCtrl = require('./TxCtrl.js'),
     AssetCtrl = require('./AssetCtrl.js');
 
 //Caching
