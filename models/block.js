@@ -56,6 +56,7 @@ function list_block_txs(blockhash) {
                 }, {
                     "_id": 0,
                     "id": 0,
+                    "rawtx": 0,
                     "inputs": {
                         "$slice": 5
                     }
