@@ -37,65 +37,60 @@ function Info(req, res) {
         .then((result) => Promise.all([evaluateTxs(address, result[0], result[1]), result[0]]))
         .then((results) => {
             res.json(Message(1, undefined, {
-                assets: results[0].assets,
+                assets: results[0],
                 tx_count: results[1].length
             }));
         })
         .catch((error) => {
-            console.error(error.message);
+            console.error(error);
             res.status(404).json(Message(0, 'ERR_LIST_TRANSACTIONS'));
         });
 }
 
-
-function prepareTxsPage(txs, page, items_per_page) {
-    return txs.slice(items_per_page * page, items_per_page * page + items_per_page);
-}
-
 function evaluateTxs(address, txs, current_height) {
-    return new Promise((resolve, reject) => {
-        var assets = {};
-        Promise.all(txs.map((tx) => Promise.all([evaluateInputs(tx, address, assets, current_height), evaluateOutputs(tx, address, assets, current_height)])))
-            .then(() => resolve({
-                assets: assets
-            }));
-    });
+    var assets = {
+        'ETP': {
+            received: 0,
+            locked: 0,
+            sent: 0,
+            decimals: 8
+        }
+    };
+    return Promise.all(txs.map((tx) => Promise.all([evaluateInputs(tx, address, assets, current_height), evaluateOutputs(tx, address, assets, current_height)])))
+        .then(() => assets);
 }
 
 function evaluateInputs(tx, address, assets, current_height) {
     return Promise.all(tx.inputs.map((input) => {
         if (input.address === address) {
-            if (assets[input.asset.symbol] === undefined) {
+            if (assets[input.attachment.symbol] === undefined && input.attachment.symbol != "ETP") {
                 //Initialize input stats
-                assets[input.asset.symbol] = {
+                assets[input.attachment.symbol] = {
                     received: 0,
-                    locked: 0,
                     sent: 0,
-                    decimals: input.asset.decimals
+                    decimals: input.attachment.decimals
                 };
+                assets[input.attachment.symbol].sent += parseInt(input.attachment.quantity);
             }
-            //a found input for the given address is an input that left
-            //the addresses balance
-            assets[input.asset.symbol].sent += parseInt(input.quantity);
+            assets['ETP'].sent += parseInt(input.value);
         }
     }));
 };
 
 function evaluateOutputs(tx, address, assets, current_height) {
-    return Promise.all(tx.outputs.map((input) => {
-        if (input.address === address) {
-            if (assets[input.asset.symbol] === undefined) {
-                //Initialize input stats
-                assets[input.asset.symbol] = {
+    return Promise.all(tx.outputs.map((output) => {
+        if (output.address === address) {
+            if (assets[output.attachment.symbol] === undefined && output.attachment.symbol != "ETP") {
+                assets[output.attachment.symbol] = {
                     received: 0,
-                    locked: 0,
                     sent: 0,
-                    decimals: input.asset.decimals
+                    decimals: output.attachment.decimals
                 };
+                assets[output.attachment.symbol].received += parseInt(output.attachment.quantity);
             }
-            assets[input.asset.symbol].received += parseInt(input.quantity);
-            if (parseInt(input.lock_height) + tx.height > current_height)
-                assets[input.asset.symbol].locked += parseInt(input.quantity);
+            if (output.locked_height_range + tx.height > current_height)
+                assets['ETP'].locked += output.value;
+            assets['ETP'].received += output.value;
         }
     }));
 };

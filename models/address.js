@@ -18,13 +18,13 @@ function listTxsData(address) {
             'inputs.address': address
         }, {
             'outputs.address': address
-        }]
+        }],
+        "orphan": 0
     }, {
         "_id": 0,
+        "rawtx": 0,
         "id": 0
-    }, 'tx', {
-        height: -1
-    }, true);
+    }, 'tx', {}, true);
 }
 
 
