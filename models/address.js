@@ -37,6 +37,7 @@ function listTxsDataCounted(address, page, items_per_page) {
         }]
     }, {
         "_id": 0,
+        "rawtx": 0,
         "inputs": {
             "$slice": 5
         }
