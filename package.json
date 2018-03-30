@@ -12,7 +12,9 @@
     "apicache": "^0.8.3",
     "body-parser": "^1.16.0",
     "express": "^4.14.1",
+    "express-elasticsearch-logger": "^2.1.0",
     "express-swagger-generator": "^1.0.4",
+    "express-winston": "^2.5.0",
     "geoip-lite": "^1.2.1",
     "geojson": "^0.4.1",
     "method-override": "^2.3.7",
@@ -21,6 +23,8 @@
     "mysql": "^2.13.0",
     "path": "^0.12.7",
     "redis": "^2.7.1",
-    "requestify": "^0.2.5"
+    "requestify": "^0.2.5",
+    "winston": "^2.4.1",
+    "winston-elasticsearch": "^0.5.8"
   }
 }

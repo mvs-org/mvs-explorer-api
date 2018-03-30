@@ -37,12 +37,11 @@ function listTxsDataCounted(address, page, items_per_page) {
         }]
     }, {
         "_id": 0,
-        "id": 0,
         "inputs": {
             "$slice": 5
         }
     }, 'tx', {
-        height: -1
+        "height": -1
     }, page, items_per_page);
 }
 

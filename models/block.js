@@ -31,12 +31,13 @@ function fetch(number) {
         mongo.connect()
             .then((db) => {
                 db.collection('block').find({
-                    "number": number
+                    "number": number,
+                    "orphan": 0
                 }, {
                     "_id": 0
                 }).toArray((err, docs) => {
                     if (err || docs.length !== 1) {
-                        console.error(err, number);
+                        console.error(err);
                         throw Error("ERR_FETCH_BLOCK");
                     } else
                         resolve(docs[0]);
