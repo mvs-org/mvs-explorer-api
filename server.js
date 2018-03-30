@@ -37,23 +37,26 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-var winston = require('winston');
-var expressWinston = require('express-winston');
-var Elasticsearch = require('winston-elasticsearch');
-app.use(expressWinston.logger({
-    transports: [
-        new Elasticsearch({
-            index: 'explorer-api'
-        })
-    ],
-    meta: true,
-    msg: "HTTP {{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}",
-    expressFormat: true,
-    colorize: true,
-    ignoreRoute: function(req, res) {
-        return false;
-    } // optional: allows to skip some log messages based on request and/or response
-}));
+//Configure logging
+if (config.app.logging.enable) {
+    var winston = require('winston');
+    var expressWinston = require('express-winston');
+    var Elasticsearch = require('winston-elasticsearch');
+    app.use(expressWinston.logger({
+        transports: [
+            new Elasticsearch({
+                index: 'explorer-api'
+            })
+        ],
+        meta: true,
+        msg: "HTTP {{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}",
+        expressFormat: true,
+        colorize: true,
+        ignoreRoute: function(req, res) {
+            return false;
+        } // optional: allows to skip some log messages based on request and/or response
+    }));
+}
 
 //HTTP Method overwriter to set error response codes
 var methodOverride = require('method-override');
@@ -68,14 +71,6 @@ app.all('/*', (req, res, next) => {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
-
-//Configure logging
-if (config.app.logging.enable) {
-    var morgan = require('morgan');
-    // setup the file logger
-    app.use(morgan('combined'));
-    app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'));
-}
 
 //Define routes
 app.use(router.routes);
