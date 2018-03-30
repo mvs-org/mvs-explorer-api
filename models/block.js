@@ -2,9 +2,6 @@
 
 //Set up database
 var mongo = require('../libraries/mongo.js');
-var mysql = require('mysql');
-var config = require('../config/mysql.js');
-var connection = mysql.createConnection(config.db);
 
 exports.height = height;
 exports.list = list;

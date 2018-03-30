@@ -1,9 +1,6 @@
 'use strict';
 
 //Set up database
-var mysql = require('mysql');
-var config = require('../config/mysql.js');
-var connection = mysql.createConnection(config.db);
 var mongo = require('../libraries/mongo.js');
 
 
@@ -119,7 +116,7 @@ function circulation() {
                 }, function(name, quantity) {
                     return Array.sum(quantity);
                 }, {
-                    out: "rewards",
+                    out: "circulation",
                     query: {
                         "inputs.previous_output.hash": "0000000000000000000000000000000000000000000000000000000000000000",
                         "orphan": 0
