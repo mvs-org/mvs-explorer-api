@@ -17,13 +17,11 @@ function listassets(hash) {
   return new Promise((resolve, reject) => {
       mongo.connect()
           .then((db) => {
-              db.collection('asset_output').find({
+              db.collection('asset').find({
 
               }, {
                   "_id": 0,
-                  "output_id": 0,
-                  "address_id": 0,
-                  "tx_id": 0
+                  "type": 0
               }).toArray((err, docs) => {
                   resolve(docs);
               });
