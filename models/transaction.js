@@ -9,13 +9,9 @@ var mongo = require('../libraries/mongo.js');
 
 module.exports = {
     listTxsByAddress: listTxsByAddress,
-    listTxsByBlock: listTxsByBlock,
-    listOutputsByTx: listOutputsByTx,
-    listInputsByTx: listInputsByTx,
     fetch: fetch,
     locksum: locksum,
-    rewards: rewards,
-    includeTransactionData: includeTransactionData
+    rewards: rewards
 };
 
 /**
@@ -41,81 +37,6 @@ module.exports = {
      });
  }
 
-/**
- * List all transactions of given block
- * @param {} block_no Height of block
- * @returns {}
- */
-function listTxsByBlockMongo(block_no) {
-    return new Promise((resolve, reject) => {
-        var sql = "SELECT `tx`.`id`,`tx`.`block_height`,`tx`.`hash` FROM `tx` WHERE `block_height`= ?;";
-        connection.query(sql, [block_no], (error, result) => {
-            if (error) {
-                console.error(error);
-                reject(Error("ERR_FETCH_TRANSACTIONS"));
-            } else {
-                resolve(result);
-            }
-        });
-    });
-}
-/**
- * List all transactions of given block
- * @param {} block_no Height of block
- * @returns {}
- */
-function listTxsByBlock(block_no) {
-    return new Promise((resolve, reject) => {
-        var sql = "SELECT `tx`.`id`,`tx`.`block_height`,`tx`.`hash` FROM `tx` WHERE `block_height`= ?;";
-        connection.query(sql, [block_no], (error, result) => {
-            if (error) {
-                console.error(error);
-                reject(Error("ERR_FETCH_TRANSACTIONS"));
-            } else {
-                resolve(result);
-            }
-        });
-    });
-}
-
-/**
- * List inputs of given transaction
- * @param {} tx_id Transaction id
- * @returns {}
- */
-function listInputsByTx(tx_id) {
-    return new Promise((resolve, reject) => {
-        var sql = "SELECT `tx_input`.`script`,`tx_input`.`tx_value` AS `value`, `tx_input`.`decimal_number` AS `decimals`, `tx_input`.`asset`, `address`.`address` FROM `tx_input` LEFT JOIN `address` ON `tx_input`.`address_id`=`address`.`id` WHERE `tx_input`.`tx_id`= ?;";
-        connection.query(sql, [tx_id], (error, result) => {
-            if (error) {
-                console.error(error);
-                reject(Error("ERR_FETCH_INPUTS"));
-            } else {
-                resolve(result);
-            }
-        });
-    });
-}
-
-/**
- * List inputs of given transaction
- * @param {} tx_id
- * @returns {}
- */
-function listOutputsByTx(tx_id) {
-    return new Promise((resolve, reject) => {
-        //var sql = "SELECT * FROM (SELECT `tx_output`.`script`, `tx_output`.`output_value` AS `value`, `address`.`address`, `tx_output`.`asset`, `tx_output`.`decimal_number` AS `decimals` FROM `tx_output` LEFT JOIN `address` ON `tx_output`.`address_id`=`address`.`id` WHERE `tx_output`.`tx_id`= ?) AS etp_txo UNION  (SELECT NULL AS `script`, `tx_output_asset`.`output_value`, `address`.`address`, `asset_name` , `tx_output_asset`.`asset_type` AS `decimal_number` FROM `tx_output_asset` LEFT JOIN `address` ON `tx_output_asset`.`address_id`=`address`.`id` WHERE `tx_output_asset`.`tx_id`= ?);";
-        var sql = "SELECT `tx_output`.`script`, `tx_output`.`output_value` AS `value`, `address`.`address`, `tx_output`.`asset`, `tx_output`.`decimal_number` AS `decimals` FROM `tx_output` LEFT JOIN `address` ON `tx_output`.`address_id`=`address`.`id` WHERE `tx_output`.`tx_id`= ?;";
-        connection.query(sql, [tx_id, tx_id], (error, result) => {
-            if (error) {
-                console.error(error);
-                reject(Error("ERR_FETCH_OUTPUTS"));
-            } else {
-                resolve(result);
-            }
-        });
-    });
-}
 
 /**
  * List transactions of given address
@@ -145,24 +66,6 @@ function listTxsByAddress(address, page, num) {
             }
 
         });
-    });
-}
-
-/**
- * Adds inputs and outputs to the given transaction.
- * @param {} tx Transaction object (at least property id must be defined)
- * @returns {} Transaction object with in and outputs
- */
-function includeTransactionData(tx) {
-    return new Promise((resolve, reject) => {
-        Promise.all([listInputsByTx(tx.id), listOutputsByTx(tx.id)])
-            .then((results) => {
-                console.log("includeTransactionData:" + tx)
-                tx.inputs = results[0];
-                tx.outputs = results[1];
-                resolve(tx);
-            })
-            .catch((error) => reject(Error(error.message)));
     });
 }
 
