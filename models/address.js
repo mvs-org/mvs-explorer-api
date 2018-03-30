@@ -34,7 +34,8 @@ function listTxsDataCounted(address, page, items_per_page) {
             'inputs.address': address
         }, {
             'outputs.address': address
-        }]
+        }],
+        "orphan": 0
     }, {
         "_id": 0,
         "rawtx": 0,
