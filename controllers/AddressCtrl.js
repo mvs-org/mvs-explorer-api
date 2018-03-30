@@ -63,15 +63,16 @@ function evaluateTxs(address, txs, current_height) {
 function evaluateInputs(tx, address, assets, current_height) {
     return Promise.all(tx.inputs.map((input) => {
         if (input.address === address) {
-            if (assets[input.attachment.symbol] === undefined && input.attachment.symbol != "ETP") {
+            if (assets[input.attachment.symbol] === undefined) {
                 //Initialize input stats
                 assets[input.attachment.symbol] = {
                     received: 0,
                     sent: 0,
                     decimals: input.attachment.decimals
                 };
-                assets[input.attachment.symbol].sent += parseInt(input.attachment.quantity);
             }
+            if (input.attachment.symbol != "ETP")
+                assets[input.attachment.symbol].sent += parseInt(input.attachment.quantity);
             assets['ETP'].sent += parseInt(input.value);
         }
     }));
@@ -80,14 +81,15 @@ function evaluateInputs(tx, address, assets, current_height) {
 function evaluateOutputs(tx, address, assets, current_height) {
     return Promise.all(tx.outputs.map((output) => {
         if (output.address === address) {
-            if (assets[output.attachment.symbol] === undefined && output.attachment.symbol != "ETP") {
+            if (assets[output.attachment.symbol] === undefined) {
                 assets[output.attachment.symbol] = {
                     received: 0,
                     sent: 0,
                     decimals: output.attachment.decimals
                 };
-                assets[output.attachment.symbol].received += parseInt(output.attachment.quantity);
             }
+            if (output.attachment.symbol != "ETP")
+                assets[output.attachment.symbol].received += parseInt(output.attachment.quantity);
             if (output.locked_height_range + tx.height > current_height)
                 assets['ETP'].locked += output.value;
             assets['ETP'].received += output.value;
