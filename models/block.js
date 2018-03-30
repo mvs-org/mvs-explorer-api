@@ -8,23 +8,8 @@ var connection = mysql.createConnection(config.db);
 
 exports.height = height;
 exports.list = list;
-exports.circulation = circulation;
 exports.fetch = fetch;
 exports.list_block_txs = list_block_txs;
-
-function circulation(number) {
-    return new Promise((resolve, reject) => {
-        var sql = "SELECT sum_output.value-sum_input.value AS circulation FROM sum_input,sum_output;";
-        connection.query(sql, (error, result, fields) => {
-            if (error || result.length !== 1) {
-                console.log(error);
-                reject(Error("ERR_FETCH_BLOCK"));
-            } else {
-                resolve(result[0].circulation);
-            }
-        });
-    });
-}
 
 function fetch(number) {
     return new Promise((resolve, reject) => {

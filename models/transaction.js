@@ -11,6 +11,7 @@ module.exports = {
     listTxsByAddress: listTxsByAddress,
     fetch: fetch,
     locksum: locksum,
+    circulation: circulation,
     rewards: rewards
 };
 
@@ -19,23 +20,23 @@ module.exports = {
  * @param {} hash
  * @returns {}
  */
- function fetch(hash) {
-     return new Promise((resolve, reject) => {
-         mongo.connect()
-             .then((db) => {
-                 db.collection('tx').find({
-                     "hash": hash
-                 }).toArray((err, docs) => {
-                     if (err || docs.length !== 1) {
-                         console.error(err, number);
-                         throw Error("ERROR_FETCH_TX");
-                     } else {
-                         resolve(docs[0]);
-                     }
-                 });
-             });
-     });
- }
+function fetch(hash) {
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('tx').find({
+                    "hash": hash
+                }).toArray((err, docs) => {
+                    if (err || docs.length !== 1) {
+                        console.error(err, number);
+                        throw Error("ERROR_FETCH_TX");
+                    } else {
+                        resolve(docs[0]);
+                    }
+                });
+            });
+    });
+}
 
 
 /**
@@ -130,6 +131,48 @@ function rewards(height) {
                                 res[e._id] = e.value;
                             });
                         resolve(res);
+                    }
+                });
+            });
+    });
+}
+
+function circulation() {
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('tx').mapReduce(function() {
+                    if (this.inputs[0].previous_output.hash == "0000000000000000000000000000000000000000000000000000000000000000")
+                        this.outputs.forEach(function(output) {
+                            if (output.locked_height_range)
+                                emit("deposit", output.value);
+                            else
+                                emit("block", output.value);
+                        });
+                }, function(name, quantity) {
+                    return Array.sum(quantity);
+                }, {
+                    out: "rewards",
+                    query: {
+                        "inputs.previous_output.hash": "0000000000000000000000000000000000000000000000000000000000000000",
+                        "orphan": 0
+                    }
+                }, (err, tmp) => {
+                    if (err) {
+                        console.error(err);
+                        throw Error("ERROR_FETCH_CIRCULATION");
+                    } else {
+                        tmp.find().toArray((err, result) => {
+                            if (err) {
+                                console.error(err);
+                                throw Error("ERROR_FETCH_CIRCULATION");
+                            } else {
+                                resolve({
+                                    block: result[0].value,
+                                    deposit: result[1].value
+                                });
+                            }
+                        });
                     }
                 });
             });
