@@ -43,7 +43,7 @@ router.get('/tx/:hash', longCacheSuccess, TxCtrl.FetchTx);
  * @group address - Operations about addresses
  * @returns {object} 200 - Address details
  */
-router.get('/address/info/:address', shortCacheSuccess, AddressCtrl.GetBalances);
+router.get('/address/info/:address', shortCacheSuccess, AddressCtrl.ListBalances);
 
 /**
  * Get the transactions of an address.
