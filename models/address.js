@@ -9,6 +9,7 @@ module.exports = {
     listTxsDataCounted: listTxsDataCounted,
     listOutputs: listOutputs,
     listInputs: listInputs,
+    balances: listBalances,
     listAddressIds: listAddressIds
 };
 
@@ -100,6 +101,73 @@ function listAddressIds(addresses) {
                         Promise.all(docs.map((a) => {
                             addresses_list.push(a.id);
                         })).then(() => resolve(addresses_list));
+                    }
+                });
+            });
+    });
+}
+
+function listBalances(address, height) {
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('tx').mapReduce(function() {
+                    emit('*TXNO', 1);
+                    if (this.inputs)
+                        this.inputs.forEach((input) => {
+                            if (input.address == address) {
+                                if (input.attachment.symbol != "ETP")
+                                    emit(input.attachment.symbol, input.attachment.quantity);
+                                emit("ETP", -input.value);
+                            }
+                        });
+                    if (this.outputs)
+                        this.outputs.forEach((output) => {
+                            if (output && output.address == address) {
+                                if (output.attachment.symbol != "ETP")
+                                    emit(output.attachment.symbol, output.attachment.quantity);
+                                if(output.value){
+                                    if(output.locked_height_range+this.height<height)
+                                        emit("ETP", output.value);
+                                    else
+                                        emit("*FROZEN", output.value);
+                                }
+                            }
+                        });
+                }, function(name, quantity) {
+                    return Array.sum(quantity);
+                }, {
+                    out: {
+                        inline: 1
+                    },
+                    query: {
+                        $or: [{
+                            'inputs.address': address
+                        }, {
+                            'outputs.address': address
+                        }],
+                        "orphan": 0
+                    },
+                    scope: {
+                        address: address,
+                        height: height
+                    }
+                }, (err, tmp) => {
+                    if (err) {
+                        console.error(err);
+                        throw Error("ERROR_FETCH_BALANCES");
+                    } else {
+                        let results = {
+                            info:{},
+                            tokens:{}
+                        };
+                        tmp.forEach((item) => {
+                            if(item._id.startsWith('*'))
+                                results['info'][item._id.substring(1)]=item.value;
+                            else if(!results[item._id])
+                                results['tokens'][item._id]=item.value;
+                        });
+                        resolve(results);
                     }
                 });
             });

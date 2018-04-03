@@ -43,6 +43,7 @@ router.get('/tx/:hash', longCacheSuccess, TxCtrl.FetchTx);
  * @returns {object} 200 - Address details
  */
 router.get('/address/info/:address', mediumCacheSuccess, AddressCtrl.Info);
+router.get('/address/balances/:address', shortCacheSuccess, AddressCtrl.GetBalances);
 
 /**
  * Get the transactions of an address.
@@ -106,7 +107,6 @@ router.get('/circulation', mediumCacheSuccess, BlockCtrl.FetchCirculation);
  */
 router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
 
-router.get('/inouts', shortCacheSuccess, AddressCtrl.listInOuts);
 router.get('/mining', shortCacheSuccess, MiningCtrl.info);
 router.get('/poolstats', mediumCacheSuccess, MiningCtrl.poolstats);
 
