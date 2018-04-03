@@ -2,6 +2,7 @@
 
 var Message = require('../models/message.js');
 let Address = require('../models/address.js');
+let Asset = require('../models/assets.js');
 let Block = require('../models/block.js');
 
 exports.ListTxs = ListTxs;
@@ -30,12 +31,19 @@ function ListTxs(req, res) {
         });
 }
 
-function ListBalances(req,res) {
+function ListBalances(req, res) {
     let address = req.params.address;
     Block.height()
-        .then((height)=>Address.balances(address, height))
+        .then((height) => Address.balances(address, height))
         .then((balances) => {
-            res.status(200).json(Message(1, undefined, balances));
+            balances['definitions'] = {};
+            Asset.listassets()
+                .then((assets) => Promise.all(assets.map((asset) => {
+                    if (balances['tokens'][asset.symbol]) {
+                        balances['definitions'][asset.symbol] = asset;
+                    }
+                })))
+                .then(() => res.status(200).json(Message(1, undefined, balances)));
         })
         .catch((error) => {
             console.error(error);

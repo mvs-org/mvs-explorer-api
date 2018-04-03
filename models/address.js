@@ -117,7 +117,7 @@ function listBalances(address, height) {
                         this.inputs.forEach((input) => {
                             if (input.address == address) {
                                 if (input.attachment.symbol != "ETP")
-                                    emit(input.attachment.symbol, input.attachment.quantity);
+                                    emit(input.attachment.symbol, -input.attachment.quantity);
                                 emit("ETP", -input.value);
                             }
                         });
