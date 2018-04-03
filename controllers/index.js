@@ -22,6 +22,7 @@ let apicache = require('apicache'),
     .middleware;
 //Define cache rules to only cache if result was successfull
 const onlyStatus200 = (req, res) => res.statusCode === 200,
+    hourCacheSuccess = cache('60 minutes', onlyStatus200),
     longCacheSuccess = cache('5 minutes', onlyStatus200),
     mediumCacheSuccess = cache('1 minutes', onlyStatus200),
     shortCacheSuccess = cache('20 seconds', onlyStatus200);
@@ -96,7 +97,7 @@ router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
  * @group general - General operations
  * @returns {object} 200 - Number of coins
  */
-router.get('/circulation', longCacheSuccess, BlockCtrl.FetchCirculation);
+router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
 
 /**
  * This function returns the pricing information.
