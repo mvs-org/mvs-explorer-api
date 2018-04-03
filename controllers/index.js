@@ -97,7 +97,7 @@ router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
  * @group general - General operations
  * @returns {object} 200 - Number of coins
  */
-router.get('/circulation', mediumCacheSuccess, BlockCtrl.FetchCirculation);
+router.get('/circulation', longCacheSuccess, BlockCtrl.FetchCirculation);
 
 /**
  * This function returns the pricing information.
