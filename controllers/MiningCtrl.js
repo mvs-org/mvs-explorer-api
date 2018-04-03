@@ -30,14 +30,19 @@ function poolstats(req, res) {
     Block.height()
         .then((height) => Promise.all([Mining.pools(), Mining.poolstats(height - 1000, height)]))
         .then((results) => {
+            let pools = [];
             return Promise.all(results[0].map((pool) => {
-                pool.counter = 0;
-                return Promise.all(results[1].map((stat) => {
-                    if (pool.addresses.indexOf(stat._id)!==-1)
-                            pool.counter += stat.finds;
-                    }))
-                    .then(() => (pool.counter)?pool:undefined);
-            }));
+                    pool.counter = 0;
+                    return Promise.all(results[1].map((stat) => {
+                            if (pool.addresses.indexOf(stat._id) !== -1)
+                                pool.counter += stat.finds;
+                        }))
+                        .then(() => {
+                            if (pool.counter)
+                                pools.push(pool);
+                        });
+                }))
+                .then(() => pools);
         })
         .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => res.status(404).json(Message(0, error.message)));

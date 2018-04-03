@@ -108,7 +108,7 @@ router.get('/circulation', mediumCacheSuccess, BlockCtrl.FetchCirculation);
 router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
 
 router.get('/mining', shortCacheSuccess, MiningCtrl.info);
-router.get('/poolstats', mediumCacheSuccess, MiningCtrl.poolstats);
+router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
 
 /**
  * This function returns the sum of add deposited ETP.
