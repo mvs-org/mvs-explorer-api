@@ -39,7 +39,7 @@ function ListBalances(req, res) {
             balances['definitions'] = {};
             Asset.listassets()
                 .then((assets) => Promise.all(assets.map((asset) => {
-                    if (balances['tokens'][asset.symbol]) {
+                    if (typeof (balances['tokens'][asset.symbol]) != 'undefined') {
                         balances['definitions'][asset.symbol] = asset;
                     }
                 })))
