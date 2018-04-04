@@ -22,6 +22,7 @@ let apicache = require('apicache'),
     .middleware;
 //Define cache rules to only cache if result was successfull
 const onlyStatus200 = (req, res) => res.statusCode === 200,
+    hourCacheSuccess = cache('60 minutes', onlyStatus200),
     longCacheSuccess = cache('5 minutes', onlyStatus200),
     mediumCacheSuccess = cache('1 minutes', onlyStatus200),
     shortCacheSuccess = cache('20 seconds', onlyStatus200);
@@ -42,7 +43,7 @@ router.get('/tx/:hash', longCacheSuccess, TxCtrl.FetchTx);
  * @group address - Operations about addresses
  * @returns {object} 200 - Address details
  */
-router.get('/address/info/:address', mediumCacheSuccess, AddressCtrl.Info);
+router.get('/address/info/:address', shortCacheSuccess, AddressCtrl.ListBalances);
 
 /**
  * Get the transactions of an address.
@@ -96,7 +97,7 @@ router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
  * @group general - General operations
  * @returns {object} 200 - Number of coins
  */
-router.get('/circulation', mediumCacheSuccess, BlockCtrl.FetchCirculation);
+router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
 
 /**
  * This function returns the pricing information.
@@ -106,9 +107,8 @@ router.get('/circulation', mediumCacheSuccess, BlockCtrl.FetchCirculation);
  */
 router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
 
-router.get('/inouts', shortCacheSuccess, AddressCtrl.listInOuts);
 router.get('/mining', shortCacheSuccess, MiningCtrl.info);
-router.get('/part-of-cake', longCacheSuccess, MiningCtrl.partofcake);
+router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
 
 /**
  * This function returns the sum of add deposited ETP.

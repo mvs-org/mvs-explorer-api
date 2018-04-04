@@ -12,7 +12,7 @@ module.exports = {
 function find_and_count(args, selector, collection,sort,page,items_per_page) {
 		return connect()
 			.then((db) => Promise.all([_find_paged(db,args,selector,collection,sort,page,items_per_page), _count(db,args,collection)]))
-			.then((results)=> { return {result: results[0],count: results[1]} })
+			  .then((results)=> { return {result: results[0],count: results[1]}; });
 };
 
 function _find_paged(db, args, selector, collection, sort,page, items_per_page) {

@@ -8,6 +8,14 @@ var Block = require('../models/block');
 exports.FetchTx = fetch;
 exports.LockSum = locksum;
 exports.Rewards = rewards;
+exports.Search = search;
+
+function search(req,res){
+    var string = req.query.string;
+    Transaction.search(string)
+        .then((txs) => res.json(Message(1, undefined, txs)))
+        .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_TX')));
+}
 
 function rewards(req, res) {
     Block.height()
