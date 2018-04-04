@@ -1,35 +1,58 @@
 let requestify = require('requestify');
 
 //Set up database
-var mysql = require('mysql');
-var config = require('../config/mysql.js');
-var connection = mysql.createConnection(config.db);
+var mongo = require('../libraries/mongo.js');
 
 module.exports = {
-    stats: stats,
-    partofcake: partofcake
+    poolstats: poolstats,
+    pools: pools
 };
 
-function stats() {
-    return new Promise((resolve, reject) => {
-        requestify.get('http://112.74.84.61/api/stats')
-            .then(function(response) {
-                resolve(response.getBody());
-            });
-    });
+function pools(){
+    return mongo.connect()
+        .then((db)=>db.collection('pool'))
+        .then((pool)=>pool.find({},{_id:0}))
+        .then((cursor)=>cursor.toArray());
 }
 
-function partofcake(number_of_blocks, start_height) {
+function poolstats(from, to) {
     return new Promise((resolve, reject) => {
-        var sql = "SELECT miner_address.name, miner.url, miner.origin , count(*) as counter FROM (SELECT address.id, address.address FROM explorer.block JOIN tx ON tx.block_height = block.number JOIN tx_output ON tx.id = tx_output.tx_id JOIN address on tx_output.address_id=address.id WHERE block.number < ? AND block.number > ? AND tx_output.output_index=0 GROUP BY block.number) as t1 LEFT JOIN miner_address ON t1.id = miner_address.address_id JOIN miner ON miner_address.name = miner.name GROUP BY miner_address.name ORDER BY count(*) DESC;";
-
-        connection.query(sql, [number_of_blocks + start_height, start_height], (error, result, fields) => {
-            if (error) {
-                console.log(error);
-                reject(Error("ERR_PART_OF_CAKE"));
-            } else {
-                resolve(result);
-            }
-        });
+        mongo.connect()
+            .then((db) => {
+                db.collection('tx').aggregate([{
+                    $match: {
+                        "height": {
+                            "$gt": from,
+                            "$lt": to
+                        },
+                        "orphan": 0,
+                        "inputs.0.previous_output.hash": "0000000000000000000000000000000000000000000000000000000000000000",
+                        "outputs.0.locked_height_range": 0
+                    }
+                }, {
+                    $project: {
+                        firstoutput: {
+                            $arrayElemAt: ["$outputs", 0]
+                        }
+                    }
+                }, {
+                    $project: {
+                        address: "$firstoutput.address"
+                    }
+                }, {
+                    $group: {
+                        _id: "$address",
+                        'finds': {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $sort: {
+                        finds: -1
+                    }
+                }], {}, (err, result) => {
+                    resolve(result);
+                });
+            });
     });
 }

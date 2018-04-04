@@ -3,7 +3,6 @@ exports.app = {
         "port": "80"
     },
     "logging": {
-        "enable": true,
-        "path": "./logs"
+        "enable": false
     }
 };

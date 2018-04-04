@@ -17,14 +17,15 @@ exports.FetchCirculation = FetchCirculation;
  */
 function FetchBlock(req, res) {
     var number = req.params.block_no;
-    Promise.all([Block.fetch_mongo(parseInt(number)), Block.list_block_txs(parseInt(number))])
-        .then((block_data) => {
-            let block = block_data[0];
-            block.txs = undefined;
-            block.transactions = block_data[1];
-            res.json(Message(1, undefined, block));
-        })
-        .catch((error) => res.status(404).json(Message(0, error.message)));
+    Block.fetch(parseInt(number))
+        .then((block)=>{
+            return Block.list_block_txs(block.hash)
+                .then((transactions) => {
+                    block.transactions = transactions;
+                    res.json(Message(1, undefined, block));
+                })
+                .catch((error) => res.status(404).json(Message(0, error.message)));
+        });
 }
 
 /**
@@ -39,12 +40,12 @@ function FetchHeight(req, res) {
 }
 
 function FetchCirculation(req, res) {
-    Block.circulation()
-        .then((quantity) => {
+    Transaction.circulation()
+        .then((result) => {
             if (req.query.format == 'plain') {
-                res.send((quantity / 100000000).toString());
+                res.send(((result.block + result.deposit) / 100000000).toString());
             } else {
-                res.json(Message(1, undefined, quantity / 100000000));
+                res.json(Message(1, undefined, (result.block + result.deposit) / 100000000));
             }
         })
         .catch((error) => {
@@ -59,8 +60,8 @@ function FetchCirculation(req, res) {
  * @param {} res
  */
 function ListBlocks(req, res) {
-    var page = req.params.page;
-    Block.list(page)
+    var page = parseInt(req.params.page);
+    Block.list(page,10)
         .then((blocks) => res.json(Message(1, undefined, blocks)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_BLOCKS')));
 }
