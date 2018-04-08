@@ -92,6 +92,14 @@ router.get('/block/:block_no', longCacheSuccess, BlockCtrl.Fetch);
 router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
 
 /**
+ * This function returns the information about a specific asset.
+ * @route GET /asset/{asset_name}
+ * @group general - General operations
+ * @returns {object} 200 - Asset info
+ */
+router.get('/asset/:asset_symbol', longCacheSuccess, AssetCtrl.AssetInfo);
+
+/**
  * This function returns number of coins in circulation.
  * @route GET /circulation
  * @group general - General operations
