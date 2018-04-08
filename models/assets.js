@@ -36,12 +36,12 @@ function listassets(hash) {
  * @param {} hash
  * @returns {}
  */
-function search(query) {
+function search(prefix) {
     return mongo.connect()
         .then((db) => db.collection('asset'))
         .then((collection) => collection.distinct("symbol", {
             symbol: {
-                $regex: new RegExp('^'+query)
+                $regex: new RegExp('^'+prefix)
             }
         }, {
             symbol: 1

@@ -92,12 +92,12 @@ router.get('/block/:block_no', longCacheSuccess, BlockCtrl.Fetch);
 router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
 
 /**
- * This function returns the list of all the asset names that start with given query string.
- * @route GET /suggest/asset/:query
+ * This function returns the list of all the asset names that start with given prefix.
+ * @route GET /suggest/asset/:prefix
  * @group general - Asset operations
  * @returns {object} 200 - Search for assets
  */
-router.get('/suggest/asset/:query', mediumCacheSuccess, AssetCtrl.Search);
+router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
 
 /**
  * This function returns the information about a specific asset.

@@ -25,8 +25,8 @@ function listassets(req, res) {
  * @param {} res
  */
 function search(req, res) {
-    let query = req.params.query;
-    Assets.search(query)
+    let prefix = req.params.prefix;
+    Assets.search(prefix)
         .then((assets) => res.json(Message(1, undefined, assets)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_ASSETS')));
 };
