@@ -55,6 +55,15 @@ router.get('/suggest/tx/:prefix', mediumCacheSuccess, TxCtrl.Suggest);
 router.get('/address/info/:address', shortCacheSuccess, AddressCtrl.ListBalances);
 
 /**
+ * Search for addresses.
+ * @route GET /suggest/address/{prefix}
+ * @param {string} address.prefix.required - Address prefix
+ * @group address - Operations about addresses
+ * @returns {object} 200 - Address suggestion
+ */
+router.get('/suggest/address/:prefix', AddressCtrl.Suggest);
+
+/**
  * Get the transactions of an address.
  * @route GET /address/txs/{address}
  * @param {string} address.path.required - address

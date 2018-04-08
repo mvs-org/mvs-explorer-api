@@ -6,6 +6,7 @@ let Asset = require('../models/assets.js');
 let Block = require('../models/block.js');
 
 exports.ListTxs = ListTxs;
+exports.Suggest = Suggest;
 exports.ListBalances = ListBalances;
 
 /**
@@ -31,6 +32,16 @@ function ListTxs(req, res) {
         });
 }
 
+function Suggest(req, res) {
+    let prefix = req.params.prefix;
+    Address.suggest(prefix, 10)
+        .then((addresses) => res.status(200).json(Message(1, undefined, addresses)))
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_SUGGEST_ADDRESSES'));
+        });
+};
+
 function ListBalances(req, res) {
     let address = req.params.address;
     Block.height()
@@ -39,7 +50,7 @@ function ListBalances(req, res) {
             balances['definitions'] = {};
             Asset.listassets()
                 .then((assets) => Promise.all(assets.map((asset) => {
-                    if (typeof (balances['tokens'][asset.symbol]) != 'undefined') {
+                    if (typeof(balances['tokens'][asset.symbol]) != 'undefined') {
                         balances['definitions'][asset.symbol] = asset;
                     }
                 })))

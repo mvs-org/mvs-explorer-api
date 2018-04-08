@@ -10,6 +10,7 @@ module.exports = {
     listOutputs: listOutputs,
     listInputs: listInputs,
     balances: listBalances,
+    suggest: suggest,
     listAddressIds: listAddressIds
 };
 
@@ -27,6 +28,67 @@ function listTxsData(address) {
         "id": 0
     }, 'tx', {}, true);
 }
+
+
+/**
+ * Suggest address.
+ * @param {String} prefix
+ * @returns {}
+ */
+function suggest(prefix, limit) {
+    return mongo.connect()
+        .then((db) => db.collection('tx'))
+        .then((collection) => collection.mapReduce(function() {
+            let addresses = new Set();
+            if (this.inputs)
+                this.inputs.forEach((input) => {
+                    if (input && input.address.startsWith(prefix)) {
+                        addresses.add(input.address);
+                    }
+                });
+            if (this.outputs)
+                this.outputs.forEach((output) => {
+                    if (output && output.address.startsWith(prefix)) {
+                        addresses.add(output.address);
+                    }
+                });
+            addresses.forEach((address) => emit(address, 1));
+        }, function(name, quantity) {
+            return Array.sum(quantity);
+        }, {
+            out: {
+                inline: 1
+            },
+            query: {
+                $or: [{
+                    'inputs.address': {
+                        $regex: new RegExp('^' + prefix)
+                    }
+                }, {
+                    'outputs.address': {
+                        $regex: new RegExp('^' + prefix)
+                    }
+                }],
+                "orphan": 0
+            },
+            scope: {
+                prefix: prefix
+            }
+        }))
+        .then((result)=>{
+            result.sort(function(a,b){return b.value-a.value;});
+            return result.slice(0,limit);
+        })
+        .then((sorted)=>{
+            let result=new Array();
+            sorted.forEach((item)=>result.push({
+                address: item._id,
+                txs: item.value
+            }));
+            return result;
+        });
+}
+
 
 
 function listTxsDataCounted(address, page, items_per_page) {
@@ -126,8 +188,8 @@ function listBalances(address, height) {
                             if (output && output.address == address) {
                                 if (output.attachment.symbol != "ETP")
                                     emit(output.attachment.symbol, output.attachment.quantity);
-                                if(output.value){
-                                    if(output.locked_height_range+this.height<height)
+                                if (output.value) {
+                                    if (output.locked_height_range + this.height < height)
                                         emit("ETP", output.value);
                                     else
                                         emit("*FROZEN", output.value);
@@ -158,14 +220,14 @@ function listBalances(address, height) {
                         throw Error("ERROR_FETCH_BALANCES");
                     } else {
                         let results = {
-                            info:{},
-                            tokens:{}
+                            info: {},
+                            tokens: {}
                         };
                         tmp.forEach((item) => {
-                            if(item._id.startsWith('*'))
-                                results['info'][item._id.substring(1)]=item.value;
-                            else if(!results[item._id])
-                                results['tokens'][item._id]=item.value;
+                            if (item._id.startsWith('*'))
+                                results['info'][item._id.substring(1)] = item.value;
+                            else if (!results[item._id])
+                                results['tokens'][item._id] = item.value;
                         });
                         resolve(results);
                     }
