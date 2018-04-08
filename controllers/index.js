@@ -28,13 +28,22 @@ const onlyStatus200 = (req, res) => res.statusCode === 200,
     shortCacheSuccess = cache('20 seconds', onlyStatus200);
 
 /**
- * Get information on an address.
+ * Get information on a transaction.
  * @route GET /tx/{hash}
  * @param {string} hash.path.required - Transaction hash
  * @group transaction - Operations about transactions
  * @returns {object} 200 - Transaction details
  */
 router.get('/tx/:hash', longCacheSuccess, TxCtrl.FetchTx);
+
+/**
+ * Search for transaction hash.
+ * @route GET /suggest/tx/{prefix}
+ * @param {string} hash.prefix.required - Transaction hash prefix
+ * @group transaction - Operations about transactions
+ * @returns {object} 200 - Transaction details
+ */
+router.get('/suggest/tx/:prefix', mediumCacheSuccess, TxCtrl.Suggest);
 
 /**
  * Get information on an address.

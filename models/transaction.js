@@ -8,6 +8,7 @@ module.exports = {
     fetch: fetch,
     locksum: locksum,
     circulation: circulation,
+    suggest: suggest,
     rewards: rewards
 };
 
@@ -32,6 +33,25 @@ function fetch(hash) {
                 });
             });
     });
+}
+
+/**
+ * Get transaction hashes with given prefix
+ * @param {String} prefix
+ * @param {Number} limit
+ * @returns {}
+ */
+function suggest(prefix, limit) {
+    return mongo.connect()
+        .then((db) => db.collection('tx'))
+        .then((collection) => collection.distinct("hash", {
+            hash: {
+                $regex: new RegExp('^'+prefix)
+            }
+        }, {
+            hash: 1
+        }))
+        .then((result)=>result.slice(0, limit));
 }
 
 function locksum(height) {
