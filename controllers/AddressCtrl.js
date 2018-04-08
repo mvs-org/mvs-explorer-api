@@ -34,7 +34,9 @@ function ListTxs(req, res) {
 
 function Suggest(req, res) {
     let prefix = req.params.prefix;
-    Address.suggest(prefix, 10)
+    let limit = 10;
+    let includeTxCount=false;
+    Address.suggest(prefix, limit, includeTxCount)
         .then((addresses) => res.status(200).json(Message(1, undefined, addresses)))
         .catch((error) => {
             console.error(error);

@@ -35,7 +35,7 @@ function listTxsData(address) {
  * @param {String} prefix
  * @returns {}
  */
-function suggest(prefix, limit) {
+function suggest(prefix, limit, includeTxCount) {
     return mongo.connect()
         .then((db) => db.collection('tx'))
         .then((collection) => collection.mapReduce(function() {
@@ -81,10 +81,10 @@ function suggest(prefix, limit) {
         })
         .then((sorted)=>{
             let result=new Array();
-            sorted.forEach((item)=>result.push({
+            sorted.forEach((item)=>(includeTxCount)?result.push({
                 address: item._id,
                 txs: item.value
-            }));
+            }):result.push(item._id));
             return result;
         });
 }
