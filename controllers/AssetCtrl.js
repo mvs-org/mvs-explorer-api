@@ -6,6 +6,7 @@ var Assets = require('../models/assets.js'),
 
 exports.ListAllAssets = listassets;
 exports.AssetInfo = assetinfo;
+exports.Search = search;
 
 /**
  * Get the list of all the assets.
@@ -16,6 +17,18 @@ function listassets(req, res) {
     Assets.listassets()
         .then((assets) => res.json(Message(1, undefined, assets)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_ASSETS')));
+};
+
+/**
+ * Search for assets names.
+ * @param {} req
+ * @param {} res
+ */
+function search(req, res) {
+    let query = req.params.query;
+    Assets.search(query)
+        .then((assets) => res.json(Message(1, undefined, assets)))
+        .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_ASSETS')));
 };
 
 /**

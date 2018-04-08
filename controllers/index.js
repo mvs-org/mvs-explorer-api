@@ -86,15 +86,23 @@ router.get('/block/:block_no', longCacheSuccess, BlockCtrl.Fetch);
 /**
  * This function returns the list of all the assets.
  * @route GET /assets
- * @group general - General operations
+ * @group general - Asset operations
  * @returns {object} 200 - List of assets
  */
 router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
 
 /**
+ * This function returns the list of all the asset names that start with given query string.
+ * @route GET /suggest/asset/:query
+ * @group general - Asset operations
+ * @returns {object} 200 - Search for assets
+ */
+router.get('/suggest/asset/:query', mediumCacheSuccess, AssetCtrl.Search);
+
+/**
  * This function returns the information about a specific asset.
  * @route GET /asset/{asset_name}
- * @group general - General operations
+ * @group general - Asset operations
  * @returns {object} 200 - Asset info
  */
 router.get('/asset/:asset_symbol', longCacheSuccess, AssetCtrl.AssetInfo);

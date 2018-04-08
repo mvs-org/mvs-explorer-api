@@ -6,6 +6,7 @@ var mongo = require('../libraries/mongo.js');
 
 module.exports = {
     listassets: listassets,
+    search: search,
     assetinfo: assetinfo
 };
 
@@ -15,19 +16,36 @@ module.exports = {
  * @returns {}
  */
 function listassets(hash) {
-  return new Promise((resolve, reject) => {
-      mongo.connect()
-          .then((db) => {
-              db.collection('asset').find({
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('asset').find({
 
-              }, {
-                  "_id": 0,
-                  "type": 0
-              }).toArray((err, docs) => {
-                  resolve(docs);
-              });
-          });
-  });
+                }, {
+                    "_id": 0,
+                    "type": 0
+                }).toArray((err, docs) => {
+                    resolve(docs);
+                });
+            });
+    });
+}
+
+/**
+ * Search for assets.
+ * @param {} hash
+ * @returns {}
+ */
+function search(query) {
+    return mongo.connect()
+        .then((db) => db.collection('asset'))
+        .then((collection) => collection.distinct("symbol", {
+            symbol: {
+                $regex: new RegExp('^'+query)
+            }
+        }, {
+            symbol: 1
+        }));
 }
 
 /**
@@ -36,17 +54,17 @@ function listassets(hash) {
  * @returns {}
  */
 function assetinfo(symbol) {
-  return new Promise((resolve, reject) => {
-      mongo.connect()
-          .then((db) => {
-              db.collection('asset').find({
-                  "symbol": symbol
-              }, {
-                  "_id": 0,
-                  "type": 0
-              }).toArray((err, docs) => {
-                  resolve(docs);
-              });
-          });
-  });
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('asset').find({
+                    "symbol": symbol
+                }, {
+                    "_id": 0,
+                    "type": 0
+                }).toArray((err, docs) => {
+                    resolve(docs);
+                });
+            });
+    });
 }
