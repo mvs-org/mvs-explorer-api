@@ -69,6 +69,8 @@ router.get('/suggest/address/:prefix', AddressCtrl.Suggest);
  * @param {string} address.path.required - address
  * @param {string} page.query.optional - page
  * @param {string} items_per_page.query.optional - items per page
+ * @param {number} page.from.optional - From timestamp
+ * @param {number} page.to.optional - To timestamp
  * @group address - Operations about addresses
  * @returns {object} 200 - Transaction array
  */

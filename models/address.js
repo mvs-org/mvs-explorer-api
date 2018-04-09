@@ -14,18 +14,25 @@ module.exports = {
     listAddressIds: listAddressIds
 };
 
-function listTxsData(address) {
+function listTxsData(address, from, to) {
     return mongo.find({
         $or: [{
             'inputs.address': address
         }, {
             'outputs.address': address
         }],
-        "orphan": 0
+        "orphan": 0,
+        "confirmed_at": {
+            $lt: to,
+            $gt: from
+        }
     }, {
         "_id": 0,
         "rawtx": 0,
-        "id": 0
+        "id": 0,
+        "inputs": {
+            "$slice": 5
+        }
     }, 'tx', {}, true);
 }
 
@@ -75,31 +82,41 @@ function suggest(prefix, limit, includeTxCount) {
                 prefix: prefix
             }
         }))
-        .then((result)=>{
-            result.sort(function(a,b){return b.value-a.value;});
-            return result.slice(0,limit);
+        .then((result) => {
+            result.sort(function(a, b) {
+                return b.value - a.value;
+            });
+            return result.slice(0, limit);
         })
-        .then((sorted)=>{
-            let result=new Array();
-            sorted.forEach((item)=>(includeTxCount)?result.push({
+        .then((sorted) => {
+            let result = new Array();
+            sorted.forEach((item) => (includeTxCount) ? result.push({
                 address: item._id,
                 txs: item.value
-            }):result.push(item._id));
+            }) : result.push(item._id));
             return result;
         });
 }
 
 
 
-function listTxsDataCounted(address, page, items_per_page) {
-    return mongo.find_and_count({
+function listTxsDataCounted(address, page, items_per_page, from, to) {
+    let query = {
         $or: [{
             'inputs.address': address
         }, {
             'outputs.address': address
         }],
         "orphan": 0
-    }, {
+    };
+    if(from||to){
+        query.confirmed_at={};
+        if(to)
+            query.confirmed_at.$lt=to;
+        if(from)
+            query.confirmed_at.$gt=from;
+    }
+    return mongo.find_and_count(query, {
         "_id": 0,
         "rawtx": 0,
         "inputs": {
