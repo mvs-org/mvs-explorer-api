@@ -73,10 +73,11 @@ function FetchHeight(req, res) {
 function FetchCirculation(req, res) {
     Transaction.circulation()
         .then((result) => {
+            console.log(result)
             if (req.query.format == 'plain') {
-                res.send(((result.block + result.deposit) / 100000000).toString());
+                res.send(result.toString());
             } else {
-                res.json(Message(1, undefined, (result.block + result.deposit) / 100000000));
+                res.json(Message(1, undefined, result));
             }
         })
         .catch((error) => {

@@ -51,31 +51,31 @@ function fetch(hash) {
  */
 function list(page, items_per_page, filter) {
     let query = {};
-    if(!filter.allow_orphan){
-        query.orphan=0;
+    if (!filter.allow_orphan) {
+        query.orphan = 0;
     }
-    if(filter.blockhash)
-        query.block=filter.blockhash;
-    if(filter.address){
-        query.$or=[{
+    if (filter.blockhash)
+        query.block = filter.blockhash;
+    if (filter.address) {
+        query.$or = [{
             'inputs.address': filter.address
         }, {
             'outputs.address': filter.address
         }];
     }
-    if(filter.min_time||filter.max_time){
-        query.confirmed_at={};
-        if(filter.max_time)
-            query.confirmed_at.$lte=filter.max_time;
-        if(filter.min_time)
-            query.confirmed_at.$gte=filter.min_time;
+    if (filter.min_time || filter.max_time) {
+        query.confirmed_at = {};
+        if (filter.max_time)
+            query.confirmed_at.$lte = filter.max_time;
+        if (filter.min_time)
+            query.confirmed_at.$gte = filter.min_time;
     }
-    if(filter.min_height||filter.max_height){
-        query.height={};
-        if(filter.max_height)
-            query.height.$lte=filter.max_height;
-        if(filter.min_height)
-            query.height.$gte=filter.min_height;
+    if (filter.min_height || filter.max_height) {
+        query.height = {};
+        if (filter.max_height)
+            query.height.$lte = filter.max_height;
+        if (filter.min_height)
+            query.height.$gte = filter.min_height;
     }
     return mongo.find_and_count(query, {
         "_id": 0,
@@ -99,12 +99,12 @@ function suggest(prefix, limit) {
         .then((db) => db.collection('tx'))
         .then((collection) => collection.distinct("hash", {
             hash: {
-                $regex: new RegExp('^'+prefix)
+                $regex: new RegExp('^' + prefix)
             }
         }, {
             hash: 1
         }))
-        .then((result)=>result.slice(0, limit));
+        .then((result) => result.slice(0, limit));
 }
 
 function locksum(height) {
@@ -175,43 +175,9 @@ function rewards(height) {
 }
 
 function circulation() {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('tx').mapReduce(function() {
-                    if (this.inputs[0].previous_output.hash == "0000000000000000000000000000000000000000000000000000000000000000")
-                        this.outputs.forEach(function(output) {
-                            if (output.locked_height_range)
-                                emit("deposit", output.value);
-                            else
-                                emit("block", output.value);
-                        });
-                }, function(name, quantity) {
-                    return Array.sum(quantity);
-                }, {
-                    out: "circulation",
-                    query: {
-                        "inputs.previous_output.hash": "0000000000000000000000000000000000000000000000000000000000000000",
-                        "orphan": 0
-                    }
-                }, (err, tmp) => {
-                    if (err) {
-                        console.error(err);
-                        throw Error("ERROR_FETCH_CIRCULATION");
-                    } else {
-                        tmp.find().toArray((err, result) => {
-                            if (err) {
-                                console.error(err);
-                                throw Error("ERROR_FETCH_CIRCULATION");
-                            } else {
-                                resolve({
-                                    block: result[0].value,
-                                    deposit: result[1].value
-                                });
-                            }
-                        });
-                    }
-                });
-            });
-    });
+    return mongo.connect()
+        .then((db) => db.collection('address_balances').findOne({
+            _id: "coinbase"
+        }))
+        .then((result) => - result.value["ETP"] * Math.pow(10,-8));
 }
