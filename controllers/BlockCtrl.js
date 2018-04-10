@@ -5,28 +5,58 @@ var Message = require('../models/message.js');
 var Block = require('../models/block');
 var Transaction = require('../models/transaction');
 
+let Helper = require('../libraries/helper.js');
+
 exports.ListBlocks = ListBlocks;
 exports.FetchHeight = FetchHeight;
-exports.Fetch = FetchBlock;
+exports.Fetch = Fetch;
+exports.FetchHash = FetchHash;
+exports.ListTxs = ListTxs;
 exports.Suggest = Suggest;
 exports.FetchCirculation = FetchCirculation;
+
+/**
+ * Get block information for block hash.
+ * @param {} req
+ * @param {} res
+ */
+function FetchHash(req, res) {
+    var blockhash = req.params.blockhash;
+    Helper.checkError(blockhash,'ERR_BLOCK_HASH_MISSING')
+        .then(()=>Block.fetchHash(blockhash))
+        .then((block) => {
+            return res.json(Message(1, undefined, block));
+        })
+        .catch((error) => res.status(404).json(Message(0, error.message)));
+}
 
 /**
  * Get block information for block number.
  * @param {} req
  * @param {} res
  */
-function FetchBlock(req, res) {
+function Fetch(req, res) {
+    var number = parseInt(req.params.block_no);
+    Helper.checkError(!isNaN(number),'ERR_BLOCK_NUMER_INVALID')
+        .then(()=>Block.fetch(number))
+        .then((block) => {
+            return res.json(Message(1, undefined, block));
+        })
+        .catch((error) => res.status(404).json(Message(0, error.message)));
+}
+
+function ListTxs(req,res){
     var number = req.params.block_no;
-    Block.fetch(parseInt(number))
-        .then((block)=>{
-            return Block.list_block_txs(block.hash)
-                .then((transactions) => {
-                    block.transactions = transactions;
-                    res.json(Message(1, undefined, block));
-                })
-                .catch((error) => res.status(404).json(Message(0, error.message)));
-        });
+    var page = parseInt(req.query.page) || 0;
+    var filter = {
+        allow_orphan: true,
+        blockhash: req.params.blockhash,
+        max_height: parseInt(req.query.max_height) || undefined,
+        min_height: parseInt(req.query.min_height) || undefined
+    };
+    Transaction.list(page, 10, filter)
+        .then((txs) => res.json(Message(1, undefined, txs)))
+        .catch((error) => res.status(404).json(Message(0, 'ERR_BLOCK_TXS')));
 }
 
 /**

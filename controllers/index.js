@@ -99,6 +99,16 @@ router.get('/height', shortCacheSuccess, BlockCtrl.FetchHeight);
 router.get('/blocks/:page', shortCacheSuccess, BlockCtrl.ListBlocks);
 
 /**
+ * List block transactions.
+ * @route GET /block/txs/{blockhash}
+ * @group block - Operations about blocks
+ * @param {string} blockhash.path.required - Hash of block
+ * @param {number} page.query.required - Page
+ * @returns {object} 200 - Block data
+ */
+router.get('/block/txs/:blockhash', shortCacheSuccess, BlockCtrl.ListTxs);
+
+/**
  * Search for block hashes by given prefix.
  * @route GET /suggest/blocks/{prefix}
  * @group block - Operations about blocks
@@ -109,13 +119,14 @@ router.get('/blocks/:page', shortCacheSuccess, BlockCtrl.ListBlocks);
 router.get('/suggest/blocks/:prefix', shortCacheSuccess, BlockCtrl.Suggest);
 
 /**
- * Get the specified block.
- * @route GET /block/{block_no}
+ * Get the specified block by hash or number.
+ * @route GET /block/{block}
  * @group block - Operations about blocks
- * @param {number} block_no.path.required - block number
+ * @param {number} block.path.required - block number or hash
  * @returns {object} 200 - Block data
  */
-router.get('/block/:block_no', longCacheSuccess, BlockCtrl.Fetch);
+router.get('/block/:blockhash([A-Za-z0-9]{64})', longCacheSuccess, BlockCtrl.FetchHash);
+router.get('/block/:block_no([0-9]{1,10})', longCacheSuccess, BlockCtrl.Fetch);
 
 /**
  * This function returns the list of all the assets.

@@ -6,27 +6,39 @@ var mongo = require('../libraries/mongo.js');
 exports.height = height;
 exports.list = list;
 exports.fetch = fetch;
+exports.fetchHash = fetchHash;
 exports.suggest = suggest;
 exports.list_block_txs = list_block_txs;
 
 function fetch(number) {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('block').find({
-                    "number": number,
-                    "orphan": 0
-                }, {
-                    "_id": 0
-                }).toArray((err, docs) => {
-                    if (err || docs.length !== 1) {
-                        console.error(err);
-                        throw Error("ERR_FETCH_BLOCK");
-                    } else
-                        resolve(docs[0]);
-                });
-            });
-    });
+    return mongo.connect()
+        .then((db) => db.collection('block'))
+        .then((collection) => collection.findOne({
+            "number": number,
+            "orphan": 0
+        }, {
+            "_id": 0
+        }).then((block) => {
+            if (block)
+                return block;
+            else
+                throw Error("ERR_BLOCK_NOT_FOUND");
+        }));
+}
+
+function fetchHash(blockhash) {
+    return mongo.connect()
+        .then((db) => db.collection('block'))
+        .then((collection) => collection.findOne({
+            "hash": blockhash
+        }, {
+            "_id": 0
+        }).then((block) => {
+            if (block)
+                return block;
+            else
+                throw Error("ERR_BLOCK_NOT_FOUND");
+        }));
 }
 
 /**
@@ -40,13 +52,13 @@ function suggest(prefix, limit) {
         .then((db) => db.collection('block'))
         .then((collection) => collection.distinct("hash", {
             hash: {
-                $regex: new RegExp('^'+prefix)
+                $regex: new RegExp('^' + prefix)
             }
         }, {
             hash: 1,
             number: 1
         }))
-        .then((result)=>result.slice(0, limit));
+        .then((result) => result.slice(0, limit));
 }
 
 function list_block_txs(blockhash) {
@@ -83,9 +95,11 @@ function list(page, num) {
     return new Promise((resolve, reject) => {
         mongo.connect()
             .then((db) => {
-                return db.collection('block').find({orphan: 0}, {
+                return db.collection('block').find({
+                    orphan: 0
+                }, {
                     "_id": 0
-                }).skip(page*num).limit(num).toArray((err, blocks) => {
+                }).skip(page * num).limit(num).toArray((err, blocks) => {
                     if (err) {
                         console.error(err);
                         throw Error("ERR_FETCH_BLOCKS");

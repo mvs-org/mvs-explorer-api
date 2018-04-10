@@ -50,9 +50,12 @@ function fetch(hash) {
  * @returns {}
  */
 function list(page, items_per_page, filter) {
-    let query = {
-        "orphan": 0
-    };
+    let query = {};
+    if(!filter.allow_orphan){
+        query.orphan=0;
+    }
+    if(filter.blockhash)
+        query.block=filter.blockhash;
     if(filter.address){
         query.$or=[{
             'inputs.address': filter.address
