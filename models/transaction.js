@@ -9,6 +9,7 @@ module.exports = {
     locksum: locksum,
     circulation: circulation,
     suggest: suggest,
+    list: list,
     rewards: rewards
 };
 
@@ -33,6 +34,55 @@ function fetch(hash) {
                 });
             });
     });
+}
+
+/**
+ * List all transactions that meet the filter criteria.
+ * Possible filter options are:
+ * - max_time - Unix timestamp for upper time limit
+ * - min_time
+ * - min_height
+ * - max_height
+ * - address
+ * @param {number} page
+ * @param {number} items_per_page
+ * @param {any} filter
+ * @returns {}
+ */
+function list(page, items_per_page, filter) {
+    let query = {
+        "orphan": 0
+    };
+    if(filter.address){
+        query.$or=[{
+            'inputs.address': filter.address
+        }, {
+            'outputs.address': filter.address
+        }];
+    }
+    if(filter.min_time||filter.max_time){
+        query.confirmed_at={};
+        if(filter.max_time)
+            query.confirmed_at.$lte=filter.max_time;
+        if(filter.min_time)
+            query.confirmed_at.$gte=filter.min_time;
+    }
+    if(filter.min_height||filter.max_height){
+        query.height={};
+        if(filter.max_height)
+            query.height.$lte=filter.max_height;
+        if(filter.min_height)
+            query.height.$gte=filter.min_height;
+    }
+    return mongo.find_and_count(query, {
+        "_id": 0,
+        "rawtx": 0,
+        "inputs": {
+            "$slice": 5
+        }
+    }, 'tx', {
+        "height": -1
+    }, page, items_per_page);
 }
 
 /**

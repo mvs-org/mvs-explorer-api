@@ -6,7 +6,6 @@ var config = require('../config/config.js');
 
 module.exports = {
     listTxsData: listTxsData,
-    listTxsDataCounted: listTxsDataCounted,
     listOutputs: listOutputs,
     listInputs: listInputs,
     balances: listBalances,
@@ -23,8 +22,8 @@ function listTxsData(address, from, to) {
         }],
         "orphan": 0,
         "confirmed_at": {
-            $lt: to,
-            $gt: from
+            $lte: to,
+            $gte: from
         }
     }, {
         "_id": 0,
@@ -96,35 +95,6 @@ function suggest(prefix, limit, includeTxCount) {
             }) : result.push(item._id));
             return result;
         });
-}
-
-
-
-function listTxsDataCounted(address, page, items_per_page, from, to) {
-    let query = {
-        $or: [{
-            'inputs.address': address
-        }, {
-            'outputs.address': address
-        }],
-        "orphan": 0
-    };
-    if(from||to){
-        query.confirmed_at={};
-        if(to)
-            query.confirmed_at.$lt=to;
-        if(from)
-            query.confirmed_at.$gt=from;
-    }
-    return mongo.find_and_count(query, {
-        "_id": 0,
-        "rawtx": 0,
-        "inputs": {
-            "$slice": 5
-        }
-    }, 'tx', {
-        "height": -1
-    }, page, items_per_page);
 }
 
 function listOutputs(address_ids) {

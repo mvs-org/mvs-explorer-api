@@ -36,6 +36,7 @@ const onlyStatus200 = (req, res) => res.statusCode === 200,
  * @returns {object} 200 - Transaction details
  */
 router.get('/tx/:hash', longCacheSuccess, TxCtrl.FetchTx);
+router.get('/txs', TxCtrl.List);
 
 /**
  * Search for transaction hash.

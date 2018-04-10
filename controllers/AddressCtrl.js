@@ -4,6 +4,7 @@ var Message = require('../models/message.js');
 let Address = require('../models/address.js');
 let Asset = require('../models/assets.js');
 let Block = require('../models/block.js');
+let Tx = require('../models/transaction.js');
 
 exports.ListTxs = ListTxs;
 exports.Suggest = Suggest;
@@ -15,12 +16,16 @@ exports.ListBalances = ListBalances;
  * @param {} res
  */
 function ListTxs(req, res) {
-    var address = req.params.address;
     var page = parseInt(req.query.page) || 0;
-    var from = parseInt(req.query.from);
-    var to = parseInt(req.query.to);
     var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 10;
-    Address.listTxsDataCounted(address, page, items_per_page, from, to)
+    var filter={
+        address: req.params.address,
+        max_time: parseInt(req.query.max_time) || undefined,
+        min_time: parseInt(req.query.min_time) || undefined,
+        max_height: parseInt(req.query.max_height) || undefined,
+        min_height: parseInt(req.query.min_height) || undefined
+    };
+    Tx.list(page, items_per_page, filter)
         .then((txs_data) => {
             res.json(Message(1, undefined, {
                 transactions: txs_data.result,
