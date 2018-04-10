@@ -5,6 +5,7 @@ let express = require('express'),
 let AddressCtrl = require('./AddressCtrl.js'),
     BlockCtrl = require('./BlockCtrl.js'),
     PricingCtrl = require('./PricingCtrl.js'),
+    SearchCtrl = require('./SearchCtrl.js'),
     MiningCtrl = require('./MiningCtrl.js'),
     GeoCtrl = require('./GeoCtrl.js'),
     FullnodeCtrl = require('./FullnodeCtrl.js'),
@@ -39,7 +40,8 @@ router.get('/tx/:hash', longCacheSuccess, TxCtrl.FetchTx);
 /**
  * Search for transaction hash.
  * @route GET /suggest/tx/{prefix}
- * @param {string} hash.prefix.required - Transaction hash prefix
+ * @param {string} prefix.path.required - Transaction hash prefix
+ * @param {number} limit.query.required - Number of results
  * @group transaction - Operations about transactions
  * @returns {object} 200 - Transaction details
  */
@@ -57,7 +59,8 @@ router.get('/address/info/:address', shortCacheSuccess, AddressCtrl.ListBalances
 /**
  * Search for addresses.
  * @route GET /suggest/address/{prefix}
- * @param {string} address.prefix.required - Address prefix
+ * @param {string} prefix.path.required - Address prefix
+ * @param {number} limit.query.required - Number of results
  * @group address - Operations about addresses
  * @returns {object} 200 - Address suggestion
  */
@@ -69,8 +72,8 @@ router.get('/suggest/address/:prefix', AddressCtrl.Suggest);
  * @param {string} address.path.required - address
  * @param {string} page.query.optional - page
  * @param {string} items_per_page.query.optional - items per page
- * @param {number} page.from.optional - From timestamp
- * @param {number} page.to.optional - To timestamp
+ * @param {number} from.query.optional - From timestamp
+ * @param {number} from.query.optional - To timestamp
  * @group address - Operations about addresses
  * @returns {object} 200 - Transaction array
  */
@@ -95,6 +98,16 @@ router.get('/height', shortCacheSuccess, BlockCtrl.FetchHeight);
 router.get('/blocks/:page', shortCacheSuccess, BlockCtrl.ListBlocks);
 
 /**
+ * Search for block hashes by given prefix.
+ * @route GET /suggest/blocks/{prefix}
+ * @group block - Operations about blocks
+ * @param {string} prefix.path.required - Prefix
+ * @param {number} limit.query.required - Number of results
+ * @returns {object} 200 - Block data
+ */
+router.get('/suggest/blocks/:prefix', shortCacheSuccess, BlockCtrl.Suggest);
+
+/**
  * Get the specified block.
  * @route GET /block/{block_no}
  * @group block - Operations about blocks
@@ -113,7 +126,7 @@ router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
 
 /**
  * This function returns the list of all the asset names that start with given prefix.
- * @route GET /suggest/asset/:prefix
+ * @route GET /suggest/asset/{prefix}
  * @group general - Asset operations
  * @returns {object} 200 - Search for assets
  */
@@ -171,5 +184,15 @@ router.get('/rewards', shortCacheSuccess, TxCtrl.Rewards);
 router.get('/fullnode/version', mediumCacheSuccess, FullnodeCtrl.version);
 
 router.get('/locations', mediumCacheSuccess, GeoCtrl.locations);
+
+/**
+ * Search for transactions, blocks, addresses and assets by given prefix.
+ * @route GET /suggest/all/{prefix}
+ * @param {string} prefix.path.required - Target prefix
+ * @param {number} limit.query.required - Number of result for each group
+ * @group general - General operations
+ * @returns {object} 200 - Suggestion list
+ */
+router.get('/suggest/all/:prefix', SearchCtrl.Suggest);
 
 exports.routes = router;

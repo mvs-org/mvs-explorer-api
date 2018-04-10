@@ -6,6 +6,7 @@ var mongo = require('../libraries/mongo.js');
 exports.height = height;
 exports.list = list;
 exports.fetch = fetch;
+exports.suggest = suggest;
 exports.list_block_txs = list_block_txs;
 
 function fetch(number) {
@@ -28,6 +29,25 @@ function fetch(number) {
     });
 }
 
+/**
+ * Get block hashes with given prefix
+ * @param {String} prefix
+ * @param {Number} limit
+ * @returns {}
+ */
+function suggest(prefix, limit) {
+    return mongo.connect()
+        .then((db) => db.collection('block'))
+        .then((collection) => collection.distinct("hash", {
+            hash: {
+                $regex: new RegExp('^'+prefix)
+            }
+        }, {
+            hash: 1,
+            number: 1
+        }))
+        .then((result)=>result.slice(0, limit));
+}
 
 function list_block_txs(blockhash) {
     return new Promise((resolve, reject) => {

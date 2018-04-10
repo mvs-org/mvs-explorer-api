@@ -8,6 +8,7 @@ var Transaction = require('../models/transaction');
 exports.ListBlocks = ListBlocks;
 exports.FetchHeight = FetchHeight;
 exports.Fetch = FetchBlock;
+exports.Suggest = Suggest;
 exports.FetchCirculation = FetchCirculation;
 
 /**
@@ -64,4 +65,22 @@ function ListBlocks(req, res) {
     Block.list(page,10)
         .then((blocks) => res.json(Message(1, undefined, blocks)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_BLOCKS')));
+}
+
+/**
+ * Suggest transaction hashes for given prefix.
+ * @param {} req
+ * @param {} res
+ */
+function Suggest(req, res) {
+    var prefix = req.params.prefix;
+    var limit = parseInt(req.query.limit) || 10;
+    Block.suggest(prefix, limit)
+        .then((hashes) => {
+            res.json(Message(1, undefined, hashes));
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_SUGGEST_BLOCKS'));
+        });
 }

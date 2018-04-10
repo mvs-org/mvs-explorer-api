@@ -26,7 +26,8 @@ function listassets(req, res) {
  */
 function search(req, res) {
     let prefix = req.params.prefix;
-    Assets.search(prefix)
+    var limit = parseInt(req.query.limit) || 10;
+    Assets.suggest(prefix)
         .then((assets) => res.json(Message(1, undefined, assets)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_ASSETS')));
 };

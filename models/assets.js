@@ -6,7 +6,7 @@ var mongo = require('../libraries/mongo.js');
 
 module.exports = {
     listassets: listassets,
-    search: search,
+    suggest: suggest,
     assetinfo: assetinfo
 };
 
@@ -36,7 +36,7 @@ function listassets(hash) {
  * @param {} hash
  * @returns {}
  */
-function search(prefix) {
+function suggest(prefix, limit) {
     return mongo.connect()
         .then((db) => db.collection('asset'))
         .then((collection) => collection.distinct("symbol", {
@@ -45,7 +45,8 @@ function search(prefix) {
             }
         }, {
             symbol: 1
-        }));
+        }))
+        .then((result)=>result.slice(0, limit));
 }
 
 /**
