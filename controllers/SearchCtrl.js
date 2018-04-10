@@ -24,7 +24,12 @@ function suggest(req, res) {
             Asset.suggest(prefix, limit)
         ])
         .then((suggestions) => {
-            res.json(Message(1, undefined, suggestions));
+            res.json(Message(1, undefined, {
+                tx: suggestions[0],
+                address: suggestions[1],
+                block: suggestions[2],
+                asset: suggestions[3]
+            }));
         })
         .catch((error) => {
             console.error(error);
