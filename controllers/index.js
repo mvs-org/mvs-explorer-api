@@ -18,15 +18,15 @@ let apicache = require('apicache'),
     redis_config = require('../config/redis.js'),
     cache = apicache
     .options({
-        redisClient: (redis_config.enabled) ? redis.createClient(redis_config.config) : undefined
+        redisClient: (redis_config.enabled) ? redis.createClient(redis_config.config) : undefined,
+        statusCodes: {include: [200]}
     })
     .middleware;
 //Define cache rules to only cache if result was successfull
-const onlyStatus200 = (req, res) => res.statusCode === 200,
-    hourCacheSuccess = cache('60 minutes', onlyStatus200),
-    longCacheSuccess = cache('5 minutes', onlyStatus200),
-    mediumCacheSuccess = cache('1 minutes', onlyStatus200),
-    shortCacheSuccess = cache('20 seconds', onlyStatus200);
+const hourCacheSuccess = cache('60 minutes'),
+    longCacheSuccess = cache('5 minutes'),
+    mediumCacheSuccess = cache('1 minutes'),
+    shortCacheSuccess = cache('20 seconds');
 
 /**
  * Get information on a transaction.
