@@ -216,6 +216,6 @@ router.get('/locations', mediumCacheSuccess, GeoCtrl.locations);
  */
 router.get('/suggest/all/:prefix', SearchCtrl.Suggest);
 
-router.get('/stats/blockstats', hourCacheSuccess, BlockCtrl.ListBlockstats);
+router.get('/stats/block', hourCacheSuccess, BlockCtrl.ListBlockstats);
 
 exports.routes = router;
