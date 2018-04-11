@@ -60,7 +60,14 @@ function suggest(prefix, limit) {
             number: 1,
             time_stamp: 1
         }).toArray())
-        .then((result) => result.slice(0, limit));
+        .then((result) => result.slice(0, limit))
+        .then((result)=>result.map((tx)=>{
+            return {
+                h: tx.hash,
+                n: tx.number,
+                t: tx.time_stamp
+            };
+        }));
 }
 
 function list_block_txs(blockhash) {

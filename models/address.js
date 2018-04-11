@@ -90,8 +90,8 @@ function suggest(prefix, limit, includeTxCount) {
         .then((sorted) => {
             let result = new Array();
             sorted.forEach((item) => (includeTxCount) ? result.push({
-                address: item._id,
-                txs: item.value
+                a: item._id,
+                n: item.value
             }) : result.push(item._id));
             return result;
         });

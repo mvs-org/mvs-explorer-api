@@ -105,9 +105,15 @@ function suggest(prefix, limit) {
         }, {
             hash: 1,
             _id:0,
-            timestamp:1
+            height:1
         }).toArray())
-        .then((result) => result.slice(0, limit));
+        .then((result) => result.slice(0, limit))
+        .then((result)=>result.map((tx)=>{
+            return {
+                h: tx.hash,
+                b: tx.height
+            };
+        }));
 }
 
 function locksum(height) {
