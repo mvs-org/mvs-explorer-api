@@ -50,14 +50,16 @@ function fetchHash(blockhash) {
 function suggest(prefix, limit) {
     return mongo.connect()
         .then((db) => db.collection('block'))
-        .then((collection) => collection.distinct("hash", {
+        .then((collection) => collection.find({
             hash: {
                 $regex: new RegExp('^' + prefix)
             }
         }, {
+            _id: 0,
             hash: 1,
-            number: 1
-        }))
+            number: 1,
+            time_stamp: 1
+        }).toArray())
         .then((result) => result.slice(0, limit));
 }
 

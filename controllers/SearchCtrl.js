@@ -19,7 +19,7 @@ function suggest(req, res) {
     var limit = parseInt(req.query.limit) || 10;
     Promise.all([
             Transaction.suggest(prefix, limit),
-            Address.suggest(prefix, limit),
+            Address.suggest(prefix, limit, true),
             Block.suggest(prefix, limit),
             Asset.suggest(prefix, limit)
         ])

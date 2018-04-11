@@ -97,13 +97,16 @@ function list(page, items_per_page, filter) {
 function suggest(prefix, limit) {
     return mongo.connect()
         .then((db) => db.collection('tx'))
-        .then((collection) => collection.distinct("hash", {
+        .then((collection) => collection.find({
             hash: {
                 $regex: new RegExp('^' + prefix)
-            }
+            },
+            orphan: 0
         }, {
-            hash: 1
-        }))
+            hash: 1,
+            _id:0,
+            timestamp:1
+        }).toArray())
         .then((result) => result.slice(0, limit));
 }
 
