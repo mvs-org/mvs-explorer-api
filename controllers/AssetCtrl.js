@@ -28,7 +28,7 @@ function listassets(req, res) {
 function listStakes(req, res) {
     let symbol = req.params.symbol;
     let limit = parseInt(req.query.limit) || 20;
-    Assets.stakelist(symbol.replace('.','_'), limit)
+    Assets.stakelist(symbol.replace(/\./g,'_'), limit)
         .then((list) => res.json(Message(1, undefined, list)))
         .catch((error) => {
             console.error(error);

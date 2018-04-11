@@ -20,9 +20,9 @@ function suggest(req, res) {
     var limit = parseInt(req.query.limit) || 10;
 
     Promise.all([
-        Helper.checkError(limit <= 20, 'ERR_LIMIT_RANGE'),
-        Helper.checkError(prefix.length>=3, 'ERR_PREFIX_LENGTH')
-    ])
+            Helper.checkError(limit <= 20, 'ERR_LIMIT_RANGE'),
+            Helper.checkError(prefix.length >= 3, 'ERR_PREFIX_LENGTH')
+        ])
         .then(() => Promise.all([
             Transaction.suggest(prefix, limit),
             Address.suggest(prefix, limit, true),
@@ -38,7 +38,13 @@ function suggest(req, res) {
             }));
         })
         .catch((error) => {
-            console.error(error);
+            switch (error.message) {
+                case 'ERR_LIMIT_RANGE':
+                case 'ERR_PREFIX_LENGTH':
+                    break;
+                default:
+                    console.error(error);
+            }
             res.status(404).json(Message(0, error.message));
         });
 }
