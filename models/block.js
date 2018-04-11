@@ -53,7 +53,8 @@ function suggest(prefix, limit) {
         .then((collection) => collection.find({
             hash: {
                 $regex: new RegExp('^' + prefix)
-            }
+            },
+            orphan: 0
         }, {
             _id: 0,
             hash: 1,
