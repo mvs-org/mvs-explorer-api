@@ -39,7 +39,7 @@ function search(req, res) {
  */
 function assetinfo(req, res) {
     var symbol = req.params.asset_symbol;
-    Assets.assetinfo(symbol)
+    Assets.assetinfo(symbol.toUpperCase())
         .then((assets) => res.json(Message(1, undefined, assets)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_ASSETS')));
 };
