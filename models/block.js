@@ -5,6 +5,7 @@ var mongo = require('../libraries/mongo.js');
 
 exports.height = height;
 exports.list = list;
+exports.blockstats = blockstats;
 exports.fetch = fetch;
 exports.fetchHash = fetchHash;
 exports.suggest = suggest;
@@ -38,6 +39,15 @@ function fetchHash(blockhash) {
                 return block;
             else
                 throw Error("ERR_BLOCK_NOT_FOUND");
+        }));
+}
+
+function blockstats(interval){
+    return mongo.connect()
+        .then((db)=>db.collection('block'))
+        .then((c)=>c.find({orphan: 0, number: {$mod: [interval,0]}}).toArray())
+        .then((blocks)=>blocks.map((block, index)=>{
+            return [block.number,(index==0)?0:parseFloat(((blocks[index-1].time_stamp+block.time_stamp)/(interval*100000)).toFixed(3)),parseInt(block.bits)];
         }));
 }
 

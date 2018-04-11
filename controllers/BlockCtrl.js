@@ -10,6 +10,7 @@ let Helper = require('../libraries/helper.js');
 exports.ListBlocks = ListBlocks;
 exports.FetchHeight = FetchHeight;
 exports.Fetch = Fetch;
+exports.ListBlockstats = ListBlockstats;
 exports.FetchHash = FetchHash;
 exports.ListTxs = ListTxs;
 exports.Suggest = Suggest;
@@ -57,6 +58,12 @@ function ListTxs(req,res){
     Transaction.list(page, 10, filter)
         .then((txs) => res.json(Message(1, undefined, txs)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_BLOCK_TXS')));
+}
+
+function ListBlockstats(req,res){
+    Block.blockstats(1000)
+        .then((times) => res.json(Message(1, undefined, times)))
+        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_BLOCKTIMES')));
 }
 
 /**
