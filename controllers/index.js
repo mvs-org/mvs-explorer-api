@@ -216,6 +216,16 @@ router.get('/locations', mediumCacheSuccess, GeoCtrl.locations);
  */
 router.get('/suggest/all/:prefix', SearchCtrl.Suggest);
 
+/**
+ * List block statistics.
+ *
+ * Result array contains points in form [height, avg blocktime, difficulty]
+ *
+ * @route GET /stats/block
+ * @param {number} interval.query.optional - Interval
+ * @group general - General operations
+ * @returns {object} 200 - Suggestion list
+ */
 router.get('/stats/block', hourCacheSuccess, BlockCtrl.ListBlockstats);
 
 exports.routes = router;
