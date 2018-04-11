@@ -39,14 +39,16 @@ function listassets(hash) {
 function suggest(prefix, limit) {
     return mongo.connect()
         .then((db) => db.collection('asset'))
-        .then((collection) => collection.distinct("symbol", {
+        .then((collection) => collection.find({
             symbol: {
-                $regex: new RegExp('^'+prefix)
+                $regex: new RegExp(prefix)
             }
         }, {
-            symbol: 1
-        }))
-        .then((result)=>result.slice(0, limit));
+            symbol: 1,
+            _id:0
+        }).toArray())
+        .then((result)=>result.slice(0, limit))
+        .then((result)=>result.map((item)=>item.symbol));
 }
 
 /**
