@@ -137,6 +137,15 @@ router.get('/block/:block_no([0-9]{1,10})', longCacheSuccess, BlockCtrl.Fetch);
 router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
 
 /**
+ * This function returns the list of all the assets stakeholders ordered by stake.
+ * @route GET /stakes/{symbol}
+ * @param {string} symbol.path.required - Asset symbol
+ * @group general - Asset operations
+ * @returns {object} 200 - List of assets
+ */
+router.get('/stakes/:symbol', longCacheSuccess, AssetCtrl.ListStakes);
+
+/**
  * This function returns the list of all the asset names that start with given prefix.
  * @route GET /suggest/asset/{prefix}
  * @group general - Asset operations

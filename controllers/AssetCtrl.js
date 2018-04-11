@@ -5,6 +5,7 @@ var Assets = require('../models/assets.js'),
     Message = require('../models/message.js');
 
 exports.ListAllAssets = listassets;
+exports.ListStakes = listStakes;
 exports.AssetInfo = assetinfo;
 exports.Search = search;
 
@@ -17,6 +18,22 @@ function listassets(req, res) {
     Assets.listassets()
         .then((assets) => res.json(Message(1, undefined, assets)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_ASSETS')));
+};
+
+/**
+ * Get the list of all the assets stakeholders ordered by stake.
+ * @param {} req
+ * @param {} res
+ */
+function listStakes(req, res) {
+    let symbol = req.params.symbol;
+    let limit = parseInt(req.query.limit) || 20;
+    Assets.stakelist(symbol.replace('.','_'), limit)
+        .then((list) => res.json(Message(1, undefined, list)))
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_LIST_ASSETS_STAKES'));
+        });
 };
 
 /**

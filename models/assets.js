@@ -7,6 +7,7 @@ var mongo = require('../libraries/mongo.js');
 module.exports = {
     listassets: listassets,
     suggest: suggest,
+    stakelist: stakelist,
     assetinfo: assetinfo
 };
 
@@ -19,9 +20,7 @@ function listassets(hash) {
     return new Promise((resolve, reject) => {
         mongo.connect()
             .then((db) => {
-                db.collection('asset').find({
-
-                }, {
+                db.collection('asset').find({}, {
                     "_id": 0,
                     "type": 0
                 }).toArray((err, docs) => {
@@ -45,10 +44,30 @@ function suggest(prefix, limit) {
             }
         }, {
             symbol: 1,
-            _id:0
+            _id: 0
         }).toArray())
-        .then((result)=>result.slice(0, limit))
-        .then((result)=>result.map((item)=>item.symbol));
+        .then((result) => result.slice(0, limit))
+        .then((result) => result.map((item) => item.symbol));
+}
+
+function stakelist(symbol, limit) {
+    return mongo.connect()
+        .then((db) => db.collection('address_balances'))
+        .then((c) => c.find({
+            ["value." + symbol]: {
+                $gt: 0
+            }
+        }, {
+            ["value." + symbol]: 1
+        }).sort({
+            ["value." + symbol]: -1
+        }).limit(limit).toArray())
+        .then((result)=>result.map((stake)=>{
+            return {
+                a: stake._id,
+                q: stake.value[symbol]
+            };
+        }));
 }
 
 /**
