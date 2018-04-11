@@ -40,7 +40,7 @@ function suggest(prefix, limit) {
         .then((db) => db.collection('asset'))
         .then((collection) => collection.find({
             symbol: {
-                $regex: new RegExp(prefix)
+                $regex: new RegExp(prefix.toUpperCase())
             }
         }, {
             symbol: 1,
