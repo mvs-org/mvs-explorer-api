@@ -81,7 +81,6 @@ function FetchHeight(req, res) {
 function FetchCirculation(req, res) {
     Transaction.circulation()
         .then((result) => {
-            console.log(result)
             if (req.query.format == 'plain') {
                 res.send(result.toString());
             } else {
