@@ -19,21 +19,14 @@ module.exports = {
  * @returns {}
  */
 function fetch(hash) {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('tx').find({
-                    "hash": hash
-                }).toArray((err, docs) => {
-                    if (err || docs.length !== 1) {
-                        console.error(err);
-                        throw Error("ERROR_FETCH_TX");
-                    } else {
-                        resolve(docs[0]);
-                    }
-                });
-            });
-    });
+    return mongo.connect()
+        .then((db) => db.collection('tx').findOne({
+            "hash": hash
+        }).then((tx) => {
+            if (tx == null)
+                throw Error('ERR_TX_NOT_FOUND');
+            return tx;
+        }));
 }
 
 /**
@@ -104,11 +97,11 @@ function suggest(prefix, limit) {
             orphan: 0
         }, {
             hash: 1,
-            _id:0,
-            height:1
+            _id: 0,
+            height: 1
         }).toArray())
         .then((result) => result.slice(0, limit))
-        .then((result)=>result.map((tx)=>{
+        .then((result) => result.map((tx) => {
             return {
                 h: tx.hash,
                 b: tx.height
@@ -188,5 +181,5 @@ function circulation() {
         .then((db) => db.collection('address_balances').findOne({
             _id: "coinbase"
         }))
-        .then((result) => - result.value["ETP"] * Math.pow(10,-8));
+        .then((result) => -result.value["ETP"] * Math.pow(10, -8));
 }
