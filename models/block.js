@@ -112,22 +112,11 @@ function list_block_txs(blockhash) {
  * @returns {} 
  */
 function list(page, num) {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                return db.collection('block').find({
-                    orphan: 0
-                }, {
-                    "_id": 0
-                }).skip(page * num).limit(num).toArray((err, blocks) => {
-                    if (err) {
-                        console.error(err);
-                        throw Error("ERR_FETCH_BLOCKS");
-                    } else
-                        resolve(blocks);
-                });
-            });
-    });
+    return mongo.find_and_count({orphan:0}, {
+        "_id": 0,
+    }, 'block', {
+        "number": -1
+    }, page, num);
 }
 
 /**

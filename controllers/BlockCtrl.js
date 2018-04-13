@@ -100,7 +100,7 @@ function FetchCirculation(req, res) {
  */
 function ListBlocks(req, res) {
     var page = parseInt(req.params.page);
-    Block.list(page,10)
+    Block.list(page,50)
         .then((blocks) => res.json(Message(1, undefined, blocks)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_BLOCKS')));
 }
