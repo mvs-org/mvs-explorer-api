@@ -131,7 +131,7 @@ router.get('/block/:block_no([0-9]{1,10})', longCacheSuccess, BlockCtrl.Fetch);
 /**
  * This function returns the list of all the assets.
  * @route GET /assets
- * @group general - Asset operations
+ * @group asset - Asset operations
  * @returns {object} 200 - List of assets
  */
 router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
@@ -140,7 +140,7 @@ router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
  * This function returns the list of all the assets stakeholders ordered by stake.
  * @route GET /stakes/{symbol}
  * @param {string} symbol.path.required - Asset symbol
- * @group general - Asset operations
+ * @group asset - Asset operations
  * @returns {object} 200 - List of assets
  */
 router.get('/stakes/:symbol', longCacheSuccess, AssetCtrl.ListStakes);
@@ -148,7 +148,7 @@ router.get('/stakes/:symbol', longCacheSuccess, AssetCtrl.ListStakes);
 /**
  * This function returns the list of all the asset names that start with given prefix.
  * @route GET /suggest/asset/{prefix}
- * @group general - Asset operations
+ * @group asset - Asset operations
  * @returns {object} 200 - Search for assets
  */
 router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
@@ -156,7 +156,7 @@ router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
 /**
  * This function returns the information about a specific asset.
  * @route GET /asset/{asset_name}
- * @group general - Asset operations
+ * @group asset - Asset operations
  * @returns {object} 200 - Asset info
  */
 router.get('/asset/:asset_symbol', longCacheSuccess, AssetCtrl.AssetInfo);
@@ -177,7 +177,20 @@ router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
  */
 router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
 
+/**
+ * This function returns the mining information.
+ * @route GET /mining
+ * @group general - General operations
+ * @returns {object} 200 - Mining info
+ */
 router.get('/mining', shortCacheSuccess, MiningCtrl.info);
+
+/**
+ * This function returns the mining pool statistics.
+ * @route GET /poolstats
+ * @group general - General operations
+ * @returns {object} 200 - Mining pool statistics
+ */
 router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
 
 /**
@@ -186,7 +199,7 @@ router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
  * @group general - General operations
  * @returns {object} 200 - Deposit sum
  */
-router.get('/depositsum', mediumCacheSuccess, TxCtrl.LockSum);
+router.get('/depositsum', longCacheSuccess, TxCtrl.LockSum);
 
 /**
  * This function returns the total amount of rewards from ETP deposits.
@@ -194,7 +207,7 @@ router.get('/depositsum', mediumCacheSuccess, TxCtrl.LockSum);
  * @group general - General operations
  * @returns {object} 200 - Deposit rewards
  */
-router.get('/rewards', mediumCacheSuccess, TxCtrl.Rewards);
+router.get('/rewards', longCacheSuccess, TxCtrl.Rewards);
 
 /**
  * This function returns version information on the fullnode wallet.
@@ -223,7 +236,7 @@ router.get('/suggest/all/:prefix', SearchCtrl.Suggest);
  *
  * @route GET /stats/block
  * @param {number} interval.query.optional - Interval
- * @group general - General operations
+ * @group general - general operations
  * @returns {object} 200 - Suggestion list
  */
 router.get('/stats/block', hourCacheSuccess, BlockCtrl.ListBlockstats);
