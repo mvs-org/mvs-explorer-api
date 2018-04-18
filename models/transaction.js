@@ -110,70 +110,75 @@ function suggest(prefix, limit) {
 }
 
 function locksum(height) {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('tx').mapReduce(function() {
-                    this.outputs.forEach((output) => {
-                        if (this.height + output.lock_height > height && this.height < height) emit(output.asset.symbol, parseInt(output.quantity));
-                    });
-                }, function(name, quantity) {
-                    return Array.sum(quantity);
-                }, {
-                    out: "locksum",
-                    query: {
-                        "outputs.lock_height": {
-                            $gt: 0
-                        }
+    return mongo.connect()
+        .then((db) =>
+            db.collection('tx').mapReduce(function() {
+                this.outputs.forEach((output) => {
+                    if (this.height + output.locked_height_range > height) {
+                        if (output.attachment.type == "asset-transfer")
+                            emit(output.attachment.symbol, output.attachment.quantity);
+                        else
+                            emit('ETP', output.value);
                     }
                 });
-                db.collection('locksum').find().toArray((err, docs) => {
-                    if (err || docs.length !== 1) {
-                        console.error(err);
-                        throw Error("ERROR_FETCH_LOCKSUM");
-                    } else
-                        resolve(docs[0].value);
-                });
-            });
-    });
+            }, function(name, quantity) {
+                return Array.sum(quantity);
+            }, {
+                out: "locksum",
+                query: {
+                    "outputs.locked_height_range": {
+                        $gt: 0
+                    },
+                    orphan: 0
+                },
+                scope: {
+                    height: height
+                }
+            })
+            .then(() =>
+                db.collection('locksum').find().toArray())
+            .then((docs) => {
+                return docs[0].value;
+            }));
 }
 
 function rewards(height) {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('tx').mapReduce(function() {
-                    this.outputs.forEach((output) => {
-                        if (this.inputs.length == 1 && this.inputs[0].address == "") {
-                            if (this.height + output.lock_height > height && this.height < height) emit('locked', parseInt(output.quantity));
-                            else if (output.lock_height > 0) emit('unlocked', parseInt(output.quantity));
-                        }
+    return mongo.connect()
+        .then((db) =>
+            db.collection('tx').mapReduce(function() {
+                this.outputs.forEach((output) => {
+                    if (this.inputs.length == 1 && this.inputs[0].address == "") {
+                        if (this.height + output.locked_height_range > height) emit('locked', parseInt(output.value));
+                        else emit('unlocked', parseInt(output.value));
+                    }
+                });
+            }, function(name, quantity) {
+                return Array.sum(quantity);
+            }, {
+                out: "rewards",
+                query: {
+                    "outputs.locked_height_range": {
+                        $gt: 0
+                    },
+                    orphan: 0
+                },
+                scope: {
+                    height: height
+                }
+            })
+            .then(() => db.collection('rewards').find().toArray())
+            .then((docs) => {
+                let res = {};
+                if (docs.length)
+                    docs.forEach((e) => {
+                        res[e._id] = e.value;
                     });
-                }, function(name, quantity) {
-                    return Array.sum(quantity);
-                }, {
-                    out: "rewards",
-                    query: {
-                        "outputs.lock_height": {
-                            $gt: 0
-                        }
-                    }
-                });
-                db.collection('rewards').find().toArray((err, docs) => {
-                    if (err) {
-                        console.error(err);
-                        throw Error("ERROR_FETCH_REWARDS");
-                    } else {
-                        let res = {};
-                        if (docs.length)
-                            docs.forEach((e) => {
-                                res[e._id] = e.value;
-                            });
-                        resolve(res);
-                    }
-                });
-            });
-    });
+                return res;
+            }))
+        .catch((err) => {
+            console.error(err);
+            throw Error("ERROR_FETCH_REWARDS");
+        });
 }
 
 function circulation() {

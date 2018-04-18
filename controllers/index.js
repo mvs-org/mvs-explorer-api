@@ -194,7 +194,7 @@ router.get('/depositsum', mediumCacheSuccess, TxCtrl.LockSum);
  * @group general - General operations
  * @returns {object} 200 - Deposit rewards
  */
-router.get('/rewards', shortCacheSuccess, TxCtrl.Rewards);
+router.get('/rewards', mediumCacheSuccess, TxCtrl.Rewards);
 
 /**
  * This function returns version information on the fullnode wallet.
