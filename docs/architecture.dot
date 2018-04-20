@@ -4,6 +4,9 @@ digraph app_architecture	{
 	redis[shape=box]
 	mvsd[shape=box]
 	nginx[shape=invhouse]
+	ws_router[label="WebSocket router"]
+	ws_block_provider[label="Tx data\n provider"]
+	ws_tx_provider[label="Block data\n provider"]
 	
 	nginx -> api
 	nginx -> ws_router
