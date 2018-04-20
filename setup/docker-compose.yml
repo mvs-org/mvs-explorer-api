@@ -38,9 +38,9 @@ services:
         ports:
             - "80:80"
     ws:
-        build: https://github.com/mvs-org/mvs-explorer-websocket.git:router
+        build: https://github.com/mvs-org/mvs-explorer-websocket.git#master:router
     ws_provider_transactions:
-        build: https://github.com/mvs-org/mvs-explorer-websocket.git:provider
+        build: https://github.com/mvs-org/mvs-explorer-websocket.git#master:provider
         restart: always
         environment:
             - PROVIDE_TASK=TRANSACTIONS
@@ -54,7 +54,7 @@ services:
             - ws
             - mongodb
     explorer_ws_provider_blocks:
-        build: https://github.com/mvs-org/mvs-explorer-websocket.git:provider
+        build: https://github.com/mvs-org/mvs-explorer-websocket.git#master:provider
         restart: always
         environment:
             - PROVIDE_TASK=BLOCKS
