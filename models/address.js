@@ -6,46 +6,95 @@ var config = require('../config/config.js');
 
 module.exports = {
     listTxsData: listTxsData,
-    listTxsDataCounted: listTxsDataCounted,
     listOutputs: listOutputs,
     listInputs: listInputs,
     balances: listBalances,
+    suggest: suggest,
     listAddressIds: listAddressIds
 };
 
-function listTxsData(address) {
+function listTxsData(address, from, to) {
     return mongo.find({
         $or: [{
             'inputs.address': address
         }, {
             'outputs.address': address
         }],
-        "orphan": 0
+        "orphan": 0,
+        "confirmed_at": {
+            $lte: to,
+            $gte: from
+        }
     }, {
         "_id": 0,
         "rawtx": 0,
-        "id": 0
+        "id": 0,
+        "inputs": {
+            "$slice": 5
+        }
     }, 'tx', {}, true);
 }
 
 
-function listTxsDataCounted(address, page, items_per_page) {
-    return mongo.find_and_count({
-        $or: [{
-            'inputs.address': address
+/**
+ * Suggest address.
+ * @param {String} prefix
+ * @returns {}
+ */
+function suggest(prefix, limit, includeTxCount) {
+    return mongo.connect()
+        .then((db) => db.collection('tx'))
+        .then((collection) => collection.mapReduce(function() {
+            let addresses = new Set();
+            if (this.inputs)
+                this.inputs.forEach((input) => {
+                    if (input && input.address.startsWith(prefix)) {
+                        addresses.add(input.address);
+                    }
+                });
+            if (this.outputs)
+                this.outputs.forEach((output) => {
+                    if (output && output.address.startsWith(prefix)) {
+                        addresses.add(output.address);
+                    }
+                });
+            addresses.forEach((address) => emit(address, 1));
+        }, function(name, quantity) {
+            return Array.sum(quantity);
         }, {
-            'outputs.address': address
-        }],
-        "orphan": 0
-    }, {
-        "_id": 0,
-        "rawtx": 0,
-        "inputs": {
-            "$slice": 5
-        }
-    }, 'tx', {
-        "height": -1
-    }, page, items_per_page);
+            out: {
+                inline: 1
+            },
+            query: {
+                $or: [{
+                    'inputs.address': {
+                        $regex: new RegExp('^' + prefix)
+                    }
+                }, {
+                    'outputs.address': {
+                        $regex: new RegExp('^' + prefix)
+                    }
+                }],
+                "orphan": 0
+            },
+            scope: {
+                prefix: prefix
+            }
+        }))
+        .then((result) => {
+            result.sort(function(a, b) {
+                return b.value - a.value;
+            });
+            return result.slice(0, limit);
+        })
+        .then((sorted) => {
+            let result = new Array();
+            sorted.forEach((item) => (includeTxCount) ? result.push({
+                a: item._id,
+                n: item.value
+            }) : result.push(item._id));
+            return result;
+        });
 }
 
 function listOutputs(address_ids) {
@@ -126,8 +175,8 @@ function listBalances(address, height) {
                             if (output && output.address == address) {
                                 if (output.attachment.symbol != "ETP")
                                     emit(output.attachment.symbol, output.attachment.quantity);
-                                if(output.value){
-                                    if(output.locked_height_range+this.height<height)
+                                if (output.value) {
+                                    if (output.locked_height_range + this.height < height)
                                         emit("ETP", output.value);
                                     else
                                         emit("*FROZEN", output.value);
@@ -158,14 +207,14 @@ function listBalances(address, height) {
                         throw Error("ERROR_FETCH_BALANCES");
                     } else {
                         let results = {
-                            info:{},
-                            tokens:{}
+                            info: {},
+                            tokens: {}
                         };
                         tmp.forEach((item) => {
-                            if(item._id.startsWith('*'))
-                                results['info'][item._id.substring(1)]=item.value;
-                            else if(!results[item._id])
-                                results['tokens'][item._id]=item.value;
+                            if (item._id.startsWith('*'))
+                                results['info'][item._id.substring(1)] = item.value;
+                            else if (!results[item._id])
+                                results['tokens'][item._id] = item.value;
                         });
                         resolve(results);
                     }

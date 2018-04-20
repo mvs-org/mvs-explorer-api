@@ -4,8 +4,10 @@ var Message = require('../models/message.js');
 let Address = require('../models/address.js');
 let Asset = require('../models/assets.js');
 let Block = require('../models/block.js');
+let Tx = require('../models/transaction.js');
 
 exports.ListTxs = ListTxs;
+exports.Suggest = Suggest;
 exports.ListBalances = ListBalances;
 
 /**
@@ -14,10 +16,16 @@ exports.ListBalances = ListBalances;
  * @param {} res
  */
 function ListTxs(req, res) {
-    var address = req.params.address;
-    var page = parseInt(req.query.page) | 0;
+    var page = parseInt(req.query.page) || 0;
     var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 10;
-    Address.listTxsDataCounted(address, page, items_per_page)
+    var filter={
+        address: req.params.address,
+        max_time: parseInt(req.query.max_time) || undefined,
+        min_time: parseInt(req.query.min_time) || undefined,
+        max_height: parseInt(req.query.max_height) || undefined,
+        min_height: parseInt(req.query.min_height) || undefined
+    };
+    Tx.list(page, items_per_page, filter)
         .then((txs_data) => {
             res.json(Message(1, undefined, {
                 transactions: txs_data.result,
@@ -31,6 +39,18 @@ function ListTxs(req, res) {
         });
 }
 
+function Suggest(req, res) {
+    let prefix = req.params.prefix;
+    let limit = 10;
+    let includeTxCount=false;
+    Address.suggest(prefix, limit, includeTxCount)
+        .then((addresses) => res.status(200).json(Message(1, undefined, addresses)))
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_SUGGEST_ADDRESSES'));
+        });
+};
+
 function ListBalances(req, res) {
     let address = req.params.address;
     Block.height()
@@ -39,7 +59,7 @@ function ListBalances(req, res) {
             balances['definitions'] = {};
             Asset.listassets()
                 .then((assets) => Promise.all(assets.map((asset) => {
-                    if (typeof (balances['tokens'][asset.symbol]) != 'undefined') {
+                    if (typeof(balances['tokens'][asset.symbol]) != 'undefined') {
                         balances['definitions'][asset.symbol] = asset;
                     }
                 })))
