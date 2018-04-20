@@ -15,6 +15,8 @@ docker-compose up --build
 
 It will setup all backend and frontend services. Then it syncs the blockchain to a mongodb.
 
+<img align="center" src="docs/architecture.png" alt="Metavserse Blockchain Explorer Architecture">
+
 # Configuration
 
 ## API configuration
@@ -52,4 +54,11 @@ It will setup all backend and frontend services. Then it syncs the blockchain to
 | MVSD_HOST            | MVSD host             | 127.0.0.1 |
 | MVSD_PORT            | MVSD port             |      8820 |
 
+# Help
+
+Please feel free to create issues for questions or feature request. If you want to setup a production environment you should not just use the example docker configuration. At least try to setup a dedicated mongodb (cluster).
+
+# Contribution
+
+We <3 our contributors! Many thanks to all supporters. We want to encourage everyone to become part of the development and support us with translations, testing and patches. If you want to help us please don't hesitate to contact us and become a part of the community.
 
