@@ -1,0 +1,29 @@
+digraph app_architecture	{
+
+	mongodb[shape=box]
+	redis[shape=box]
+	mvsd[shape=box]
+	nginx[shape=invhouse]
+	
+	nginx -> api
+	nginx -> ws_router
+	nginx -> frontend
+	
+	ws_router -> ws_block_provider [dir=back]
+	ws_router -> ws_tx_provider [dir=back]
+	sync -> mvsd [ 
+		style=dashed 
+		label="       "
+	];
+	
+	api->sync[style = invis]
+	sync->redis[style = invis]
+	
+	api -> mongodb;
+	api -> redis;
+	
+	sync -> mongodb [
+		style=dashed
+		label="       "
+	];
+}
