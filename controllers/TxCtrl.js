@@ -8,13 +8,38 @@ var Block = require('../models/block');
 exports.FetchTx = fetch;
 exports.LockSum = locksum;
 exports.Rewards = rewards;
-exports.Search = search;
+exports.List = List;
+exports.Suggest = suggest;
 
-function search(req,res){
-    var string = req.query.string;
-    Transaction.search(string)
+function List(req,res){
+    var page = parseInt(req.query.page) || 0;
+    var filter = {
+        max_time: parseInt(req.query.max_time) || undefined,
+        min_time: parseInt(req.query.min_time) || undefined,
+        max_height: parseInt(req.query.max_height) || undefined,
+        min_height: parseInt(req.query.min_height) || undefined
+    };
+    Transaction.list(page, 10, filter)
         .then((txs) => res.json(Message(1, undefined, txs)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_TX')));
+}
+
+/**
+ * Suggest transaction hashes for given prefix.
+ * @param {} req
+ * @param {} res
+ */
+function suggest(req, res) {
+    var prefix = req.params.prefix;
+    var limit = parseInt(req.query.limit) || 10;
+    Transaction.suggest(prefix, limit)
+        .then((hashes) => {
+            res.json(Message(1, undefined, hashes));
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_SUGGEST_TRANSACTIONS'));
+        });
 }
 
 function rewards(req, res) {

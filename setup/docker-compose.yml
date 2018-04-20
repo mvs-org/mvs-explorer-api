@@ -1,0 +1,69 @@
+version: '2'
+
+services:
+    redis:
+        image: redis
+    mongodb:
+        image: library/mongo
+    mvsd:
+        image: cangr/mvsd
+    sync:
+        build: https://github.com/canguruhh/metaverse-mongo-sync-node.git
+        environment:
+            - MONGO_HOST=mongodb
+            - MVSD_HOST=mvsd
+        links:
+            - mongodb
+            - mvsd
+        depends_on:
+            - mvsd
+            - mongodb
+    api:
+        build: ../../mvs-explorer-api
+        environment:
+            - MONGO_HOST=mongodb
+            - REDIS_HOST=redis
+        links:
+            - ws
+            - redis
+            - mongodb
+    frontend:
+        build: https://github.com/mvs-org/mvs-explorer-www.git
+    proxy:
+        build: ./proxy
+        links:
+            - api
+            - ws
+            - frontend
+        ports:
+            - "80:80"
+    ws:
+        build: https://github.com/mvs-org/mvs-explorer-websocket.git:router
+    ws_provider_transactions:
+        build: https://github.com/mvs-org/mvs-explorer-websocket.git:provider
+        restart: always
+        environment:
+            - PROVIDE_TASK=TRANSACTIONS
+            - TRANSACTION_TIMER=2000
+            - ROUTER_URL=ws://ws:8080/ws
+            - REALM=realm1
+            - WS_USER=transactionprovider
+            - WS_SECRET=TXSECRET
+            - MONGO_HOST=mongodb
+        links:
+            - ws
+            - mongodb
+    explorer_ws_provider_blocks:
+        build: https://github.com/mvs-org/mvs-explorer-websocket.git:provider
+        restart: always
+        environment:
+            - PROVIDE_TASK=BLOCKS
+            - BLOCK_TIMER=2000
+            - ROUTER_URL=ws://ws:8080/ws
+            - REALM=realm1
+            - WS_USER=blockprovider
+            - WS_SECRET=BLOCKSECRET
+            - MONGO_HOST=mongodb
+        links:
+            - ws
+            - mongodb
