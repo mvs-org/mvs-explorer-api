@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://www.mvs.org/">
-    <img src="images/logo.png" alt="Metaverse">
+  <a href="https://explorer.mvs.org/">
+    <img src="https://explorer.mvs.org/img/metaverselogo.png" alt="Metaverse">
   </a>
   <h1 align="center">Metaverse Blockchain Explorer</h1>
 </p>
