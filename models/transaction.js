@@ -72,7 +72,7 @@ function listall(filter) {
             "outputs": 1,
             height:1,
             "_id": 0
-        }).sort({height:1}))
+        }).sort({height:-1}))
         .then((result)=>result.toArray());
 }
 /**
