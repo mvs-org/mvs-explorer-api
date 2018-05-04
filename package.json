@@ -23,6 +23,8 @@
     "mysql": "^2.13.0",
     "path": "^0.12.7",
     "redis": "^2.7.1",
+    "request": "^2.85.0",
+    "request-promise": "^4.2.2",
     "requestify": "^0.2.5",
     "winston": "^2.4.1",
     "winston-elasticsearch": "^0.5.8"

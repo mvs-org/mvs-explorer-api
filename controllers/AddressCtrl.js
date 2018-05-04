@@ -40,7 +40,6 @@ function ListAddressesTxs(req, res) {
             return tx;
             })))
         .then((txs_data) => {
-            console.log(txs_data)
             res.json(Message(1, undefined, {
                 transactions: txs_data
             }));
