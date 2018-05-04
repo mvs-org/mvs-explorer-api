@@ -18,7 +18,7 @@ exports.ListBalances = ListBalances;
  */
 function ListAddressesTxs(req, res) {
     var filter = {
-        addresses: req.query.addresses,
+        addresses: (Array.isArray(req.query.addresses))?req.query.addresses:[req.query.addresses],
         max_time: parseInt(req.query.max_time) || undefined,
         min_time: parseInt(req.query.min_time) || undefined,
         max_height: parseInt(req.query.max_height) || undefined,

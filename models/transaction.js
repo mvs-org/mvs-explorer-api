@@ -44,13 +44,6 @@ function listall(filter) {
             'outputs.address': { $in: filter.addresses }
         }];
     }
-    if (filter.addresses) {
-        query.$or = [{
-            'inputs.address': { $in: filter.addresses }
-        }, {
-            'outputs.address': { $in: filter.addresses }
-        }];
-    }
     if (filter.min_time || filter.max_time) {
         query.confirmed_at = {};
         if (filter.max_time)
@@ -72,7 +65,7 @@ function listall(filter) {
             "outputs": 1,
             height:1,
             "_id": 0
-        }).sort({height:1}))
+        }).sort({height:-1}))
         .then((result)=>result.toArray());
 }
 /**
