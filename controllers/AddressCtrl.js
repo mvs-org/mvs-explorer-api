@@ -7,8 +7,49 @@ let Block = require('../models/block.js');
 let Tx = require('../models/transaction.js');
 
 exports.ListTxs = ListTxs;
+exports.ListAddressesTxs = ListAddressesTxs;
 exports.Suggest = Suggest;
 exports.ListBalances = ListBalances;
+
+/**
+ * List transactions for given addresses.
+ * @param {} req
+ * @param {} res
+ */
+function ListAddressesTxs(req, res) {
+    var filter = {
+        addresses: req.query.addresses,
+        max_time: parseInt(req.query.max_time) || undefined,
+        min_time: parseInt(req.query.min_time) || undefined,
+        max_height: parseInt(req.query.max_height) || undefined,
+        min_height: parseInt(req.query.min_height) || undefined
+    };
+    Tx.listall(filter)
+        .then((txs) => Promise.all(txs.map((tx) => {
+            let inp=[],outp=[];
+                tx.inputs.forEach((input)=>{
+                    if(filter.addresses.indexOf(input.address)!==-1)
+                        inp.push(input);
+                });
+                tx.outputs.forEach((output)=>{
+                    if(filter.addresses.indexOf(output.address)!==-1)
+                        outp.push(output);
+                });
+            tx.inputs=inp;
+            tx.outputs=outp;
+            return tx;
+            })))
+        .then((txs_data) => {
+            console.log(txs_data)
+            res.json(Message(1, undefined, {
+                transactions: txs_data
+            }));
+        })
+        .catch((error) => {
+            console.error('Error listing txs for address : ' + error.message);
+            res.status(404).json(Message(0, 'ERR_LIST_TRANSACTIONS'));
+        });
+}
 
 /**
  * List transactions for given address.
@@ -18,7 +59,7 @@ exports.ListBalances = ListBalances;
 function ListTxs(req, res) {
     var page = parseInt(req.query.page) || 0;
     var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 10;
-    var filter={
+    var filter = {
         address: req.params.address,
         max_time: parseInt(req.query.max_time) || undefined,
         min_time: parseInt(req.query.min_time) || undefined,
@@ -42,7 +83,7 @@ function ListTxs(req, res) {
 function Suggest(req, res) {
     let prefix = req.params.prefix;
     let limit = 10;
-    let includeTxCount=false;
+    let includeTxCount = false;
     Address.suggest(prefix, limit, includeTxCount)
         .then((addresses) => res.status(200).json(Message(1, undefined, addresses)))
         .catch((error) => {
