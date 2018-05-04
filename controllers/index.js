@@ -73,13 +73,30 @@ router.get('/suggest/address/:prefix', AddressCtrl.Suggest);
  * @param {string} address.path.required - address
  * @param {string} page.query.optional - page
  * @param {string} items_per_page.query.optional - items per page
- * @param {number} from.query.optional - From timestamp
- * @param {number} from.query.optional - To timestamp
+ * @param {number} min_time.query.optional - From timestamp
+ * @param {number} max_time.query.optional - To timestamp
+ * @param {number} min_height.query.optional - From height
+ * @param {number} max_height.query.optional - To height
  * @group address - Operations about addresses
  * @returns {object} 200 - Transaction array
  */
 router.get('/address/txs/:address', mediumCacheSuccess, AddressCtrl.ListTxs);
 router.get('/address/:address', mediumCacheSuccess, AddressCtrl.ListTxs);
+
+/**
+ * Get the transactions of multiple addresses.
+ * @route GET /addresses/txs
+ * @param {string} page.query.optional - page
+ * @param {string} items_per_page.query.optional - items per page
+ * @param {number} min_time.query.optional - From timestamp
+ * @param {number} max_time.query.optional - To timestamp
+ * @param {number} min_height.query.optional - From height
+ * @param {number} max_height.query.optional - To height
+ * @param {Array<string>} addresses.query.required - Addresses
+ * @group address - Operations about addresses
+ * @returns {object} 200 - Transaction array
+ */
+router.get('/addresses/txs', shortCacheSuccess, AddressCtrl.ListAddressesTxs);
 
 /**
  * Get latest block number.
