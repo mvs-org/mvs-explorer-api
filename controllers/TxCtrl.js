@@ -10,6 +10,7 @@ exports.LockSum = locksum;
 exports.Rewards = rewards;
 exports.List = List;
 exports.Suggest = suggest;
+exports.Broadcast = broadcast;
 
 function List(req,res){
     var page = parseInt(req.query.page) || 0;
@@ -66,4 +67,19 @@ function fetch(req, res) {
     Transaction.fetch(hash)
         .then((tx) => res.json(Message(1, undefined, tx)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_TX')));
+};
+
+/**
+ * Broadcast given raw transaction.
+ * @param {} req
+ * @param {} res
+ */
+function broadcast(req, res) {
+    var tx = req.body.tx;
+    Transaction.broadcast(tx)
+        .then((tx) => res.json(Message(1, undefined, tx)))
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_BROADCAST_TX'));
+        });
 };

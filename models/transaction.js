@@ -3,6 +3,9 @@
 //Set up database
 var mongo = require('../libraries/mongo.js');
 
+const mvsd_config = require('../config/mvsd.js'),
+    rp = require('request-promise');
+
 
 module.exports = {
     fetch: fetch,
@@ -11,7 +14,8 @@ module.exports = {
     suggest: suggest,
     list: list,
     listall: listall,
-    rewards: rewards
+    rewards: rewards,
+    broadcast: broadcast
 };
 
 /**
@@ -39,9 +43,13 @@ function listall(filter) {
         query.block = filter.blockhash;
     if (filter.addresses) {
         query.$or = [{
-            'inputs.address': { $in: filter.addresses }
+            'inputs.address': {
+                $in: filter.addresses
+            }
         }, {
-            'outputs.address': { $in: filter.addresses }
+            'outputs.address': {
+                $in: filter.addresses
+            }
         }];
     }
     if (filter.min_time || filter.max_time) {
@@ -59,14 +67,16 @@ function listall(filter) {
             query.height.$gte = filter.min_height;
     }
     return mongo.connect()
-        .then((db) => db.collection('tx').find(query,{
+        .then((db) => db.collection('tx').find(query, {
             "hash": 1,
             "inputs": 1,
             "outputs": 1,
-            height:1,
+            height: 1,
             "_id": 0
-        }).sort({height:-1}))
-        .then((result)=>result.toArray());
+        }).sort({
+            height: -1
+        }))
+        .then((result) => result.toArray());
 }
 /**
  * List all transactions that meet the filter criteria.
@@ -90,9 +100,13 @@ function list(page, items_per_page, filter) {
         query.block = filter.blockhash;
     if (filter.addresses) {
         query.$or = [{
-            'inputs.address': { $in: filter.addresses }
+            'inputs.address': {
+                $in: filter.addresses
+            }
         }, {
-            'outputs.address': { $in: filter.addresses }
+            'outputs.address': {
+                $in: filter.addresses
+            }
         }];
     }
     if (filter.address) {
@@ -233,4 +247,18 @@ function circulation() {
             _id: "coinbase"
         }))
         .then((result) => -result.value["ETP"] * Math.pow(10, -8));
+}
+
+function broadcast(tx) {
+    let options = {
+        uri: `${mvsd_config.protocol}://${mvsd_config.host}:${mvsd_config.port}/rpc`,
+        method: 'POST',
+        json: true //parse result
+    };
+
+    options.body = {
+        method: 'sendrawtx',
+        params: [tx]
+    };
+    return rp(options);
 }

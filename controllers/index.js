@@ -39,6 +39,15 @@ router.get('/tx/:hash', longCacheSuccess, TxCtrl.FetchTx);
 router.get('/txs', TxCtrl.List);
 
 /**
+ * Broadcast a hex encoded transaction.
+ * @route POST /tx
+ * @param {string} tx.param.required - Transaction hash
+ * @group transaction - Operations about transactions
+ * @returns {object} 200 - Transaction
+ */
+router.post('/tx', TxCtrl.Broadcast);
+
+/**
  * Search for transaction hash.
  * @route GET /suggest/tx/{prefix}
  * @param {string} prefix.path.required - Transaction hash prefix
