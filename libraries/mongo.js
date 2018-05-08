@@ -62,7 +62,7 @@ function connect() {
 		if (_db !== undefined)
 			resolve(_db);
 		else {
-			let url = 'mongodb://' + mongo_config.host + ':' + mongo_config.port + '/' + mongo_config.database;
+			  let url = (mongo_config.url)?mongo_config.url:'mongodb://' + mongo_config.host + ':' + mongo_config.port + '/' + mongo_config.database;
 			MongoClient.connect(url, function(err, db) {
 				if (err) throw Error(err.message);
 				else {
