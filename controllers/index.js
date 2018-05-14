@@ -10,7 +10,8 @@ let AddressCtrl = require('./AddressCtrl.js'),
     GeoCtrl = require('./GeoCtrl.js'),
     FullnodeCtrl = require('./FullnodeCtrl.js'),
     TxCtrl = require('./TxCtrl.js'),
-    AssetCtrl = require('./AssetCtrl.js');
+    AssetCtrl = require('./AssetCtrl.js'),
+    AvatarCtrl = require('./AvatarCtrl.js');
 
 //Caching
 let apicache = require('apicache'),
@@ -186,6 +187,30 @@ router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
  * @returns {object} 200 - Asset info
  */
 router.get('/asset/:asset_symbol', longCacheSuccess, AssetCtrl.AssetInfo);
+
+/**
+ * This function returns the list of all the avatars.
+ * @route GET /avatars
+ * @group avatar - Avatar operations
+ * @returns {object} 200 - List of assets
+ */
+router.get('/avatars', longCacheSuccess, AvatarCtrl.ListAllAvatars);
+
+/**
+ * This function returns the list of all the avatars names that start with given prefix.
+ * @route GET /suggest/avatar/{prefix}
+ * @group avatar - Avatar operations
+ * @returns {object} 200 - Search for assets
+ */
+router.get('/suggest/avatar/:prefix', mediumCacheSuccess, AvatarCtrl.Search);
+
+/**
+ * This function returns the information about a specific avatar.
+ * @route GET /avatar/{avatar_name}
+ * @group avatar - Avatar operations
+ * @returns {object} 200 - Asset info
+ */
+router.get('/avatar/:avatar_symbol', longCacheSuccess, AvatarCtrl.AvatarInfo);
 
 /**
  * This function returns number of coins in circulation.
