@@ -11,7 +11,8 @@ let AddressCtrl = require('./AddressCtrl.js'),
     FullnodeCtrl = require('./FullnodeCtrl.js'),
     TxCtrl = require('./TxCtrl.js'),
     AssetCtrl = require('./AssetCtrl.js'),
-    AvatarCtrl = require('./AvatarCtrl.js');
+    AvatarCtrl = require('./AvatarCtrl.js'),
+    CertCtrl = require('./CertCtrl.js');
 
 //Caching
 let apicache = require('apicache'),
@@ -192,7 +193,7 @@ router.get('/asset/:asset_symbol', longCacheSuccess, AssetCtrl.AssetInfo);
  * This function returns the list of all the avatars.
  * @route GET /avatars
  * @group avatar - Avatar operations
- * @returns {object} 200 - List of assets
+ * @returns {object} 200 - List of avatars
  */
 router.get('/avatars', longCacheSuccess, AvatarCtrl.ListAllAvatars);
 
@@ -200,7 +201,7 @@ router.get('/avatars', longCacheSuccess, AvatarCtrl.ListAllAvatars);
  * This function returns the list of all the avatars names that start with given prefix.
  * @route GET /suggest/avatar/{prefix}
  * @group avatar - Avatar operations
- * @returns {object} 200 - Search for assets
+ * @returns {object} 200 - Search for avatars
  */
 router.get('/suggest/avatar/:prefix', mediumCacheSuccess, AvatarCtrl.Search);
 
@@ -211,6 +212,22 @@ router.get('/suggest/avatar/:prefix', mediumCacheSuccess, AvatarCtrl.Search);
  * @returns {object} 200 - Asset info
  */
 router.get('/avatar/:avatar_symbol', longCacheSuccess, AvatarCtrl.AvatarInfo);
+
+/**
+ * This function returns the list of all the certs.
+ * @route GET /certs
+ * @group cert - Cert operations
+ * @returns {object} 200 - List of certs
+ */
+router.get('/certs', longCacheSuccess, CertCtrl.ListAllCerts);
+
+/**
+ * This function returns the certs about a specific avatar.
+ * @route GET /certs/{avatar_name}
+ * @group certs - Cert operations
+ * @returns {object} 200 - Cert info
+ */
+router.get('/certs/:owner', longCacheSuccess, CertCtrl.CertsInfo);
 
 /**
  * This function returns number of coins in circulation.

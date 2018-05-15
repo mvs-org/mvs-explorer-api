@@ -9,7 +9,7 @@ exports.Search = search;
 exports.AvatarInfo = avatarinfo;
 
 /**
- * Get the list of all the assets.
+ * Get the list of all the avatars.
  * @param {} req
  * @param {} res
  */
@@ -33,7 +33,7 @@ function search(req, res) {
 };
 
 /**
- * Get the information of an asset.
+ * Get the information of an avatar.
  * @param {} req
  * @param {} res
  */
