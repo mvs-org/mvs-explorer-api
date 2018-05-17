@@ -44,7 +44,7 @@ function listStakes(req, res) {
 function search(req, res) {
     let prefix = req.params.prefix;
     var limit = parseInt(req.query.limit) || 10;
-    Assets.suggest(prefix)
+    Assets.suggest(prefix, limit)
         .then((assets) => res.json(Message(1, undefined, assets)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_ASSETS')));
 };
