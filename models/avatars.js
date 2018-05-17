@@ -16,17 +16,10 @@ module.exports = {
  * @returns {}
  */
 function listavatars() {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('avatar').find({}, {
-                    "_id": 0,
-                    "type": 0
-                }).toArray((err, docs) => {
-                    resolve(docs);
-                });
-            });
-    });
+    return mongo.connect()
+        .then((db) => db.collection('avatar'))
+        .then((avatars) => avatars.find({},{_id:0, type: 0}))
+        .then((result)=>result.toArray());
 }
 
 /**
@@ -37,14 +30,10 @@ function listavatars() {
 function suggest(prefix, limit) {
     return mongo.connect()
         .then((db) => db.collection('avatar'))
-        .then((collection) => collection.find({
-            symbol: {
-                $regex: new RegExp('^' + prefix)
-            }
-        }, {
-            symbol: 1,
-            _id: 0
-        }).toArray())
+        .then((avatars) => avatars.find({symbol: {
+            $regex: new RegExp('^' + prefix)
+        }},{_id:0, symbol: 1}))
+        .then((result)=>result.toArray())
         .then((result) => result.slice(0, limit))
         .then((result) => result.map((item) => item.symbol));
 }
@@ -55,17 +44,12 @@ function suggest(prefix, limit) {
  * @returns {}
  */
 function avatarinfo(symbol) {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('avatar').find({
-                    "symbol": symbol
-                }, {
-                    "_id": 0,
-                    "type": 0
-                }).toArray((err, docs) => {
-                    resolve(docs);
-                });
-            });
-    });
+    return mongo.connect()
+        .then((db) => db.collection('avatar'))
+        .then((avatars) => avatars.findOne({
+            "symbol": symbol
+        }, {
+            "_id": 0,
+            "type": 0
+        }));
 }
