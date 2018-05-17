@@ -27,7 +27,7 @@ function listavatars(req, res) {
 function search(req, res) {
     let prefix = req.params.prefix;
     var limit = parseInt(req.query.limit) || 10;
-    Avatars.suggest(prefix)
+    Avatars.suggest(prefix, limit)
         .then((avatars) => res.json(Message(1, undefined, avatars)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_AVATARS')));
 };
