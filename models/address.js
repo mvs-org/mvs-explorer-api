@@ -48,13 +48,13 @@ function suggest(prefix, limit, includeTxCount) {
             let addresses = new Set();
             if (this.inputs)
                 this.inputs.forEach((input) => {
-                    if (input && input.address.startsWith(prefix)) {
+                    if (input && input.address && input.address.startsWith(prefix)) {
                         addresses.add(input.address);
                     }
                 });
             if (this.outputs)
                 this.outputs.forEach((output) => {
-                    if (output && output.address.startsWith(prefix)) {
+                    if (output && output.address && output.address.startsWith(prefix)) {
                         addresses.add(output.address);
                     }
                 });
