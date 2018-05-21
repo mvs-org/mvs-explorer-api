@@ -217,6 +217,7 @@ router.get('/avatar/:avatar_symbol', longCacheSuccess, AvatarCtrl.AvatarInfo);
  * This function returns the list of all the certs.
  * @route GET /certs
  * @group cert - Cert operations
+ * @param {show_invalidated} limit.query.optional - Include invalidated certificates (default: false)
  * @returns {object} 200 - List of certs
  */
 router.get('/certs', longCacheSuccess, CertCtrl.ListAllCerts);
@@ -225,6 +226,7 @@ router.get('/certs', longCacheSuccess, CertCtrl.ListAllCerts);
  * This function returns the certs about a specific avatar.
  * @route GET /certs/{avatar_name}
  * @group certs - Cert operations
+ * @param {show_invalidated} limit.query.optional - Include invalidated certificates (default: false)
  * @returns {object} 200 - Cert info
  */
 router.get('/certs/:owner', longCacheSuccess, CertCtrl.CertsInfo);

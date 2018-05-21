@@ -13,7 +13,8 @@ exports.CertsInfo = certsinfo;
  * @param {} res
  */
 function listcerts(req, res) {
-    Certs.listcerts()
+    var show_invalidated = req.query.show_invalidated>0;
+    Certs.listcerts(show_invalidated)
         .then((certs) => res.json(Message(1, undefined, certs)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_CERTS')));
 };
@@ -25,7 +26,8 @@ function listcerts(req, res) {
  */
 function certsinfo(req, res) {
     var owner = req.params.owner;
-    Certs.certsinfo(owner)
+    var show_invalidated = req.query.show_invalidated>0;
+    Certs.certsinfo(owner, show_invalidated)
         .then((certs) => res.json(Message(1, undefined, certs)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_CERTS')));
 };
