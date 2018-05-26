@@ -14,7 +14,9 @@ exports.AvatarInfo = avatarinfo;
  * @param {} res
  */
 function listavatars(req, res) {
-    Avatars.listavatars()
+    var page = parseInt(req.query.page) || 0;
+    var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 100;
+    Avatars.listavatars(page, items_per_page)
         .then((avatars) => res.json(Message(1, undefined, avatars)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_AVATARS')));
 };

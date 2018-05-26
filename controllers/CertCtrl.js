@@ -14,7 +14,9 @@ exports.CertsInfo = certsinfo;
  */
 function listcerts(req, res) {
     var show_invalidated = req.query.show_invalidated>0;
-    Certs.listcerts(show_invalidated)
+    var page = parseInt(req.query.page) || 0;
+    var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 50;
+    Certs.listcerts(show_invalidated, page, items_per_page)
         .then((certs) => res.json(Message(1, undefined, certs)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_CERTS')));
 };

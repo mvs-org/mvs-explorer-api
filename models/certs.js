@@ -14,7 +14,7 @@ module.exports = {
  * @param {boolean} show_invalidated include invalidated certs
  * @returns {Array<Output>}
  */
-function listcerts(show_invalidated) {
+function listcerts(show_invalidated, page, items_per_page) {
     let query = {
         'attachment.type': "asset-cert",
         orphaned_at: 0
@@ -22,13 +22,7 @@ function listcerts(show_invalidated) {
     if(!show_invalidated){
         query.spent_tx = 0;
     }
-    return mongo.connect()
-        .then((db) => db.collection('output'))
-        .then(collection => collection.find(query, {
-            "_id": 0,
-            "type": 0
-        }))
-        .then(cursor => cursor.toArray());
+    return mongo.find_and_count(query, {_id:0, type: 0}, 'output', {"height": -1}, page, items_per_page);
 }
 
 /**

@@ -121,10 +121,11 @@ router.get('/height', shortCacheSuccess, BlockCtrl.FetchHeight);
  * List blocks.
  * @route GET /blocks/{page}
  * @group block - Operations about blocks
- * @param {number} page.path.required - page
+ * @param {string} page.query.optional - page (default: 0)
+ * @param {string} items_per_page.query.optional - items per page (default: 50)
  * @returns {object} 200 - Block data
  */
-router.get('/blocks/:page', shortCacheSuccess, BlockCtrl.ListBlocks);
+router.get('/blocks', shortCacheSuccess, BlockCtrl.ListBlocks);
 
 /**
  * List block transactions.
@@ -193,6 +194,8 @@ router.get('/asset/:asset_symbol', longCacheSuccess, AssetCtrl.AssetInfo);
  * This function returns the list of all the avatars.
  * @route GET /avatars
  * @group avatar - Avatar operations
+ * @param {string} page.query.optional - page (default: 0)
+ * @param {string} items_per_page.query.optional - items per page (default: 50)
  * @returns {object} 200 - List of avatars
  */
 router.get('/avatars', longCacheSuccess, AvatarCtrl.ListAllAvatars);
@@ -217,7 +220,9 @@ router.get('/avatar/:avatar_symbol', longCacheSuccess, AvatarCtrl.AvatarInfo);
  * This function returns the list of all the certs.
  * @route GET /certs
  * @group cert - Cert operations
- * @param {show_invalidated} limit.query.optional - Include invalidated certificates (default: false)
+ * @param {number} show_invalidated.query.optional - Include invalidated certificates (default: false)
+ * @param {string} page.query.optional - page (default: 0)
+ * @param {string} items_per_page.query.optional - items per page (default: 50)
  * @returns {object} 200 - List of certs
  */
 router.get('/certs', longCacheSuccess, CertCtrl.ListAllCerts);
@@ -226,7 +231,7 @@ router.get('/certs', longCacheSuccess, CertCtrl.ListAllCerts);
  * This function returns the certs about a specific avatar.
  * @route GET /certs/{avatar_name}
  * @group certs - Cert operations
- * @param {show_invalidated} limit.query.optional - Include invalidated certificates (default: false)
+ * @param {number} show_invalidated.query.optional - Include invalidated certificates (default: false)
  * @returns {object} 200 - Cert info
  */
 router.get('/certs/:owner', longCacheSuccess, CertCtrl.CertsInfo);
