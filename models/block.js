@@ -24,7 +24,11 @@ function fetch(number) {
                 return block;
             else
                 throw Error("ERR_BLOCK_NOT_FOUND");
-        }));
+        }))
+        .catch(error=>{
+            console.log(error);
+            throw Error(error.message);
+        });
 }
 
 function fetchHash(blockhash) {

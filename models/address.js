@@ -165,19 +165,29 @@ function listBalances(address, height) {
                     if (this.inputs)
                         this.inputs.forEach((input) => {
                             if (input.address == address) {
-                                if (input.attachment.symbol != "ETP")
-                                    emit(input.attachment.symbol, -input.attachment.quantity);
-                                emit("ETP", -input.value);
+                                switch (input.attachment.type) {
+                                    case 'asset-transfer':
+                                    case 'asset-issue':
+                                        if (input.attachment.symbol != "ETP")
+                                            emit(input.attachment.symbol, -input.attachment.quantity);
+                                        break;
+                                }
+                                emit("*ETP", -input.value);
                             }
                         });
                     if (this.outputs)
                         this.outputs.forEach((output) => {
                             if (output && output.address == address) {
-                                if (output.attachment.symbol != "ETP")
-                                    emit(output.attachment.symbol, output.attachment.quantity);
+                                switch (output.attachment.type) {
+                                    case 'asset-transfer':
+                                    case 'asset-issue':
+                                        if (output.attachment.symbol != "ETP")
+                                            emit(output.attachment.symbol, output.attachment.quantity);
+                                        break;
+                                }
                                 if (output.value) {
                                     if (output.locked_height_range + this.height < height)
-                                        emit("ETP", output.value);
+                                        emit("*ETP", output.value);
                                     else
                                         emit("*FROZEN", output.value);
                                 }

@@ -75,7 +75,10 @@ function ListBlockstats(req,res){
 function FetchHeight(req, res) {
     Block.height()
         .then((height) => res.json(Message(1, undefined, height)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT')));
+        .catch((error) => {
+		console.error(error);
+		res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT'));
+	});
 }
 
 function FetchCirculation(req, res) {
