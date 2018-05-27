@@ -15,11 +15,8 @@ module.exports = {
  * @param {} hash
  * @returns {}
  */
-function listavatars() {
-    return mongo.connect()
-        .then((db) => db.collection('avatar'))
-        .then((avatars) => avatars.find({},{_id:0, type: 0}))
-        .then((result)=>result.toArray());
+function listavatars(page, items_per_page) {
+    return mongo.find_and_count({}, {_id:0, type: 0}, 'avatar', {"height": -1}, page, items_per_page);
 }
 
 /**
