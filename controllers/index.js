@@ -12,7 +12,8 @@ let AddressCtrl = require('./AddressCtrl.js'),
     TxCtrl = require('./TxCtrl.js'),
     AssetCtrl = require('./AssetCtrl.js'),
     AvatarCtrl = require('./AvatarCtrl.js'),
-    CertCtrl = require('./CertCtrl.js');
+    CertCtrl = require('./CertCtrl.js'),
+    MitCtrl = require('./MitCtrl.js');
 
 //Caching
 let apicache = require('apicache'),
@@ -235,6 +236,26 @@ router.get('/certs', longCacheSuccess, CertCtrl.ListAllCerts);
  * @returns {object} 200 - Cert info
  */
 router.get('/certs/:owner', longCacheSuccess, CertCtrl.CertsInfo);
+
+/**
+ * This function returns the list of all the mits.
+ * @route GET /mits
+ * @group mit - Mit operations
+ * @param {number} show_invalidated.query.optional - Include invalidated mits (default: false)
+ * @param {string} page.query.optional - page (default: 0)
+ * @param {string} items_per_page.query.optional - items per page (default: 50)
+ * @returns {object} 200 - List of mits
+ */
+router.get('/mits', mediumCacheSuccess, MitCtrl.ListAllMits);
+
+/**
+ * This function returns a specific mit.
+ * @route GET /mits/{symbol}
+ * @group mits - Mit operations
+ * @param {number} show_invalidated.query.optional - Include invalidated mits (default: false)
+ * @returns {object} 200 - Mit info
+ */
+router.get('/mits/:symbol', mediumCacheSuccess, MitCtrl.MitsInfo);
 
 /**
  * This function returns number of coins in circulation.
