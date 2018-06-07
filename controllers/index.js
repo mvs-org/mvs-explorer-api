@@ -258,6 +258,15 @@ router.get('/mits', mediumCacheSuccess, MitCtrl.ListAllMits);
 router.get('/mits/:symbol', mediumCacheSuccess, MitCtrl.MitsInfo);
 
 /**
+ * Search for MIT symbol.
+ * @route GET /suggest/mit/{symbol}
+ * @group mits - Mit operations
+ * @param {string} symbol.path.required - MIT symbol
+ * @returns {object} 200 - MIT details
+ */
+router.get('/suggest/mit/:symbol', mediumCacheSuccess, MitCtrl.Search);
+
+/**
  * This function returns number of coins in circulation.
  * @route GET /circulation
  * @group general - General operations

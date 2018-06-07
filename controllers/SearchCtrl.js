@@ -7,6 +7,7 @@ var Block = require('../models/block');
 var Address = require('../models/address');
 var Asset = require('../models/assets');
 var Avatar = require('../models/avatars');
+var Mit = require('../models/mits');
 var Helper = require('../libraries/helper.js');
 
 exports.Suggest = suggest;
@@ -29,7 +30,8 @@ function suggest(req, res) {
             Address.suggest(prefix, limit, true),
             Block.suggest(prefix, limit),
             Asset.suggest(prefix, limit),
-            Avatar.suggest(prefix, limit)
+            Avatar.suggest(prefix, limit),
+            Mit.suggest(prefix, limit)
         ]))
         .then((suggestions) => {
             res.json(Message(1, undefined, {
@@ -37,7 +39,8 @@ function suggest(req, res) {
                 address: suggestions[1],
                 block: suggestions[2],
                 asset: suggestions[3],
-                avatar: suggestions[4]
+                avatar: suggestions[4],
+                mit: suggestions[5]
             }));
         })
         .catch((error) => {

@@ -6,6 +6,7 @@ var Mits = require('../models/mits.js'),
 
 exports.ListAllMits = listmits;
 exports.MitsInfo = mitsinfo;
+exports.Search = search;
 
 /**
  * Get the list of all the mits.
@@ -32,4 +33,16 @@ function mitsinfo(req, res) {
     Mits.mitsinfo(symbol, show_invalidated)
         .then((mits) => res.json(Message(1, undefined, mits)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_MITS_INFO')));
+};
+
+/**
+ * Search for a excat match of MIT symbol.
+ * @param {} req
+ * @param {} res
+ */
+function search(req, res) {
+    let symbol = req.params.symbol;
+    Mits.suggest(symbol)
+        .then((mit) => res.json(Message(1, undefined, mit)))
+        .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_MIT')));
 };

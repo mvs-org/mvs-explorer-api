@@ -6,11 +6,12 @@ var mongo = require('../libraries/mongo.js');
 
 module.exports = {
     listmits: listmits,
-    mitsinfo: mitsinfo
+    mitsinfo: mitsinfo,
+    suggest: suggest
 };
 
 /**
- * Get the list of all the assets.
+ * Get the list of all the MITs.
  * @param {boolean} show_invalidated include invalidated certs
  * @returns {Array<Output>}
  */
@@ -26,9 +27,9 @@ function listmits(show_invalidated, page, items_per_page) {
 }
 
 /**
- * Get the information of an avatar.
- * @param {string} owner did symbol of owner
- * @param {boolean} show_invalidated include invalidated certs
+ * Get the information of a MIT.
+ * @param {string} symbol MIT symbol
+ * @param {boolean} show_invalidated include invalidated MITs
  * @returns {Array<Output>}
  */
 function mitsinfo(symbol, show_invalidated) {
@@ -47,4 +48,24 @@ function mitsinfo(symbol, show_invalidated) {
             "type": 0
         }))
         .then(cursor => cursor.toArray());
+}
+
+/**
+ * Search for MIT.
+ * @param {string} symbol MIT symbol
+ * @returns {}
+ */
+function suggest(symbol) {
+    return mongo.connect()
+        .then((db) => db.collection('output'))
+        .then((collection) => collection.find({
+            'attachment.type': 'mit',
+            'attachment.symbol': symbol,
+            spent_tx: 0,
+            orphaned_at: 0
+        }, {
+            'attachment.symbol': 1,
+            _id: 0
+        }).toArray())
+        .then((result) => result.map((item) => item.attachment.symbol));
 }
