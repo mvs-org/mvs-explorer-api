@@ -77,7 +77,11 @@ function fetch(req, res) {
 function broadcast(req, res) {
     var tx = req.body.tx;
     Transaction.broadcast(tx)
-        .then((tx) => res.json(Message(1, undefined, tx)))
+        .then((tx) => {
+            if(tx.code==1021)
+                tx.error="Error decoding transaction";
+            res.json(Message(1, undefined, tx));
+        })
         .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, 'ERR_BROADCAST_TX'));
