@@ -80,6 +80,6 @@ function broadcast(req, res) {
         .then((tx) => res.json(Message(1, undefined, tx)))
         .catch((error) => {
             console.error(error);
-            res.status(404).json(Message(0, error.messge));
+            res.status(404).json(Message(0, 'ERR_BROADCAST_TX'));
         });
 };
