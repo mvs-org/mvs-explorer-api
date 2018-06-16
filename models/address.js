@@ -48,13 +48,13 @@ function suggest(prefix, limit, includeTxCount) {
             let addresses = new Set();
             if (this.inputs)
                 this.inputs.forEach((input) => {
-                    if (input && input.address.startsWith(prefix)) {
+                    if (input && input.address && input.address.startsWith(prefix)) {
                         addresses.add(input.address);
                     }
                 });
             if (this.outputs)
                 this.outputs.forEach((output) => {
-                    if (output && output.address.startsWith(prefix)) {
+                    if (output && output.address && output.address.startsWith(prefix)) {
                         addresses.add(output.address);
                     }
                 });
@@ -165,16 +165,26 @@ function listBalances(address, height) {
                     if (this.inputs)
                         this.inputs.forEach((input) => {
                             if (input.address == address) {
-                                if (input.attachment.symbol != "ETP")
-                                    emit(input.attachment.symbol, -input.attachment.quantity);
+                                switch (input.attachment.type) {
+                                    case 'asset-transfer':
+                                    case 'asset-issue':
+                                        if (input.attachment.symbol != "ETP")
+                                            emit(input.attachment.symbol, -input.attachment.quantity);
+                                        break;
+                                }
                                 emit("*ETP", -input.value);
                             }
                         });
                     if (this.outputs)
                         this.outputs.forEach((output) => {
                             if (output && output.address == address) {
-                                if (output.attachment.symbol != "ETP")
-                                    emit(output.attachment.symbol, output.attachment.quantity);
+                                switch (output.attachment.type) {
+                                    case 'asset-transfer':
+                                    case 'asset-issue':
+                                        if (output.attachment.symbol != "ETP")
+                                            emit(output.attachment.symbol, output.attachment.quantity);
+                                        break;
+                                }
                                 if (output.value) {
                                     if (output.locked_height_range + this.height < height)
                                         emit("*ETP", output.value);

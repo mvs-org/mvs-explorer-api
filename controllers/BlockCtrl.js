@@ -75,7 +75,10 @@ function ListBlockstats(req,res){
 function FetchHeight(req, res) {
     Block.height()
         .then((height) => res.json(Message(1, undefined, height)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT')));
+        .catch((error) => {
+		console.error(error);
+		res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT'));
+	});
 }
 
 function FetchCirculation(req, res) {
@@ -99,8 +102,9 @@ function FetchCirculation(req, res) {
  * @param {} res
  */
 function ListBlocks(req, res) {
-    var page = parseInt(req.params.page);
-    Block.list(page,50)
+    var page = parseInt(req.query.page) || 0;
+    var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 50;
+    Block.list(page, items_per_page)
         .then((blocks) => res.json(Message(1, undefined, blocks)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_BLOCKS')));
 }

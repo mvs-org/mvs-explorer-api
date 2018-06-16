@@ -1,0 +1,18 @@
+sudo: required
+language: node_js
+node_js:
+- 8
+services:
+- docker
+cache:
+  directories:
+  - node_modules
+script:
+- npm test
+after_success:
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
+- if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "dev" ]]; then
+  docker build -t cangr/mvs-explorer-api:dev .; docker push cangr/mvs-explorer-api:dev;
+  fi
+env:
+  secure: LoucrImA+U1ByLLdiUa/ARxOgghW32baPugi7TdvBXzVkBNTO2cqc7cI1jaczQLxw+BfkIQRKViP+8j3ybKg5D0fvVoIePK/+B+zHW4cyJQplJrCWzSWTK0WefQuA3DQG1P+oVqYuJnOOOT16rwi8LHeFzJKmBIu1DgoSdmJVueB8FnDJXA9KTVEpnoJcdWxetfI7tKwvXPUpNsPokGS7tAwF03E0luTnX995zJYfgCPA0ADoUTNLb4ctMN3n5EkhbKshI5jvGEYlsNu2jezdux43W5qTAVq09D4ots21e3YCV4+gM3arnPHPKHaj2eOMuPzvvnCYWYUeppsI4MY7g+CeOpO856JZGK7416rhJc4uGLr/yaZS2oCOGdVxXSOH2p/1yj1lrXFTZQdVmrTs/pUpsdkmXaJ0qQUBn1NDO80sYzrEVVVd3fZ7skH19+vVnG/AYd1x37xAX3sfoo+8O5iHUB9I3WBIITbizzyKILGRr1OZXTihGSGO4DWdZcVuBsyy4wba4aeGGQMAYR4vS7il9Eu8VUJqu0LXwTinPpcsG2h01uKYT4+d0OsTGGIY1wNAgFV4MBan9gZ8yH1O9pyR86UQqWsb+dhSXSBtmPFXCyqVJdvgv98lhz300/e8iy/BM4CMlwZ9vkias/vTzicTDzCTV+OdAfNhqZdzGc=

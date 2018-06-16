@@ -10,7 +10,10 @@ let AddressCtrl = require('./AddressCtrl.js'),
     GeoCtrl = require('./GeoCtrl.js'),
     FullnodeCtrl = require('./FullnodeCtrl.js'),
     TxCtrl = require('./TxCtrl.js'),
-    AssetCtrl = require('./AssetCtrl.js');
+    AssetCtrl = require('./AssetCtrl.js'),
+    AvatarCtrl = require('./AvatarCtrl.js'),
+    CertCtrl = require('./CertCtrl.js'),
+    MitCtrl = require('./MitCtrl.js');
 
 //Caching
 let apicache = require('apicache'),
@@ -119,10 +122,11 @@ router.get('/height', shortCacheSuccess, BlockCtrl.FetchHeight);
  * List blocks.
  * @route GET /blocks/{page}
  * @group block - Operations about blocks
- * @param {number} page.path.required - page
+ * @param {string} page.query.optional - page (default: 0)
+ * @param {string} items_per_page.query.optional - items per page (default: 50)
  * @returns {object} 200 - Block data
  */
-router.get('/blocks/:page', shortCacheSuccess, BlockCtrl.ListBlocks);
+router.get('/blocks', shortCacheSuccess, BlockCtrl.ListBlocks);
 
 /**
  * List block transactions.
@@ -186,6 +190,81 @@ router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
  * @returns {object} 200 - Asset info
  */
 router.get('/asset/:asset_symbol', longCacheSuccess, AssetCtrl.AssetInfo);
+
+/**
+ * This function returns the list of all the avatars.
+ * @route GET /avatars
+ * @group avatar - Avatar operations
+ * @param {string} page.query.optional - page (default: 0)
+ * @param {string} items_per_page.query.optional - items per page (default: 50)
+ * @returns {object} 200 - List of avatars
+ */
+router.get('/avatars', longCacheSuccess, AvatarCtrl.ListAllAvatars);
+
+/**
+ * This function returns the list of all the avatars names that start with given prefix.
+ * @route GET /suggest/avatar/{prefix}
+ * @group avatar - Avatar operations
+ * @returns {object} 200 - Search for avatars
+ */
+router.get('/suggest/avatar/:prefix', mediumCacheSuccess, AvatarCtrl.Search);
+
+/**
+ * This function returns the information about a specific avatar.
+ * @route GET /avatar/{avatar_name}
+ * @group avatar - Avatar operations
+ * @returns {object} 200 - Asset info
+ */
+router.get('/avatar/:avatar_symbol', longCacheSuccess, AvatarCtrl.AvatarInfo);
+
+/**
+ * This function returns the list of all the certs.
+ * @route GET /certs
+ * @group cert - Cert operations
+ * @param {number} show_invalidated.query.optional - Include invalidated certificates (default: false)
+ * @param {string} page.query.optional - page (default: 0)
+ * @param {string} items_per_page.query.optional - items per page (default: 50)
+ * @returns {object} 200 - List of certs
+ */
+router.get('/certs', longCacheSuccess, CertCtrl.ListAllCerts);
+
+/**
+ * This function returns the certs about a specific avatar.
+ * @route GET /certs/{avatar_name}
+ * @group certs - Cert operations
+ * @param {number} show_invalidated.query.optional - Include invalidated certificates (default: false)
+ * @returns {object} 200 - Cert info
+ */
+router.get('/certs/:owner', longCacheSuccess, CertCtrl.CertsInfo);
+
+/**
+ * This function returns the list of all the mits.
+ * @route GET /mits
+ * @group mit - Mit operations
+ * @param {number} show_invalidated.query.optional - Include invalidated mits (default: false)
+ * @param {string} page.query.optional - page (default: 0)
+ * @param {string} items_per_page.query.optional - items per page (default: 50)
+ * @returns {object} 200 - List of mits
+ */
+router.get('/mits', mediumCacheSuccess, MitCtrl.ListAllMits);
+
+/**
+ * This function returns a specific mit.
+ * @route GET /mits/{symbol}
+ * @group mits - Mit operations
+ * @param {number} show_invalidated.query.optional - Include invalidated mits (default: false)
+ * @returns {object} 200 - Mit info
+ */
+router.get('/mits/:symbol', mediumCacheSuccess, MitCtrl.MitsInfo);
+
+/**
+ * Search for MIT symbol.
+ * @route GET /suggest/mit/{symbol}
+ * @group mits - Mit operations
+ * @param {string} symbol.path.required - MIT symbol
+ * @returns {object} 200 - MIT details
+ */
+router.get('/suggest/mit/:symbol', mediumCacheSuccess, MitCtrl.Search);
 
 /**
  * This function returns number of coins in circulation.
