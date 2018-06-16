@@ -71,6 +71,7 @@ function listall(filter) {
             "hash": 1,
             "inputs": 1,
             "outputs": 1,
+            confirmed_at: 1,
             height: 1,
             "_id": 0
         }).sort({
