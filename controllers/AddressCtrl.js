@@ -25,20 +25,6 @@ function ListAddressesTxs(req, res) {
         min_height: parseInt(req.query.min_height) || undefined
     };
     Tx.listall(filter)
-        .then((txs) => Promise.all(txs.map((tx) => {
-            let inp=[],outp=[];
-                tx.inputs.forEach((input)=>{
-                    if(filter.addresses.indexOf(input.address)!==-1)
-                        inp.push(input);
-                });
-                tx.outputs.forEach((output)=>{
-                    if(filter.addresses.indexOf(output.address)!==-1)
-                        outp.push(output);
-                });
-            tx.inputs=inp;
-            tx.outputs=outp;
-            return tx;
-            })))
         .then((txs_data) => {
             res.json(Message(1, undefined, {
                 transactions: txs_data

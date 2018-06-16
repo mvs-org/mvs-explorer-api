@@ -167,7 +167,7 @@ function listBalances(address, height) {
                             if (input.address == address) {
                                 if (input.attachment.symbol != "ETP")
                                     emit(input.attachment.symbol, -input.attachment.quantity);
-                                emit("ETP", -input.value);
+                                emit("*ETP", -input.value);
                             }
                         });
                     if (this.outputs)
@@ -177,7 +177,7 @@ function listBalances(address, height) {
                                     emit(output.attachment.symbol, output.attachment.quantity);
                                 if (output.value) {
                                     if (output.locked_height_range + this.height < height)
-                                        emit("ETP", output.value);
+                                        emit("*ETP", output.value);
                                     else
                                         emit("*FROZEN", output.value);
                                 }
