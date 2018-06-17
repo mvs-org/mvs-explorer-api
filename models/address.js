@@ -184,7 +184,7 @@ function listBalances(address, height) {
                     },
                     query: {
                         address: address,
-                        "orphan": 0
+                        "spent_tx": 0
                     },
                     scope: {
                         address: address,
