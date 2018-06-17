@@ -51,7 +51,7 @@ function blockstats(interval){
         .then((db)=>db.collection('block'))
         .then((c)=>c.find({orphan: 0, number: {$mod: [interval,0]}},{_id: 0, number: 1, time_stamp: 1, bits: 1}).sort({height: -1}).toArray())
         .then((blocks)=>blocks.map((block, index)=>{
-            return [block.number,(block.number==0)?0:parseFloat(((block.time_stamp-blocks[index+1].time_stamp)/interval).toFixed(3)),parseInt(block.bits)];
+            return [block.number,(block.number==0 ||blocks[index+1]==undefined)?0:parseFloat(((block.time_stamp-blocks[index+1].time_stamp)/interval).toFixed(3)),parseInt(block.bits)];
         }));
 }
 
