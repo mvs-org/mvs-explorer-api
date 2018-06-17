@@ -16,18 +16,18 @@ module.exports = {
  * @param {} hash
  * @returns {}
  */
-function listassets(hash) {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('asset').find({}, {
-                    "_id": 0,
-                    "type": 0
-                }).toArray((err, docs) => {
-                    resolve(docs);
-                });
-            });
-    });
+function listassets() {
+    return mongo.connect()
+        .then((db) => db.collection('asset'))
+        .then(collection => collection.find({
+            symbol: {
+                $ne: 'ETP'
+            }
+        }, {
+            "_id": 0,
+            "type": 0
+        }))
+        .then(cursor => cursor.toArray());
 }
 
 /**
@@ -39,9 +39,17 @@ function suggest(prefix, limit) {
     return mongo.connect()
         .then((db) => db.collection('asset'))
         .then((collection) => collection.find({
-            symbol: {
-                $regex: new RegExp(prefix.toUpperCase())
-            }
+            '$and': [{
+                    symbol: {
+                        $regex: new RegExp(prefix.toUpperCase())
+                    }
+                },
+                {
+                    symbol: {
+                        $ne: 'ETP'
+                    }
+                }
+            ]
         }, {
             symbol: 1,
             _id: 0
@@ -62,7 +70,7 @@ function stakelist(symbol, limit) {
         }).sort({
             ["value." + symbol]: -1
         }).limit(limit).toArray())
-        .then((result)=>result.map((stake)=>{
+        .then((result) => result.map((stake) => {
             return {
                 a: stake._id,
                 q: stake.value[symbol]
