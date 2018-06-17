@@ -160,39 +160,22 @@ function listBalances(address, height) {
     return new Promise((resolve, reject) => {
         mongo.connect()
             .then((db) => {
-                db.collection('tx').mapReduce(function() {
-                    emit('*TXNO', 1);
-                    if (this.inputs)
-                        this.inputs.forEach((input) => {
-                            if (input.address == address) {
-                                switch (input.attachment.type) {
+                db.collection('output').mapReduce(function() {
+                            if (this.address == address) {
+                                switch (this.attachment.type) {
                                     case 'asset-transfer':
                                     case 'asset-issue':
-                                        if (input.attachment.symbol != "ETP")
-                                            emit(input.attachment.symbol, -input.attachment.quantity);
+                                        if (this.attachment.symbol != "ETP")
+                                            emit(this.attachment.symbol, this.attachment.quantity);
                                         break;
                                 }
-                                emit("*ETP", -input.value);
-                            }
-                        });
-                    if (this.outputs)
-                        this.outputs.forEach((output) => {
-                            if (output && output.address == address) {
-                                switch (output.attachment.type) {
-                                    case 'asset-transfer':
-                                    case 'asset-issue':
-                                        if (output.attachment.symbol != "ETP")
-                                            emit(output.attachment.symbol, output.attachment.quantity);
-                                        break;
-                                }
-                                if (output.value) {
-                                    if (output.locked_height_range + this.height < height)
-                                        emit("*ETP", output.value);
+                                if (this.value) {
+                                    if (this.locked_height_range + this.height < height)
+                                        emit("*ETP", this.value);
                                     else
-                                        emit("*FROZEN", output.value);
+                                        emit("*FROZEN", this.value);
                                 }
                             }
-                        });
                 }, function(name, quantity) {
                     return Array.sum(quantity);
                 }, {
@@ -200,11 +183,7 @@ function listBalances(address, height) {
                         inline: 1
                     },
                     query: {
-                        $or: [{
-                            'inputs.address': address
-                        }, {
-                            'outputs.address': address
-                        }],
+                        address: address,
                         "orphan": 0
                     },
                     scope: {
