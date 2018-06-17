@@ -23,8 +23,8 @@ exports.FetchCirculation = FetchCirculation;
  */
 function FetchHash(req, res) {
     var blockhash = req.params.blockhash;
-    Helper.checkError(blockhash,'ERR_BLOCK_HASH_MISSING')
-        .then(()=>Block.fetchHash(blockhash))
+    Helper.checkError(blockhash, 'ERR_BLOCK_HASH_MISSING')
+        .then(() => Block.fetchHash(blockhash))
         .then((block) => {
             return res.json(Message(1, undefined, block));
         })
@@ -38,15 +38,15 @@ function FetchHash(req, res) {
  */
 function Fetch(req, res) {
     var number = parseInt(req.params.block_no);
-    Helper.checkError(!isNaN(number),'ERR_BLOCK_NUMER_INVALID')
-        .then(()=>Block.fetch(number))
+    Helper.checkError(!isNaN(number), 'ERR_BLOCK_NUMER_INVALID')
+        .then(() => Block.fetch(number))
         .then((block) => {
             return res.json(Message(1, undefined, block));
         })
         .catch((error) => res.status(404).json(Message(0, error.message)));
 }
 
-function ListTxs(req,res){
+function ListTxs(req, res) {
     var number = req.params.block_no;
     var page = parseInt(req.query.page) || 0;
     var filter = {
@@ -60,11 +60,14 @@ function ListTxs(req,res){
         .catch((error) => res.status(404).json(Message(0, 'ERR_BLOCK_TXS')));
 }
 
-function ListBlockstats(req,res){
+function ListBlockstats(req, res) {
     var interval = parseInt(req.query.interval) || 1000;
     Block.blockstats(interval)
         .then((times) => res.json(Message(1, undefined, times)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_BLOCKTIMES')));
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_LIST_BLOCKTIMES'));
+        });
 }
 
 /**
@@ -76,9 +79,9 @@ function FetchHeight(req, res) {
     Block.height()
         .then((height) => res.json(Message(1, undefined, height)))
         .catch((error) => {
-		console.error(error);
-		res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT'));
-	});
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT'));
+        });
 }
 
 function FetchCirculation(req, res) {
