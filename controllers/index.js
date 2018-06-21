@@ -170,6 +170,8 @@ router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
  * This function returns the list of all the assets stakeholders ordered by stake.
  * @route GET /stakes/{symbol}
  * @param {string} symbol.path.required - Asset symbol
+ * @param {number} limit.query.optional - Number of results
+ * @param {number} min.query.optional - Minimum balance (default 0)
  * @group asset - Asset operations
  * @returns {object} 200 - List of assets
  */

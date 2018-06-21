@@ -58,12 +58,12 @@ function suggest(prefix, limit) {
         .then((result) => result.map((item) => item.symbol));
 }
 
-function stakelist(symbol, limit) {
+function stakelist(symbol, limit, min) {
     return mongo.connect()
         .then((db) => db.collection('address_balances'))
         .then((c) => c.find({
             ["value." + symbol]: {
-                $gt: 0
+                $gt: min
             }
         }, {
             ["value." + symbol]: 1
