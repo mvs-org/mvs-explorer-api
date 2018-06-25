@@ -9,6 +9,7 @@ let AddressCtrl = require('./AddressCtrl.js'),
     MiningCtrl = require('./MiningCtrl.js'),
     GeoCtrl = require('./GeoCtrl.js'),
     FullnodeCtrl = require('./FullnodeCtrl.js'),
+    LightwalletCtrl = require('./LightwalletCtrl.js'),
     TxCtrl = require('./TxCtrl.js'),
     AssetCtrl = require('./AssetCtrl.js'),
     AvatarCtrl = require('./AvatarCtrl.js'),
@@ -323,6 +324,7 @@ router.get('/rewards', longCacheSuccess, TxCtrl.Rewards);
  * @returns {object} 200 - Fullnode version
  */
 router.get('/fullnode/version', mediumCacheSuccess, FullnodeCtrl.version);
+router.get('/lightwallet/version', mediumCacheSuccess, LightwalletCtrl.version);
 
 router.get('/locations', mediumCacheSuccess, GeoCtrl.locations);
 
