@@ -11,6 +11,7 @@ exports.Rewards = rewards;
 exports.List = List;
 exports.Suggest = suggest;
 exports.Broadcast = broadcast;
+exports.FetchTxOutputs = outputs;
 
 function List(req,res){
     var page = parseInt(req.query.page) || 0;
@@ -86,4 +87,16 @@ function broadcast(req, res) {
             console.error(error);
             res.status(404).json(Message(0, 'ERR_BROADCAST_TX'));
         });
+};
+
+/**
+ * Get transaction outputs for given hash.
+ * @param {} req
+ * @param {} res
+ */
+function outputs(req, res) {
+    var hash = req.params.hash;
+    Transaction.outputs(hash)
+        .then((outputs) => res.json(Message(1, undefined, outputs)))
+        .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_TX_OUTPUTS')));
 };

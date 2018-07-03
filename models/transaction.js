@@ -15,7 +15,8 @@ module.exports = {
     list: list,
     listall: listall,
     rewards: rewards,
-    broadcast: broadcast
+    broadcast: broadcast,
+    outputs: outputs
 };
 
 /**
@@ -262,4 +263,23 @@ function broadcast(tx) {
         params: [tx]
     };
     return rp(options);
+}
+
+
+/**
+ * Get transaction outputs for given hash
+ * @param {} hash
+ * @returns {}
+ */
+function outputs(hash) {
+    return mongo.connect()
+        .then((db) => db.collection('output'))
+        .then((collection) => collection.find({
+            "tx": hash
+        }).toArray())
+        .then((outputs) => {
+            if (outputs == null)
+                throw Error('ERR_TX_OUTPUTS_NOT_FOUND');
+            return outputs;
+        });
 }

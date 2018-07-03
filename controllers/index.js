@@ -40,7 +40,29 @@ const hourCacheSuccess = cache('60 minutes'),
  * @returns {object} 200 - Transaction details
  */
 router.get('/tx/:hash', shortCacheSuccess, TxCtrl.FetchTx);
+
+/**
+ * Get the list of all the transactions.
+ * @route GET /txs
+ * @param {string} page.query.optional - page
+ * @param {number} min_time.query.optional - From timestamp
+ * @param {number} max_time.query.optional - To timestamp
+ * @param {number} min_height.query.optional - From height
+ * @param {number} max_height.query.optional - To height
+ * @group transaction - Operations about transactions
+ * @returns {object} 200 - Transactions list
+ */
 router.get('/txs', TxCtrl.List);
+
+/**
+ * Get the outputs of a transaction.
+ * @route GET /tx/outputs/{hash}
+ * @param {string} hash.path.required - Transaction hash
+ * @group transaction - Operations about transactions
+ * @returns {object} 200 - Transaction details
+ */
+router.get('/tx/outputs/:hash', longCacheSuccess, TxCtrl.FetchTxOutputs);
+
 
 /**
  * Broadcast a hex encoded transaction.
