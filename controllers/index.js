@@ -39,7 +39,7 @@ const hourCacheSuccess = cache('60 minutes'),
  * @group transaction - Operations about transactions
  * @returns {object} 200 - Transaction details
  */
-router.get('/tx/:hash', longCacheSuccess, TxCtrl.FetchTx);
+router.get('/tx/:hash', shortCacheSuccess, TxCtrl.FetchTx);
 router.get('/txs', TxCtrl.List);
 
 /**
