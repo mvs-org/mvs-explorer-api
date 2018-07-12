@@ -286,6 +286,14 @@ router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
 router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
 
 /**
+ * This function returns the pricing information for multiple assets.
+ * @route GET /pricing/tickers
+ * @group general - General operations
+ * @returns {object} 200 - Pricing info
+ */
+router.get('/pricing/tickers', mediumCacheSuccess, PricingCtrl.cmc);
+
+/**
  * This function returns the mining information.
  * @route GET /mining
  * @group general - General operations
