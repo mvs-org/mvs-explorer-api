@@ -300,12 +300,20 @@ router.get('/suggest/mit/:symbol', mediumCacheSuccess, MitCtrl.Search);
 router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
 
 /**
- * This function returns the pricing information.
+ * This function returns the pricing information of ETP on bitfinex.
  * @route GET /pricing
- * @group general - General operations
- * @returns {object} 200 - Pricing info
+ * @group general - Pricing operations
+ * @returns {object} 200 - Bitfinex ticker
  */
 router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
+
+/**
+ * This function returns the pricing information for multiple assets.
+ * @route GET /pricing/tickers
+ * @group general - Pricing operations
+ * @returns {object} 200 - Tickers
+ */
+router.get('/pricing/tickers', mediumCacheSuccess, PricingCtrl.cmc);
 
 /**
  * This function returns the mining information.

@@ -3,6 +3,8 @@
 //Load express
 var express = require('express');
 var app = express();
+app.disable('x-powered-by');
+
 const expressSwagger = require('express-swagger-generator')(app);
 
 let options = {
@@ -69,6 +71,7 @@ app.use((err, req, res, next) => {
 app.all('/*', (req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header('Content-Type', 'application/json');
     next();
 });
 
