@@ -5,7 +5,7 @@ module.exports = {
 };
 
 let assets = ["ETP", "MVS.ZGC"];
-let bases = ["BTC", "USD", "CNY", "JPY", "EUR"];
+let bases = ["BTC", "USD", "CNY", "JPY", "EUR", "GBP"];
 
 function getQuote(asset, base) {
     let id = 0;
