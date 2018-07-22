@@ -69,13 +69,14 @@ function suggest(prefix, limit, includeTxCount) {
                 $or: [{
                     'inputs.address': {
                         $regex: new RegExp('^' + prefix)
-                    }
+                    },
+                    "orphan": 0
                 }, {
                     'outputs.address': {
                         $regex: new RegExp('^' + prefix)
-                    }
-                }],
-                "orphan": 0
+                    },
+                    "orphan": 0
+                }]
             },
             scope: {
                 prefix: prefix
