@@ -6,6 +6,7 @@ var mongo = require('../libraries/mongo.js');
 
 module.exports = {
     listmits: listmits,
+    countmits: countmits,
     mitsinfo: mitsinfo,
     suggest: suggest
 };
@@ -24,6 +25,21 @@ function listmits(show_invalidated, page, items_per_page) {
         query.spent_tx = 0;
     }
     return mongo.find_and_count(query, {_id:0, type: 0}, 'output', {"height": -1}, page, items_per_page);
+}
+
+/**
+ * Count all the MITs.
+ * @returns {number}
+ */
+function countmits() {
+    let query = {
+        'attachment.type': "mit",
+        orphaned_at: 0,
+        spent_tx: 0
+    };
+    return mongo.connect()
+        .then((db) => db.collection('output'))
+        .then(collection => collection.count(query, {}))
 }
 
 /**

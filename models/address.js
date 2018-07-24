@@ -10,7 +10,8 @@ module.exports = {
     listInputs: listInputs,
     balances: listBalances,
     suggest: suggest,
-    listAddressIds: listAddressIds
+    listAddressIds: listAddressIds,
+    countaddresses: countaddresses
 };
 
 function listTxsData(address, from, to) {
@@ -211,4 +212,20 @@ function listBalances(address, height) {
                 });
             });
     });
+}
+
+/**
+ * Count all the addresses with a minimum balance.
+ * @param {number} threshold
+ * @returns {number}
+ */
+function countaddresses(threshold) {
+    let query = {
+        'value.ETP': {
+            $gte: threshold
+        }
+    };
+    return mongo.connect()
+        .then((db) => db.collection('address_balances'))
+        .then(collection => collection.count(query, {}))
 }

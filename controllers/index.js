@@ -15,6 +15,7 @@ let AddressCtrl = require('./AddressCtrl.js'),
     AvatarCtrl = require('./AvatarCtrl.js'),
     CertCtrl = require('./CertCtrl.js'),
     MitCtrl = require('./MitCtrl.js');
+    InfoCtrl = require('./InfoCtrl.js');
 
 //Caching
 let apicache = require('apicache'),
@@ -290,6 +291,14 @@ router.get('/mits/:symbol', mediumCacheSuccess, MitCtrl.MitsInfo);
  * @returns {object} 200 - MIT details
  */
 router.get('/suggest/mit/:symbol', mediumCacheSuccess, MitCtrl.Search);
+
+/**
+ * This function returns general information about Metaverse blockchain.
+ * @route GET /info
+ * @group general - General operations
+ * @returns {object} 200 - General info
+ */
+router.get('/info', longCacheSuccess, InfoCtrl.Info);
 
 /**
  * This function returns number of coins in circulation.

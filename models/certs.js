@@ -6,6 +6,7 @@ var mongo = require('../libraries/mongo.js');
 
 module.exports = {
     listcerts: listcerts,
+    countcerts: countcerts,
     certsinfo: certsinfo
 };
 
@@ -23,6 +24,21 @@ function listcerts(show_invalidated, page, items_per_page) {
         query.spent_tx = 0;
     }
     return mongo.find_and_count(query, {_id:0, type: 0}, 'output', {"height": -1}, page, items_per_page);
+}
+
+/**
+ * Count all the certs.
+ * @returns {number}
+ */
+function countcerts() {
+    let query = {
+        'attachment.type': "asset-cert",
+        orphaned_at: 0,
+        spent_tx: 0
+    };
+    return mongo.connect()
+        .then((db) => db.collection('output'))
+        .then(collection => collection.count(query, {}))
 }
 
 /**

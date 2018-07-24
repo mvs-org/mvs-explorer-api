@@ -14,6 +14,7 @@ module.exports = {
     suggest: suggest,
     list: list,
     listall: listall,
+    counttxs: counttxs,
     rewards: rewards,
     broadcast: broadcast,
     outputs: outputs
@@ -141,6 +142,32 @@ function list(page, items_per_page, filter) {
     }, 'tx', {
         "height": -1
     }, page, items_per_page);
+}
+
+
+/**
+ * Count all transactions that meet the filter criteria.
+ * Possible filter options are:
+ * - max_time - Unix timestamp for upper time limit
+ * - min_time
+ * @param {any} filter
+ * @returns {number}
+ */
+function counttxs(filter) {
+    let query = {};
+    if (filter.min_time || filter.max_time) {
+        query.confirmed_at = {};
+        if (filter.max_time)
+            query.confirmed_at.$lte = filter.max_time;
+        if (filter.min_time)
+            query.confirmed_at.$gte = filter.min_time;
+    }
+    query.orphan = 0;
+    return mongo.connect()
+        .then((db) => db.collection('tx'))
+        .then(collection => collection.count(query, {
+            "_id": 0
+        }))
 }
 
 /**

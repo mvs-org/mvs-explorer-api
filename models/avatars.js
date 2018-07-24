@@ -6,6 +6,7 @@ var mongo = require('../libraries/mongo.js');
 
 module.exports = {
     listavatars: listavatars,
+    countavatars: countavatars,
     suggest: suggest,
     avatarinfo: avatarinfo
 };
@@ -17,6 +18,16 @@ module.exports = {
  */
 function listavatars(page, items_per_page) {
     return mongo.find_and_count({}, {_id:0, type: 0}, 'avatar', {"height": -1}, page, items_per_page);
+}
+
+/**
+ * Count all the avatars.
+ * @returns {number}
+ */
+function countavatars() {
+    return mongo.connect()
+        .then((db) => db.collection('avatar'))
+        .then(collection => collection.count({}, {}))
 }
 
 /**

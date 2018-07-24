@@ -6,6 +6,7 @@ var mongo = require('../libraries/mongo.js');
 
 module.exports = {
     listassets: listassets,
+    countassets: countassets,
     suggest: suggest,
     stakelist: stakelist,
     assetinfo: assetinfo
@@ -28,6 +29,21 @@ function listassets() {
             "type": 0
         }))
         .then(cursor => cursor.toArray());
+}
+
+/**
+ * Count all the assets.
+ * @returns {number}
+ */
+function countassets() {
+    let query = {
+        symbol: {
+            $ne: 'ETP'
+        }
+    };
+    return mongo.connect()
+        .then((db) => db.collection('asset'))
+        .then(collection => collection.count(query, {}))
 }
 
 /**
