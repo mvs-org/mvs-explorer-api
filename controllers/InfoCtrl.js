@@ -21,24 +21,45 @@ function info(req,res){
     };
     Block.height()
         .then((height) => {
-            return Promise.all([height, Block.fetch(height), Block.fetch(height - 1000), Assets.countassets(), Mits.countmits(), Certs.countcerts(), Avatars.countavatars(), Transaction.counttxs(filter_last_day), Transaction.counttxs({}), Address.countaddresses(0.00000001), Mining.poolstats(height - 1000, height)])
+            return Promise.all([height, Block.fetch(height), Block.fetch(height - 1000), Assets.countassets(), Mits.countmits(), Certs.countcerts(), Avatars.countavatars(), Transaction.counttxs(filter_last_day), Transaction.counttxs({}), Address.countaddresses(0.00000001), Transaction.circulation(), Transaction.locksum(height), Mining.pools(), Mining.poolstats(height - 1000, height)])
         })
-        //
-        //
         .then((results) => {
             var info = {}
             info.height = results[0];
             info.hashrate = parseInt(results[1].bits);
-            info.last_1000_avg_block_time = (results[1].time_stamp - results[2].time_stamp)/1000;
-            info.mst_count = results[3];
-            info.mit_count = results[4];
-            info.cert_count = results[5];
-            info.avatar_count = results[6];
-            info.last_day_transactions = results[7];
-            info.total_transactions_count = results[8];
-            info.addresses_has_balance = results[9];
-            info.top_3_mining_pool_percentage = [results[10][0].finds/1000*100, results[10][1].finds/1000*100, results[10][2].finds/1000*100];
-            return info
+            info.blocktime = (results[1].time_stamp - results[2].time_stamp)/1000;
+            info.counter = {}
+            info.counter.mst = results[3];
+            info.counter.mit = results[4];
+            info.counter.cert = results[5];
+            info.counter.avatar = results[6];
+            info.counter.transactions_24h = results[7];
+            info.counter.total_transactions = results[8];
+            info.counter.addresses_with_balance = results[9];
+            info.etp = {}
+            info.etp.total_supply = results[10];
+            info.etp.locksum = results[11]/100000000;
+            let pools = [];
+            return Promise.all(results[12].map((pool) => {
+                    let pool_display = {};
+                    pool_display.share = 0;
+                    pool_display.name = pool.name;
+                    Promise.all(results[13].map((stat) => {
+                            if (pool.addresses.indexOf(stat._id) !== -1)
+                                pool_display.share += stat.finds;
+                        }))
+                        .then(() => {
+                            if (pool_display.share) {
+                                pool_display.share = parseFloat((pool_display.share/1000*100).toFixed(1));
+                                pools.push(pool_display);
+                            }
+                        });
+                }))
+                .then(() => {
+                    pools.sort(function(a, b){return b.share - a.share});
+                    info.top_mining_pool = pools.slice(0, 3);
+                    return info
+                })
         })
         .then((info) => res.json(Message(1, undefined, info)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_GET_INFO')));
