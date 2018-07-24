@@ -227,7 +227,10 @@ function locksum(height) {
             .then(() =>
                 db.collection('locksum').find().toArray())
             .then((docs) => {
-                return docs[0].value;
+                if(docs[0]&&docs[0].value)
+                    return docs[0].value;
+                else
+                    return null;
             }));
 }
 
