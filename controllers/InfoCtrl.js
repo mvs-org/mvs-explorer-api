@@ -8,27 +8,39 @@ var Message = require('../models/message.js'),
     Mits = require('../models/mits.js'),
     Certs = require('../models/certs.js'),
     Avatars = require('../models/avatars.js'),
-    Transaction = require('../models/transaction'),
     Address = require('../models/address.js'),
     Mining = require('../models/mining_pool.js');
 
 exports.Info = info;
 
-function info(req,res){
+function info(req, res) {
     var filter_last_day = {
-        max_time: Math.floor(new Date()/1000),
-        min_time: Math.floor(new Date()/1000 - (60*60*24))
+        max_time: Math.floor(new Date() / 1000),
+        min_time: Math.floor(new Date() / 1000 - (60 * 60 * 24))
     };
     Block.height()
-        .then((height) => {
-            return Promise.all([height, Block.fetch(height), Block.fetch(height - 1000), Assets.countassets(), Mits.countmits(), Certs.countcerts(), Avatars.countavatars(), Transaction.counttxs(filter_last_day), Transaction.counttxs({}), Address.countaddresses(0.00000001), Transaction.circulation(), Transaction.locksum(height), Mining.pools(), Mining.poolstats(height - 1000, height)])
-        })
+        .then((height) => Promise.all([
+            height,
+            Block.fetch(height),
+            Block.fetch(height - 1000),
+            Assets.countassets(),
+            Mits.countmits(),
+            Certs.countcerts(),
+            Avatars.countavatars(),
+            Transaction.counttxs(filter_last_day),
+            Transaction.counttxs({}),
+            Address.countaddresses(0.00000001),
+            Transaction.circulation(),
+            Transaction.locksum(height),
+            Mining.pools(),
+            Mining.poolstats(height - 1000, height)
+        ]))
         .then((results) => {
-            var info = {}
+            var info = {};
             info.height = results[0];
             info.hashrate = parseInt(results[1].bits);
-            info.blocktime = (results[1].time_stamp - results[2].time_stamp)/1000;
-            info.counter = {}
+            info.blocktime = (results[1].time_stamp - results[2].time_stamp) / 1000;
+            info.counter = {};
             info.counter.mst = results[3];
             info.counter.mit = results[4];
             info.counter.cert = results[5];
@@ -36,9 +48,9 @@ function info(req,res){
             info.counter.transactions_24h = results[7];
             info.counter.total_transactions = results[8];
             info.counter.addresses_with_balance = results[9];
-            info.etp = {}
+            info.etp = {};
             info.etp.total_supply = results[10];
-            info.etp.locksum = results[11]/100000000;
+            info.etp.locksum = results[11] / 100000000;
             let pools = [];
             return Promise.all(results[12].map((pool) => {
                     let pool_display = {};
@@ -50,17 +62,22 @@ function info(req,res){
                         }))
                         .then(() => {
                             if (pool_display.share) {
-                                pool_display.share = parseFloat((pool_display.share/1000*100).toFixed(1));
+                                pool_display.share = parseFloat((pool_display.share / 1000 * 100).toFixed(1));
                                 pools.push(pool_display);
                             }
                         });
                 }))
                 .then(() => {
-                    pools.sort(function(a, b){return b.share - a.share});
+                    pools.sort(function(a, b) {
+                        return b.share - a.share;
+                    });
                     info.top_mining_pool = pools.slice(0, 3);
-                    return info
-                })
+                    return info;
+                });
         })
         .then((info) => res.json(Message(1, undefined, info)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_GET_INFO')));
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_GET_INFO'));
+        });
 }
