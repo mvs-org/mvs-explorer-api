@@ -22,7 +22,7 @@ function info(req, res) {
         .then((height) => Promise.all([
             height,
             Block.fetch(height),
-            Block.fetch(height - 1000),
+            Block.fetch(Math.max(height - 100, 1)),
             Assets.countassets(),
             Mits.countmits(),
             Certs.countcerts(),
@@ -33,13 +33,15 @@ function info(req, res) {
             Transaction.circulation(),
             Transaction.locksum(height),
             Mining.pools(),
-            Mining.poolstats(height - 1000, height)
+            Mining.poolstats(Math.max(height - 1000, 1), height),
+            Block.fetch(Math.max(height - 1000, 1))
         ]))
         .then((results) => {
             var info = {};
             info.height = results[0];
-            info.hashrate = parseInt(results[1].bits);
-            info.blocktime = (results[1].time_stamp - results[2].time_stamp) / 1000;
+            info.difficulty = parseInt(results[1].bits);
+            info.hashrate = Math.floor(results[1].bits / (results[1].time_stamp - results[2].time_stamp) * 100);
+            info.blocktime = (results[1].time_stamp - results[14].time_stamp) / 1000;
             info.counter = {};
             info.counter.mst = results[3];
             info.counter.mit = results[4];
