@@ -210,7 +210,7 @@ function locksum(height) {
             }, function(name, quantity) {
                 return Array.sum(quantity);
             }, {
-                out: "locksum",
+                out: { inline: 1},
                 query: {
                     "outputs.locked_height_range": {
                         $gt: 0
@@ -224,8 +224,6 @@ function locksum(height) {
                     height: height
                 }
             })
-            .then(() =>
-                db.collection('locksum').find().toArray())
             .then((docs) => {
                 return (docs && docs.length) ? docs[0].value : 0;
             }));
