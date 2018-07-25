@@ -199,40 +199,36 @@ function suggest(prefix, limit) {
 }
 
 function locksum(height) {
-    return new Promise((resolve) => {
-        mongo.connect()
-            .then((db) =>
-                db.collection('tx').mapReduce(function() {
-                    this.outputs.forEach((output) => {
-                        if (this.height + output.locked_height_range > height) {
-                            emit('ETP', output.value);
-                        }
-                    });
-                }, function(name, quantity) {
-                    return Array.sum(quantity);
-                }, {
-                    out: "inline",
-                    query: {
-                        "outputs.locked_height_range": {
-                            $gt: 0
-                        },
-                        orphan: 0
+    return mongo.connect()
+        .then((db) =>
+            db.collection('tx').mapReduce(function() {
+                this.outputs.forEach((output) => {
+                    if (this.height + output.locked_height_range > height) {
+                        emit('ETP', output.value);
+                    }
+                });
+            }, function(name, quantity) {
+                return Array.sum(quantity);
+            }, {
+                out: "locksum",
+                query: {
+                    "outputs.locked_height_range": {
+                        $gt: 0
                     },
-                    scope: {
-                        height: height
-                    }
-                }, (err, docs) => {
-                    if (err) {
-                        console.error(err);
-                        throw Error("ERROR_FETCH_LOCKSUM");
-                    } else {
-                        if (docs[0] && docs[0].value)
-                            resolve(docs[0].value);
-                        else
-                            resolve(0);
-                    }
-                }));
-    });
+                    height: {
+                        $gt: height - 1314000
+                    },
+                    orphan: 0
+                },
+                scope: {
+                    height: height
+                }
+            })
+            .then(() =>
+                db.collection('locksum').find().toArray())
+            .then((docs) => {
+                return (docs && docs.length) ? docs[0].value : 0;
+            }));
 }
 
 function rewards(height) {
