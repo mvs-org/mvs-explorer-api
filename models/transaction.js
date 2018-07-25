@@ -204,16 +204,13 @@ function locksum(height) {
             db.collection('tx').mapReduce(function() {
                 this.outputs.forEach((output) => {
                     if (this.height + output.locked_height_range > height) {
-                        if (output.attachment.type == "asset-transfer")
-                            emit(output.attachment.symbol, output.attachment.quantity);
-                        else
-                            emit('ETP', output.value);
+                        emit('ETP', output.value);
                     }
                 });
             }, function(name, quantity) {
                 return Array.sum(quantity);
             }, {
-                out: "locksum",
+                out: "inline",
                 query: {
                     "outputs.locked_height_range": {
                         $gt: 0
@@ -224,10 +221,9 @@ function locksum(height) {
                     height: height
                 }
             })
-            .then(() =>
-                db.collection('locksum').find().toArray())
             .then((docs) => {
-                if(docs[0]&&docs[0].value)
+                console.log(docs)
+                if (docs[0] && docs[0].value)
                     return docs[0].value;
                 else
                     return null;
