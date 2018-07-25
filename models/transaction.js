@@ -221,11 +221,16 @@ function locksum(height) {
                     height: height
                 }
             })
-            .then((docs) => {
-                if (docs[0] && docs[0].value)
-                    return docs[0].value;
-                else
-                    return null;
+            .then((err, docs) => {
+                if (err) {
+                    console.error(err);
+                    throw Error("ERROR_FETCH_BALANCES");
+                } else {
+                    if (docs[0] && docs[0].value)
+                        return docs[0].value;
+                    else
+                        return null;
+                }
             }));
 }
 
