@@ -199,39 +199,40 @@ function suggest(prefix, limit) {
 }
 
 function locksum(height) {
-    return mongo.connect()
-        .then((db) =>
-            db.collection('tx').mapReduce(function() {
-                this.outputs.forEach((output) => {
-                    if (this.height + output.locked_height_range > height) {
-                        emit('ETP', output.value);
-                    }
-                });
-            }, function(name, quantity) {
-                return Array.sum(quantity);
-            }, {
-                out: "inline",
-                query: {
-                    "outputs.locked_height_range": {
-                        $gt: 0
+    return new Promise((resolve) => {
+        mongo.connect()
+            .then((db) =>
+                db.collection('tx').mapReduce(function() {
+                    this.outputs.forEach((output) => {
+                        if (this.height + output.locked_height_range > height) {
+                            emit('ETP', output.value);
+                        }
+                    });
+                }, function(name, quantity) {
+                    return Array.sum(quantity);
+                }, {
+                    out: "inline",
+                    query: {
+                        "outputs.locked_height_range": {
+                            $gt: 0
+                        },
+                        orphan: 0
                     },
-                    orphan: 0
-                },
-                scope: {
-                    height: height
-                }
-            })
-            .then((err, docs) => {
-                if (err) {
-                    console.error(err);
-                    throw Error("ERROR_FETCH_BALANCES");
-                } else {
-                    if (docs[0] && docs[0].value)
-                        return docs[0].value;
-                    else
-                        return null;
-                }
-            }));
+                    scope: {
+                        height: height
+                    }
+                }, (err, docs) => {
+                    if (err) {
+                        console.error(err);
+                        throw Error("ERROR_FETCH_LOCKSUM");
+                    } else {
+                        if (docs[0] && docs[0].value)
+                            resolve(docs[0].value);
+                        else
+                            resolve(0);
+                    }
+                }));
+    });
 }
 
 function rewards(height) {
