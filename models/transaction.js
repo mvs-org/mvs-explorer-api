@@ -221,6 +221,7 @@ function locksum(height) {
                     height: height
                 }
             })
+            .then(collection => collection.find())
             .then((docs) => {
                 console.log(docs)
                 if (docs[0] && docs[0].value)
