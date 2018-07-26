@@ -31,7 +31,6 @@ function info(req, res) {
             Transaction.counttxs({}),
             Address.countaddresses(0.00000001),
             Transaction.circulation(),
-            Transaction.locksum(height),
             Mining.pools(),
             Mining.poolstats(Math.max(height - 1000, 1), height),
             Block.fetch(Math.max(height - 1000, 1))
@@ -41,7 +40,7 @@ function info(req, res) {
             info.height = results[0];
             info.difficulty = parseInt(results[1].bits);
             info.hashrate = Math.floor(results[1].bits / (results[1].time_stamp - results[2].time_stamp) * 100);
-            info.blocktime = (results[1].time_stamp - results[14].time_stamp) / 1000;
+            info.blocktime = (results[1].time_stamp - results[13].time_stamp) / 1000;
             info.counter = {};
             info.counter.mst = results[3];
             info.counter.mit = results[4];
@@ -52,13 +51,12 @@ function info(req, res) {
             info.counter.addresses_with_balance = results[9];
             info.etp = {};
             info.etp.total_supply = results[10];
-            info.etp.locksum = results[11] / 100000000;
             let pools = [];
-            return Promise.all(results[12].map((pool) => {
+            return Promise.all(results[11].map((pool) => {
                     let pool_display = {};
                     pool_display.share = 0;
                     pool_display.name = pool.name;
-                    Promise.all(results[13].map((stat) => {
+                    Promise.all(results[12].map((stat) => {
                             if (pool.addresses.indexOf(stat._id) !== -1)
                                 pool_display.share += stat.finds;
                         }))
