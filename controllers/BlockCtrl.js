@@ -63,7 +63,7 @@ function ListTxs(req, res) {
 function ListBlockstats(req, res) {
     var interval = parseInt(req.query.interval) || 10000;
     var limit = parseInt(req.query.limit) || 0;
-    Block.blockstats(interval, (limit>0)?limit:undefined)
+    Block.blockstats(interval, (limit > 0) ? limit : undefined)
         .then((times) => res.json(Message(1, undefined, times)))
         .catch((error) => {
             console.error(error);
@@ -108,9 +108,10 @@ function FetchCirculation(req, res) {
 function ListBlocks(req, res) {
     var page = parseInt(req.query.page) || 0;
     var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 50;
-    Block.list(page, items_per_page)
+    Helper.checkError(items_per_page > 100 || items_per_page < 1, 'ERR_INVALID_PAGE_SIZE')
+        .then(() => Block.list(page, items_per_page))
         .then((blocks) => res.json(Message(1, undefined, blocks)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_BLOCKS')));
+        .catch((error) => res.status(404).json(Message(0, error.message)));
 }
 
 /**
