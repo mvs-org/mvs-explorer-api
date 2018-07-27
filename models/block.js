@@ -25,7 +25,7 @@ function fetch(number) {
             else
                 throw Error("ERR_BLOCK_NOT_FOUND");
         }))
-        .catch(error=>{
+        .catch(error => {
             console.log(error);
             throw Error(error.message);
         });
@@ -46,12 +46,24 @@ function fetchHash(blockhash) {
         }));
 }
 
-function blockstats(interval){
+function blockstats(interval, limit) {
     return mongo.connect()
-        .then((db)=>db.collection('block'))
-        .then((c)=>c.find({orphan: 0, number: {$mod: [interval,0]}},{_id: 0, number: 1, time_stamp: 1, bits: 1}).sort({number: -1}).toArray())
-        .then((blocks)=>blocks.map((block, index)=>{
-            return [block.number,(block.number==0 ||blocks[index+1]==undefined)?0:parseFloat(((block.time_stamp-blocks[index+1].time_stamp)/interval).toFixed(3)),parseInt(block.bits)];
+        .then((db) => db.collection('block'))
+        .then((c) => c.find({
+            orphan: 0,
+            number: {
+                $mod: [interval, 0]
+            }
+        }, {
+            _id: 0,
+            number: 1,
+            time_stamp: 1,
+            bits: 1
+        }).sort({
+            number: -1
+        }).limit(limit).toArray())
+        .then((blocks) => blocks.map((block, index) => {
+            return [block.number, (block.number == 0 || blocks[index + 1] == undefined) ? 0 : parseFloat(((block.time_stamp - blocks[index + 1].time_stamp) / interval).toFixed(3)), parseInt(block.bits)];
         }));
 }
 
@@ -76,7 +88,7 @@ function suggest(prefix, limit) {
             time_stamp: 1
         }).toArray())
         .then((result) => result.slice(0, limit))
-        .then((result)=>result.map((tx)=>{
+        .then((result) => result.map((tx) => {
             return {
                 h: tx.hash,
                 n: tx.number,
@@ -116,7 +128,9 @@ function list_block_txs(blockhash) {
  * @returns {} 
  */
 function list(page, num) {
-    return mongo.find_and_count({orphan:0}, {
+    return mongo.find_and_count({
+        orphan: 0
+    }, {
         "_id": 0,
     }, 'block', {
         "number": -1
