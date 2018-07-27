@@ -108,7 +108,7 @@ function FetchCirculation(req, res) {
 function ListBlocks(req, res) {
     var page = parseInt(req.query.page) || 0;
     var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 50;
-    Helper.checkError(items_per_page >= 1 || items_per_page <= 100, 'ERR_INVALID_PAGE_SIZE')
+    Helper.checkError(items_per_page >= 1 && items_per_page <= 100, 'ERR_INVALID_PAGE_SIZE')
         .then(() => Block.list(page, items_per_page))
         .then((blocks) => res.json(Message(1, undefined, blocks)))
         .catch((error) => res.status(404).json(Message(0, error.message)));
