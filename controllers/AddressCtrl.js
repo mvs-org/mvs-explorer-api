@@ -117,18 +117,18 @@ function ListBalances(req, res) {
 function GetBalance(req, res) {
     let address = req.params.address;
     let symbol = req.params.symbol.toUpperCase();
-    let format = (req.query.format=="text") ? "text" : "json";
+    let format = (req.query.format=="plain") ? "plain" : "json";
     Block.height()
         .then((height) => Address.balances(address, height))
         .then((balances) => {
             if(symbol=="ETP")
-                return (balances.info.ETP) ? balances.info.ETP/(10^8) : 0;
+                return (balances.info.ETP) ? parseInt(balances.info.ETP)/Math.pow(10,8) : 0;
             else
-                return (balances.tokens[symbol]) ? balances.tokens[symbol]/(10^balances.definitions[symbol].decimals) : 0;
+                return (balances.tokens[symbol]) ? balances.tokens[symbol]/Math.pow(10,balances.definitions[symbol].decimals) : 0;
         })
         .then((balance) => {
-            if(format=="text")
-                res.status(200).send(balance);
+            if(format=="plain")
+                res.send(balance);
             else
                 res.status(200).json(Message(1, undefined, balance));
         })
