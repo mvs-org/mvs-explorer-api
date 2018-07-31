@@ -14,7 +14,7 @@ let AddressCtrl = require('./AddressCtrl.js'),
     AssetCtrl = require('./AssetCtrl.js'),
     AvatarCtrl = require('./AvatarCtrl.js'),
     CertCtrl = require('./CertCtrl.js'),
-    MitCtrl = require('./MitCtrl.js');
+    MitCtrl = require('./MitCtrl.js'),
     InfoCtrl = require('./InfoCtrl.js');
 
 //Caching
@@ -92,6 +92,16 @@ router.get('/suggest/tx/:prefix', mediumCacheSuccess, TxCtrl.Suggest);
  * @returns {object} 200 - Address details
  */
 router.get('/address/info/:address', shortCacheSuccess, AddressCtrl.ListBalances);
+
+/**
+ * Get balance of an address.
+ * @route GET /address/balance/{symbol}/{address}
+ * @param {string} symbol.path.required - symbol
+ * @param {string} address.path.required - address
+ * @group address - Operations about addresses
+ * @returns {object} 200 - Address balance
+ */
+router.get('/address/balance/:symbol/:address', shortCacheSuccess, AddressCtrl.GetBalance);
 
 /**
  * Search for addresses.

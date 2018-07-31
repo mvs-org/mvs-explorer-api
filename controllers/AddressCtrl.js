@@ -9,6 +9,7 @@ let Tx = require('../models/transaction.js');
 exports.ListTxs = ListTxs;
 exports.ListAddressesTxs = ListAddressesTxs;
 exports.Suggest = Suggest;
+exports.GetBalance = GetBalance;
 exports.ListBalances = ListBalances;
 
 /**
@@ -106,6 +107,30 @@ function ListBalances(req, res) {
                     }
                 })))
                 .then(() => res.status(200).json(Message(1, undefined, balances)));
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_LIST_BALANCES'));
+        });
+};
+
+function GetBalance(req, res) {
+    let address = req.params.address;
+    let symbol = req.params.symbol.toUpperCase();
+    let format = (req.query.format=="plain") ? "plain" : "json";
+    Block.height()
+        .then((height) => Address.balances(address, height))
+        .then((balances) => {
+            if(symbol=="ETP")
+                return (balances.info.ETP) ? parseInt(balances.info.ETP)/Math.pow(10,8) : 0;
+            else
+                return (balances.tokens[symbol]) ? balances.tokens[symbol]/Math.pow(10,balances.definitions[symbol].decimals) : 0;
+        })
+        .then((balance) => {
+            if(format=="plain")
+                res.status(200).send(balance.toString());
+            else
+                res.status(200).json(Message(1, undefined, balance));
         })
         .catch((error) => {
             console.error(error);
