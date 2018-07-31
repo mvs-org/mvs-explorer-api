@@ -14,7 +14,7 @@ let AddressCtrl = require('./AddressCtrl.js'),
     AssetCtrl = require('./AssetCtrl.js'),
     AvatarCtrl = require('./AvatarCtrl.js'),
     CertCtrl = require('./CertCtrl.js'),
-    MitCtrl = require('./MitCtrl.js');
+    MitCtrl = require('./MitCtrl.js'),
     InfoCtrl = require('./InfoCtrl.js');
 
 //Caching
