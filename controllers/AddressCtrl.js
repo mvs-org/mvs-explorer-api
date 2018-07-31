@@ -128,7 +128,7 @@ function GetBalance(req, res) {
         })
         .then((balance) => {
             if(format=="plain")
-                res.send(balance);
+                res.status(200).send(balance.toString());
             else
                 res.status(200).json(Message(1, undefined, balance));
         })
