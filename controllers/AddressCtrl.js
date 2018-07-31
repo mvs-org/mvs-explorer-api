@@ -116,7 +116,7 @@ function ListBalances(req, res) {
 
 function GetBalance(req, res) {
     let address = req.params.address;
-    let symbol = req.params.symbol.toUppercase();
+    let symbol = req.params.symbol.toUpperCase();
     let format = (req.query.format=="text") ? "text" : "json";
     Block.height()
         .then((height) => Address.balances(address, height))
