@@ -9,6 +9,7 @@ let Tx = require('../models/transaction.js');
 exports.ListTxs = ListTxs;
 exports.ListAddressesTxs = ListAddressesTxs;
 exports.Suggest = Suggest;
+exports.GetBalance = GetBalance;
 exports.ListBalances = ListBalances;
 
 /**
