@@ -47,6 +47,8 @@ function fetchHash(blockhash) {
 }
 
 function blockstats(interval, limit) {
+    if(limit==undefined)
+        limit=0;
     return mongo.connect()
         .then((db) => db.collection('block'))
         .then((c) => c.find({

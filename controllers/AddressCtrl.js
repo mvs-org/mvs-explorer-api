@@ -117,17 +117,28 @@ function ListBalances(req, res) {
 function GetBalance(req, res) {
     let address = req.params.address;
     let symbol = req.params.symbol.toUpperCase();
-    let format = (req.query.format=="plain") ? "plain" : "json";
+    let format = (req.query.format == "plain") ? "plain" : "json";
     Block.height()
         .then((height) => Address.balances(address, height))
         .then((balances) => {
-            if(symbol=="ETP")
-                return (balances.info.ETP) ? parseInt(balances.info.ETP)/Math.pow(10,8) : 0;
-            else
-                return (balances.tokens[symbol]) ? balances.tokens[symbol]/Math.pow(10,balances.definitions[symbol].decimals) : 0;
+            debugger;
+            if (symbol == "ETP")
+                return (balances.info.ETP) ? parseInt(balances.info.ETP) / Math.pow(10, 8) : 0;
+            else {
+                balances['definitions'] = {};
+                return Asset.listassets()
+                    .then((assets) => Promise.all(assets.map((asset) => {
+                        if (typeof(balances['tokens'][asset.symbol]) != 'undefined') {
+                            balances['definitions'][asset.symbol] = asset;
+                        }
+                    })))
+                    .then(() => {
+                        return (balances.tokens[symbol]) ? balances.tokens[symbol] / Math.pow(10, balances.definitions[symbol].decimals) : 0;
+                    });
+            }
         })
         .then((balance) => {
-            if(format=="plain")
+            if (format == "plain")
                 res.status(200).send(balance.toString());
             else
                 res.status(200).json(Message(1, undefined, balance));

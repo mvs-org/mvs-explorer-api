@@ -63,7 +63,7 @@ function ListTxs(req, res) {
 function ListBlockstats(req, res) {
     var interval = parseInt(req.query.interval) || 10000;
     var limit = parseInt(req.query.limit) || 0;
-    Block.blockstats(interval, (limit > 0) ? limit : undefined)
+    Block.blockstats(interval, (limit > 0) ? limit : 0)
         .then((times) => res.json(Message(1, undefined, times)))
         .catch((error) => {
             console.error(error);
