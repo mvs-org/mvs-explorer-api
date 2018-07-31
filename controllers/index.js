@@ -94,6 +94,16 @@ router.get('/suggest/tx/:prefix', mediumCacheSuccess, TxCtrl.Suggest);
 router.get('/address/info/:address', shortCacheSuccess, AddressCtrl.ListBalances);
 
 /**
+ * Get balance of an address.
+ * @route GET /address/balance/{symbol}/{address}
+ * @param {string} symbol.path.required - symbol
+ * @param {string} address.path.required - address
+ * @group address - Operations about addresses
+ * @returns {object} 200 - Address balance
+ */
+router.get('/address/balance/:symbol/:address', shortCacheSuccess, AddressCtrl.GetBalance);
+
+/**
  * Search for addresses.
  * @route GET /suggest/address/{prefix}
  * @param {string} prefix.path.required - Address prefix

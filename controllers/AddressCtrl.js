@@ -112,3 +112,27 @@ function ListBalances(req, res) {
             res.status(404).json(Message(0, 'ERR_LIST_BALANCES'));
         });
 };
+
+function GetBalance(req, res) {
+    let address = req.params.address;
+    let symbol = req.params.symbol.toUppercase();
+    let format = (req.query.format=="text") ? "text" : "json";
+    Block.height()
+        .then((height) => Address.balances(address, height))
+        .then((balances) => {
+            if(symbol=="ETP")
+                return (balances.info.ETP) ? balances.info.ETP/(10^8) : 0;
+            else
+                return (balances.tokens[symbol]) ? balances.tokens[symbol]/(10^balances.definitions[symbol].decimals) : 0;
+        })
+        .then((balance) => {
+            if(format=="text")
+                res.status(200).send(balance);
+            else
+                res.status(200).json(Message(1, undefined, balance));
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_LIST_BALANCES'));
+        });
+};
