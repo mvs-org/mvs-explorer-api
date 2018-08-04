@@ -345,6 +345,7 @@ router.get('/mining', shortCacheSuccess, MiningCtrl.info);
 /**
  * This function returns the mining pool statistics.
  * @route GET /poolstats
+ * @param {number} interval.query.optional - Interval
  * @group general - General operations
  * @returns {object} 200 - Mining pool statistics
  */

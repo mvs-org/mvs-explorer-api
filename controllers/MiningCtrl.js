@@ -27,8 +27,9 @@ function info(req, res) {
 }
 
 function poolstats(req, res) {
+    var interval = parseInt(req.query.interval) || 1000;
     Block.height()
-        .then((height) => Promise.all([Mining.pools(), Mining.poolstats(height - 1000, height)]))
+        .then((height) => Promise.all([Mining.pools(), Mining.poolstats(height - interval, height)]))
         .then((results) => {
             let pools = [];
             return Promise.all(results[0].map((pool) => {
