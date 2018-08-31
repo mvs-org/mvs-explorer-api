@@ -9,7 +9,7 @@ exports.ListAllAssets = listassets;
 exports.ListStakes = listStakes;
 exports.AssetInfo = assetinfo;
 exports.Search = search;
-exports.BridgeBlacklist = ethBridgeBlacklist;
+exports.BridgeWhitelist = ethBridgeWhitelist;
 
 /**
  * Get the list of all the assets.
@@ -64,9 +64,9 @@ function assetinfo(req, res) {
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_ASSETS')));
 };
 
-function ethBridgeBlacklist(req,res){
-    if(BridgeConfig.blacklist)
-        res.json(Message(1, undefined, BridgeConfig.blacklist));
+function ethBridgeWhitelist(req,res){
+    if(BridgeConfig.whitelist)
+        res.json(Message(1, undefined, BridgeConfig.whitelist));
     else
-        res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_BLACKLIST'));
+        res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_WHITELIST'));
 }

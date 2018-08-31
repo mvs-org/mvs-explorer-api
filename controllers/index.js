@@ -220,12 +220,12 @@ router.get('/stakes/:symbol', longCacheSuccess, AssetCtrl.ListStakes);
 router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
 
 /**
- * This function returns a blacklist of MSTs that have a ERC20 prefix but still cant't be swapped with an Ethereum token.
- * @route GET /bridge/blacklist
+ * This function returns a whitelist of MSTs that can be swapped with an Ethereum token.
+ * @route GET /bridge/whitelist
  * @group asset - Asset operations
- * @returns {object} 200 - Blacklist
+ * @returns {object} 200 - Whitelist
  */
-router.get('/bridge/blacklist', longCacheSuccess, AssetCtrl.BridgeBlacklist);
+router.get('/bridge/whitelist', mediumCacheSuccess, AssetCtrl.BridgeWhitelist);
 
 /**
  * This function returns the information about a specific asset.
