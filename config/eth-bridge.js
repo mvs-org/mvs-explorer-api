@@ -1,3 +1,3 @@
 module.exports = {
-    "whitelist": (process.env.BRIDGE_BLACKLIST) ? process.env.BRIDGE_BLACKLIST.split(',') : []
+    "whitelist": (process.env.BRIDGE_WHITELIST) ? process.env.BRIDGE_WHITELIST.split(',') : []
 };
