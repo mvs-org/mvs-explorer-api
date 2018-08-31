@@ -2,12 +2,14 @@
 
 //Load Models
 var Assets = require('../models/assets.js'),
+    BridgeConfig = require('../config/eth-bridge.js'),
     Message = require('../models/message.js');
 
 exports.ListAllAssets = listassets;
 exports.ListStakes = listStakes;
 exports.AssetInfo = assetinfo;
 exports.Search = search;
+exports.BridgeWhitelist = ethBridgeWhitelist;
 
 /**
  * Get the list of all the assets.
@@ -61,3 +63,10 @@ function assetinfo(req, res) {
         .then((assets) => res.json(Message(1, undefined, assets)))
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_ASSETS')));
 };
+
+function ethBridgeWhitelist(req,res){
+    if(BridgeConfig.whitelist)
+        res.json(Message(1, undefined, BridgeConfig.whitelist));
+    else
+        res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_WHITELIST'));
+}
