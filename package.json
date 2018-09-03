@@ -1,6 +1,6 @@
 {
   "name": "mvs-explorer",
-  "version": "0.4.7",
+  "version": "0.4.9",
   "description": "Explorer for the metaverse blockchain.",
   "main": "server.js",
   "scripts": {
