@@ -220,10 +220,18 @@ router.get('/stakes/:symbol', longCacheSuccess, AssetCtrl.ListStakes);
 router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
 
 /**
+ * This function returns a list of MST-ERC20 configurations.
+ * @route GET /bridge/config
+ * @group asset - Asset operations
+ * @returns {object} 200 - Bridge configurations
+ */
+router.get('/bridge/config', mediumCacheSuccess, AssetCtrl.BridgeConfig);
+
+/**
  * This function returns a whitelist of MSTs that can be swapped with an Ethereum token.
  * @route GET /bridge/whitelist
  * @group asset - Asset operations
- * @returns {object} 200 - Whitelist
+ * @returns {object} 200 - Bridge Whitelist
  */
 router.get('/bridge/whitelist', mediumCacheSuccess, AssetCtrl.BridgeWhitelist);
 
