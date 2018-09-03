@@ -17,7 +17,7 @@ module.exports = {
 function config() {
     return mongo.connect()
         .then((db) => db.collection('bridge'))
-        .then(collection => collection.findAll({}, {
+        .then(collection => collection.find({}, {
             "_id": 0
         }))
         .then(cursor => cursor.toArray());

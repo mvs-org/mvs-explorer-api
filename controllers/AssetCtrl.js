@@ -75,5 +75,8 @@ function ethBridgeList(req,res){
 function ethBridgeConfig(req,res){
     Bridge.config()
         .then(list=>res.json(Message(1, undefined, list)))
-        .catch(()=>res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_CONFIG')));
+        .catch((error)=>{
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_CONFIG'));
+        });
 }
