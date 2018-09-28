@@ -226,7 +226,7 @@ router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
  * @group asset - Asset operations
  * @returns {object} 200 - 3rd party conversion rates
  */
-router.get('/3rd/conversion', mediumCacheSuccess, ThirdPartyCtrlr.rates);
+router.get('/3rd/conversion', mediumCacheSuccess, ThirdPartyCtrl.rates);
 
 /**
  * This function returns a list of MST-ERC20 configurations.
