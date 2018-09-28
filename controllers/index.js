@@ -7,6 +7,7 @@ let AddressCtrl = require('./AddressCtrl.js'),
     PricingCtrl = require('./PricingCtrl.js'),
     SearchCtrl = require('./SearchCtrl.js'),
     MiningCtrl = require('./MiningCtrl.js'),
+    ThirdPartyCtrl = require('./ThirdPartyCtrl.js'),
     GeoCtrl = require('./GeoCtrl.js'),
     FullnodeCtrl = require('./FullnodeCtrl.js'),
     LightwalletCtrl = require('./LightwalletCtrl.js'),
@@ -218,6 +219,14 @@ router.get('/stakes/:symbol', longCacheSuccess, AssetCtrl.ListStakes);
  * @returns {object} 200 - Search for assets
  */
 router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
+
+/**
+ * This function returns a list of 3rd party conversion rates.
+ * @route GET /3rd/conversion
+ * @group asset - Asset operations
+ * @returns {object} 200 - 3rd party conversion rates
+ */
+router.get('/3rd/conversion', mediumCacheSuccess, ThirdPartyCtrlr.rates);
 
 /**
  * This function returns a list of MST-ERC20 configurations.
