@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM node
 
 # Set the work directory
 RUN mkdir -p /var/www/app
@@ -13,4 +13,4 @@ COPY . /var/www/app
 
 EXPOSE 80
 
-CMD ["npm start"]
+CMD ["node", "server.js"]
