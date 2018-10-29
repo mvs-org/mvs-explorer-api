@@ -1,4 +1,4 @@
-FROM node
+FROM node:10-alpine
 
 # Set the work directory
 RUN mkdir -p /var/www/app
