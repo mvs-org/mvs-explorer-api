@@ -231,7 +231,7 @@ router.get('/3rd/conversion', mediumCacheSuccess, ThirdPartyCtrl.rates);
 /**
  * This function returns a list of MST-ERC20 configurations.
  * @route GET /bridge/config
- * @group asset - Asset operations
+ * @group asset - Bridge operations
  * @returns {object} 200 - Bridge configurations
  */
 router.get('/bridge/config', mediumCacheSuccess, AssetCtrl.BridgeConfig);
@@ -239,10 +239,18 @@ router.get('/bridge/config', mediumCacheSuccess, AssetCtrl.BridgeConfig);
 /**
  * This function returns a whitelist of MSTs that can be swapped with an Ethereum token.
  * @route GET /bridge/whitelist
- * @group asset - Asset operations
+ * @group asset - Bridge operations
  * @returns {object} 200 - Bridge Whitelist
  */
 router.get('/bridge/whitelist', mediumCacheSuccess, AssetCtrl.BridgeWhitelist);
+
+/**
+ * Rate for the ETH to ETP swap.
+ * @route GET /bridge/rate/ETHETP
+ * @group asset - Bridge operations
+ * @returns {object} 200 - ETHETP rate
+ */
+router.get('/bridge/rate/ETHETP', mediumCacheSuccess, PricingCtrl.ethswaprate);
 
 /**
  * This function returns the information about a specific asset.
@@ -344,10 +352,10 @@ router.get('/info', longCacheSuccess, InfoCtrl.Info);
 router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
 
 /**
- * This function returns the pricing information of ETP on bitfinex.
+ * This function returns the pricing information of ETP.
  * @route GET /pricing
  * @group general - Pricing operations
- * @returns {object} 200 - Bitfinex ticker
+ * @returns {object} 200 - tickers
  */
 router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
 
@@ -357,7 +365,7 @@ router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
  * @group general - Pricing operations
  * @returns {object} 200 - Tickers
  */
-router.get('/pricing/tickers', mediumCacheSuccess, PricingCtrl.cmc);
+router.get('/pricing/tickers', shortCacheSuccess, PricingCtrl.cmc);
 
 /**
  * This function returns the mining information.

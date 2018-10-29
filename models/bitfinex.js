@@ -1,25 +1,19 @@
 let requestify = require('requestify');
 
 module.exports = {
-    tickers: tickers
+    ticker: ticker,
+    last: last,
 };
 
-function tickers() {
-    return new Promise((resolve, reject) => {
-        requestify.get('https://api.bitfinex.com/v2/ticker/tETPUSD')
-            .then(function(response) {
-                let result = response.getBody();
-                if (result.length)
-                    resolve({
-                        'ETPUSD': result[6]
-                    });
-                else {
-                    reject(Error('ERR_PRICING_PARSING'));
-                }
-            })
-            .catch((error) => {
-                console.error(error);
-                reject(Error('ERR_LOAD_PRICING'))
-            });
-    });
+function ticker(target = "ETP", base = "USD") {
+    return requestify.get(`https://api.bitfinex.com/v2/ticker/t${target}${base}`)
+        .then(function(response) {
+            let result = response.getBody()
+            if (!result || result.length < 6) throw 'ERR_PRICING_PARSING'
+            return result
+        })
+}
+
+function last(target = "ETP", base = "USD") {
+    return ticker(target, base).then(ticker=>ticker[6])
 }
