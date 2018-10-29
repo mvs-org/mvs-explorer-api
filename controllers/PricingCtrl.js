@@ -39,7 +39,7 @@ function ethSwapRate(req, res) {
 
             let ETH_ETP = Math.min(BF_ETH_ETP, RB_ETH_ETP) * rateFactor()
 
-            return ETH_ETP.toFixed(5)
+            return parseFloat(ETH_ETP.toFixed(5))
         })
         .then(rate => res.json(Message(1, undefined, rate)))
         .catch((error) => {
