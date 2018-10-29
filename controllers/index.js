@@ -352,14 +352,6 @@ router.get('/info', longCacheSuccess, InfoCtrl.Info);
 router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
 
 /**
- * This function returns the pricing information of ETP.
- * @route GET /pricing
- * @group general - Pricing operations
- * @returns {object} 200 - tickers
- */
-router.get('/pricing', mediumCacheSuccess, PricingCtrl.tickers);
-
-/**
  * This function returns the pricing information for multiple assets.
  * @route GET /pricing/tickers
  * @group general - Pricing operations
