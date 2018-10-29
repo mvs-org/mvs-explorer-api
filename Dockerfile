@@ -8,12 +8,9 @@ WORKDIR /var/www/app
 COPY package.json ./
 RUN npm i --production
 
-# Install forever globally
-RUN npm i -g forever
-
 # Add application files
 COPY . /var/www/app
 
 EXPOSE 80
 
-CMD ["forever", "--minUptime", "100", "--spinSleepTime", "10", "server.js"]
+CMD ["npm start"]
