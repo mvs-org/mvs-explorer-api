@@ -5,6 +5,7 @@ let express = require('express'),
 let AddressCtrl = require('./AddressCtrl.js'),
     BlockCtrl = require('./BlockCtrl.js'),
     PricingCtrl = require('./PricingCtrl.js'),
+    ETHSwapCtrl = require('./ETHSwapCtrl.js'),
     SearchCtrl = require('./SearchCtrl.js'),
     MiningCtrl = require('./MiningCtrl.js'),
     ThirdPartyCtrl = require('./ThirdPartyCtrl.js'),
@@ -245,12 +246,20 @@ router.get('/bridge/config', mediumCacheSuccess, AssetCtrl.BridgeConfig);
 router.get('/bridge/whitelist', mediumCacheSuccess, AssetCtrl.BridgeWhitelist);
 
 /**
+ * Balances of the ETH swap relay pool.
+ * @route GET /bridge/balances
+ * @group asset - Bridge operations
+ * @returns {object} 200 - ETHETP rate
+ */
+router.get('/bridge/balances', mediumCacheSuccess, ETHSwapCtrl.poolBalances);
+
+/**
  * Rate for the ETH to ETP swap.
  * @route GET /bridge/rate/ETHETP
  * @group asset - Bridge operations
  * @returns {object} 200 - ETHETP rate
  */
-router.get('/bridge/rate/ETHETP', mediumCacheSuccess, PricingCtrl.ethswaprate);
+router.get('/bridge/rate/ETHETP', shortCacheSuccess, ETHSwapCtrl.ethSwapRate);
 
 /**
  * This function returns the information about a specific asset.
