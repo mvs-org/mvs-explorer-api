@@ -3,8 +3,8 @@ module.exports = {
         "testnet": {},
         "mainnet": {
             "XRB/GBC": {
-                "bid": 0.5,
-                "ask": 0.5
+                "bid": 1,
+                "ask": 1
             }
         }
     }
