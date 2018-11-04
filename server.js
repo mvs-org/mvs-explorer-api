@@ -52,7 +52,7 @@ if (limiter_config.limit > 0) {
     limiter({
         path: '*',
         method: 'all',
-        lookup: 'headers.x-real-ip',
+        lookup: 'headers.x-forwarded-for',
         total: limiter_config.limit,
         expires: limiter_config.expiration
     })
