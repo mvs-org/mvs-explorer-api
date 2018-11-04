@@ -1,4 +1,4 @@
-FROM node
+FROM node:10-alpine
 
 # Set the work directory
 RUN mkdir -p /var/www/app
@@ -13,4 +13,4 @@ COPY . /var/www/app
 
 EXPOSE 80
 
-CMD ["node", "server.js"]
+CMD ["node", "--max_old_space_size=4096", "server.js"]
