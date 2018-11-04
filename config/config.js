@@ -1,6 +1,6 @@
 exports.app = {
     "http": {
-        "port": "8080"
+        "port": "80"
     },
     "logging": {
         "enable": (process.env.LOGGING=='true') ? true : false,
