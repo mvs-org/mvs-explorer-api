@@ -41,15 +41,20 @@ app.use(bodyParser.json());
 
 //Configure logging
 if (config.app.logging.enable) {
+    console.info(`enable logging type ${config.app.logging.type}`)
     var winston = require('winston');
     var expressWinston = require('express-winston');
     let transports = [];
-    if (config.app.logging.type == 'elasticsearch'){
-        var Elasticsearch = require('winston-elasticsearch');
-        transports.push(
-            new Elasticsearch({
-                index: 'explorer-api'
-            }))
+    switch (config.app.logging.type) {
+        case 'elasticsearch':
+            var Elasticsearch = require('winston-elasticsearch');
+            transports.push(
+                new Elasticsearch({
+                    index: 'explorer-api'
+                }))
+            break;
+        default:
+            transports.push(new winston.transports.Console())
     }
     app.use(expressWinston.logger({
         transports: transports,
