@@ -1,8 +1,9 @@
 exports.app = {
     "http": {
-        "port": "80"
+        "port": "8080"
     },
     "logging": {
-        "enable": false
+        "enable": process.env.LOGGING=='true',
+        "type": (process.env.LOGGIN_TYPE)? process.env.LOGGIN_TYPE : 'std',
     }
 };

@@ -43,13 +43,16 @@ app.use(bodyParser.json());
 if (config.app.logging.enable) {
     var winston = require('winston');
     var expressWinston = require('express-winston');
-    var Elasticsearch = require('winston-elasticsearch');
-    app.use(expressWinston.logger({
-        transports: [
+    let transports = [];
+    if (config.app.logging.type == 'elasticsearch'){
+        var Elasticsearch = require('winston-elasticsearch');
+        transports.push(
             new Elasticsearch({
                 index: 'explorer-api'
-            })
-        ],
+            }))
+    }
+    app.use(expressWinston.logger({
+        transports: transports,
         meta: true,
         msg: "HTTP {{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}",
         expressFormat: true,
