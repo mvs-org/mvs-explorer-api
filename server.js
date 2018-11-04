@@ -54,7 +54,7 @@ if (limiter_config.limit > 0) {
         method: 'all',
         lookup: 'headers.x-forwarded-for',
         total: limiter_config.limit,
-        expires: limiter_config.expiration
+        expire: limiter_config.expiration
     })
 }
 
