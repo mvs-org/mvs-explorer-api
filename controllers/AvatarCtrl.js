@@ -41,7 +41,12 @@ function search(req, res) {
  */
 function avatarinfo(req, res) {
     var symbol = req.params.avatar_symbol;
-    Avatars.avatarinfo(symbol)
+    let search = (isAddress(symbol)) ? Avatars.avatarInfoByAddress : Avatars.avatarinfo
+    search(symbol)
         .then((avatars) => res.json(Message(1, undefined, avatars)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_AVATARS')));
+        .catch((error) => res.status(404).json(Message(0, 'ERR_GET_AVATAR')));
+};
+
+function isAddress(address) {
+    return (address.length == 34) && (address.charAt(0) == 'M' || address.charAt(0) == 't' || address.charAt(0) == '3');
 };
