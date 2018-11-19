@@ -39,6 +39,25 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
+const limiter_config = require('./config/limits.js')
+
+if (limiter_config.limit > 0) {
+    console.info(`enable rate limit: ${limiter_config.limit}`)
+    var redis = require('redis'),
+        redis_config = require('./config/redis.js');
+
+    var client = require('redis').createClient(redis_config.config)
+    var limiter = require('express-limiter')(app, client)
+
+    limiter({
+        path: '*',
+        method: 'all',
+        lookup: 'headers.cf-connecting-ip',
+        total: limiter_config.limit,
+        expire: limiter_config.expiration
+    })
+}
+
 //Configure logging
 if (config.app.logging.enable) {
     console.info(`enable logging type ${config.app.logging.type}`)

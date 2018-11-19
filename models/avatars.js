@@ -8,7 +8,8 @@ module.exports = {
     listavatars: listavatars,
     countavatars: countavatars,
     suggest: suggest,
-    avatarinfo: avatarinfo
+    avatarinfo: avatarinfo,
+    avatarInfoByAddress: avatarInfoByAddress,
 };
 
 /**
@@ -48,14 +49,26 @@ function suggest(prefix, limit) {
 
 /**
  * Get the information of an avatar.
- * @param {} hash
- * @returns {}
  */
 function avatarinfo(symbol) {
     return mongo.connect()
         .then((db) => db.collection('avatar'))
         .then((avatars) => avatars.findOne({
             "symbol": symbol
+        }, {
+            "_id": 0,
+            "type": 0
+        }));
+}
+
+/**
+ * Get the information of an avatar by its address.
+ */
+function avatarInfoByAddress(address) {
+    return mongo.connect()
+        .then((db) => db.collection('avatar'))
+        .then((avatars) => avatars.findOne({
+            "address": address
         }, {
             "_id": 0,
             "type": 0
