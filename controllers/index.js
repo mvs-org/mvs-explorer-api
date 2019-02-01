@@ -428,7 +428,8 @@ router.get('/suggest/all/:prefix', SearchCtrl.Suggest);
  * Result array contains points in form [height, avg blocktime, difficulty]
  *
  * @route GET /stats/block
- * @param {number} interval.query.optional - Interval
+ * @param {number} downscale.query.optional - Downscale (integer above 1)
+ * @param {string} type.query.optional - Type of mining (pow, pos or dpos)
  * @group general - general operations
  * @returns {object} 200 - Suggestion list
  */

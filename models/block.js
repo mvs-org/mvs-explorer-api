@@ -46,26 +46,27 @@ function fetchHash(blockhash) {
         }));
 }
 
-function blockstats(interval, limit) {
+function blockstats(interval, limit, type) {
     if(limit==undefined)
         limit=0;
     return mongo.connect()
-        .then((db) => db.collection('block'))
+        .then((db) => db.collection('statistic'))
         .then((c) => c.find({
-            orphan: 0,
-            number: {
+            type: type,
+            height: {
                 $mod: [interval, 0]
-            }
+            },
+            interval: 1000
         }, {
             _id: 0,
-            number: 1,
-            time_stamp: 1,
-            bits: 1
+            height: 1,
+            timestamp: 1,
+            value: 1
         }).sort({
-            number: -1
+            height: -1
         }).limit(limit).toArray())
         .then((blocks) => blocks.map((block, index) => {
-            return [block.number, (block.number == 0 || blocks[index + 1] == undefined) ? 0 : parseFloat(((block.time_stamp - blocks[index + 1].time_stamp) / interval).toFixed(3)), parseInt(block.bits)];
+            return [block.height, (block.height == 0 || blocks[index + 1] == undefined) ? 0 : parseFloat(((block.timestamp - blocks[index + 1].timestamp) / interval).toFixed(3)), block.value];
         }));
 }
 

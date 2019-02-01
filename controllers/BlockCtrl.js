@@ -61,9 +61,24 @@ function ListTxs(req, res) {
 }
 
 function ListBlockstats(req, res) {
-    var interval = parseInt(req.query.interval) || 10000;
+    var downscale = Math.max(1, parseInt(req.query.downscale)) || 10;
+    var interval = downscale*1000;
+    var type = undefined;
     var limit = parseInt(req.query.limit) || 0;
-    Block.blockstats(interval, (limit > 0) ? limit : 0)
+    switch (req.query.type) {
+        case 'pow':
+            type = 'DIFFICULTY_POW';
+            break;
+        case 'pos':
+            type = 'DIFFICULTY_POS';
+            break;
+        case 'dpos':
+            type = 'DIFFICULTY_DPOS';
+            break;
+        default:
+            type = 'DIFFICULTY_POW';
+    }
+    Block.blockstats(interval, (limit > 0) ? limit : 0, type)
         .then((times) => res.json(Message(1, undefined, times)))
         .catch((error) => {
             console.error(error);
