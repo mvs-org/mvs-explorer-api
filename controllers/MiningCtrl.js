@@ -6,7 +6,8 @@ var Mining = require('../models/mining_pool.js'),
 
 module.exports = {
     info: info,
-    poolstats: poolstats
+    poolstats: poolstats,
+    posstats: posstats
 };
 
 function info(req, res) {
@@ -28,15 +29,14 @@ function info(req, res) {
 
 function poolstats(req, res) {
     var interval = parseInt(req.query.interval) || 1000;
-    Block.height()
-        .then((height) => Promise.all([Mining.pools(), Mining.poolstats(height - interval, height)]))
+    Promise.all([Mining.pools(), Mining.poolstats(interval)])
         .then((results) => {
             let pools = [];
             return Promise.all(results[0].map((pool) => {
                     pool.counter = 0;
                     return Promise.all(results[1].map((stat) => {
-                            if (pool.addresses.indexOf(stat._id) !== -1)
-                                pool.counter += stat.finds;
+                            if (pool.name == stat._id)
+                                pool.counter = stat.finds;
                         }))
                         .then(() => {
                             if (pool.counter)
@@ -44,6 +44,29 @@ function poolstats(req, res) {
                         });
                 }))
                 .then(() => pools);
+        })
+        .then((mining_info) => res.json(Message(1, undefined, mining_info)))
+        .catch((error) => res.status(404).json(Message(0, error.message)));
+}
+
+function posstats(req, res) {
+    var interval = parseInt(req.query.interval) || 1000;
+    var top = parseInt(req.query.top) || 25;
+    Mining.posstats(interval, top)
+        .then((result) => {
+            console.log(result)
+            let avatars = []
+            return Promise.all(result.map((stat) => {
+                console.log(stat)
+                if(stat._id) {
+                    let avatar = {}
+                    avatar.avatar = stat._id
+                    avatar.counter = stat.finds
+                    avatars.push(avatar)
+                    console.log(avatars)
+                }
+            }))
+            .then(() => avatars);
         })
         .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => res.status(404).json(Message(0, error.message)));

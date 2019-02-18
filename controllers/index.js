@@ -386,6 +386,16 @@ router.get('/mining', shortCacheSuccess, MiningCtrl.info);
 router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
 
 /**
+ * This function returns the PoS mining statistics.
+ * @route GET /posstats
+ * @param {number} interval.query.optional - Interval
+ * @param {number} top.query.optional - Number of Avatars returned
+ * @group general - General operations
+ * @returns {object} 200 - PoS mining statistics
+ */
+router.get('/posstats', longCacheSuccess, MiningCtrl.posstats);
+
+/**
  * This function returns the sum of add deposited ETP.
  * @route GET /depositsum
  * @group general - General operations
