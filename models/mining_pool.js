@@ -49,7 +49,7 @@ function poolstats(interval) {
     });
 }
 
-function posstats(interval, top) {
+function posstats(interval) {
     return new Promise((resolve, reject) => {
         mongo.connect()
             .then((db) => {
@@ -75,8 +75,6 @@ function posstats(interval, top) {
                     $sort: {
                         finds: -1
                     }
-                }, {
-                    $limit: top
                 }], {}, (err, result) => {
                     resolve(result);
                 });
