@@ -8,6 +8,8 @@ exports.list = list;
 exports.blockstats = blockstats;
 exports.fetch = fetch;
 exports.fetchHash = fetchHash;
+exports.fetchDifficulty = fetchDifficulty;
+exports.statsTypeBlock = statsTypeBlock;
 exports.suggest = suggest;
 exports.list_block_txs = list_block_txs;
 
@@ -44,6 +46,56 @@ function fetchHash(blockhash) {
             else
                 throw Error("ERR_BLOCK_NOT_FOUND");
         }));
+}
+
+function fetchDifficulty(nbr_blocks, version) {
+    return mongo.connect()
+        .then((db) => db.collection('block'))
+        .then((collection) => collection.find({
+            version: version
+        }, {
+            _id: 0,
+            number: 1,
+            bits: 1,
+            time_stamp: 1
+        }).sort({
+            number: -1
+        }).limit(nbr_blocks).toArray())
+        .then((blocks) => {
+            if (blocks)
+                return blocks;
+            else
+                throw Error("ERR_BLOCK_NOT_FOUND");
+        });
+}
+
+function statsTypeBlock(since_height) {
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('block').aggregate([{
+                    $match: {
+                        number: {
+                            $gte: since_height
+                        },
+                        orphan: 0
+                    }
+                }, {
+                    $group: {
+                        _id: "$version",
+                        'counter': {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $sort: {
+                        _id: 1
+                    }
+                }], {}, (err, result) => {
+                    resolve(result);
+                });
+            });
+    });
 }
 
 function blockstats(interval, limit, type) {

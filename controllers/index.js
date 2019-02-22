@@ -369,12 +369,31 @@ router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
 router.get('/pricing/tickers', shortCacheSuccess, PricingCtrl.cmc);
 
 /**
- * This function returns the mining information.
+ * This function returns the general mining information.
  * @route GET /mining
+ * @param {number} interval.query.optional - Interval
  * @group general - General operations
  * @returns {object} 200 - Mining info
  */
 router.get('/mining', shortCacheSuccess, MiningCtrl.info);
+
+/**
+ * This function returns the PoW mining information.
+ * @route GET /mining/pow
+ * @param {number} number.query.optional - Number of blocks used to calculate the statistics
+ * @group general - General operations
+ * @returns {object} 200 - Mining info
+ */
+router.get('/mining/pow', shortCacheSuccess, MiningCtrl.PowInfo);
+
+/**
+ * This function returns the PoS mining information.
+ * @route GET /mining/pos
+ * @param {number} number.query.optional - Number of blocks used to calculate the statistics
+ * @group general - General operations
+ * @returns {object} 200 - Mining info
+ */
+router.get('/mining/pos', shortCacheSuccess, MiningCtrl.PosInfo);
 
 /**
  * This function returns the mining pool statistics.
