@@ -15,7 +15,7 @@ module.exports = {
 function info(req, res) {
     var interval = parseInt(req.query.interval) || 1000;
     Block.height()
-        .then((height) => Promise.all([height, Block.statsTypeBlock(height-interval-1), Block.fetch(height), Block.fetch(Math.max(height - interval, 1))]))
+        .then((height) => Promise.all([height, Block.statsTypeBlock(height-interval+1), Block.fetch(height), Block.fetch(Math.max(height - interval, 1))]))
         .then(([height, stats, block0, block1]) => {
             var renamed_stats = [];
             Promise.all(stats.map((stat) => {
