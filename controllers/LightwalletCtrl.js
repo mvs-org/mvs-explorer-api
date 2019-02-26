@@ -6,7 +6,7 @@ module.exports = {
 };
 
 function version(req, res) {
-    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
+    console.log(xml(lightwallet));
     res.set('Content-Type', 'text/xml');
     res.send(xml({
         update: [{
