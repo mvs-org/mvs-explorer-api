@@ -152,7 +152,7 @@ router.get('/addresses/txs', shortCacheSuccess, AddressCtrl.ListAddressesTxs);
  * @group block - Operations about blocks
  * @returns {object} 200 - Latest block number
  */
-router.get('/height', BlockCtrl.FetchHeight);
+router.get('/height', shortCacheSuccess, BlockCtrl.FetchHeight);
 
 /**
  * List blocks.
