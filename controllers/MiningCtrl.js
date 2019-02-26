@@ -44,10 +44,7 @@ function info(req, res) {
                 blocktime: (block0.time_stamp - block1.time_stamp) / interval
             };
         })
-        .then((mining_info) => {
-            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300')
-            res.json(Message(1, undefined, mining_info))
-        })
+        .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, error.message));
@@ -67,10 +64,7 @@ function PowInfo(req, res) {
                 pow_blocktime: (blocks[0].time_stamp - blocks[blocks.length-1].time_stamp) / blocks.length
             };
         })
-        .then((mining_info) => {
-            res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=60')
-            res.json(Message(1, undefined, mining_info))
-        })
+        .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, error.message));
@@ -89,10 +83,7 @@ function PosInfo(req, res) {
                 pos_blocktime: (blocks[0].time_stamp - blocks[blocks.length-1].time_stamp) / blocks.length
             };
         })
-        .then((mining_info) => {
-            res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=60')
-            res.json(Message(1, undefined, mining_info))
-        })
+        .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, error.message));
@@ -117,10 +108,7 @@ function poolstats(req, res) {
                 }))
                 .then(() => pools);
         })
-        .then((mining_info) => {
-            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
-            res.json(Message(1, undefined, mining_info))
-        })
+        .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => res.status(404).json(Message(0, error.message)));
 }
 
@@ -140,9 +128,6 @@ function posstats(req, res) {
             }))
             .then(() => avatars.slice(0, top))
         })
-        .then((mining_info) => {
-            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
-            res.json(Message(1, undefined, mining_info))
-        })
+        .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => res.status(404).json(Message(0, error.message)));
 }
