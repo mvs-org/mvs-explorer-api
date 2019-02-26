@@ -33,8 +33,11 @@ function listStakes(req, res) {
     let symbol = req.params.symbol;
     let limit = parseInt(req.query.limit) || 20;
     let min = parseInt(req.query.min) || 0;
-    Assets.stakelist(symbol.replace(/\./g,'_'), limit, min)
-        .then((list) => res.json(Message(1, undefined, list)))
+    Assets.stakelist(symbol.replace(/\./g, '_'), limit, min)
+        .then((list) => {
+            res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600')
+            res.json(Message(1, undefined, list))
+        })
         .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, 'ERR_LIST_ASSETS_STAKES'));
@@ -50,7 +53,10 @@ function search(req, res) {
     let prefix = req.params.prefix;
     var limit = parseInt(req.query.limit) || 10;
     Assets.suggest(prefix, limit)
-        .then((assets) => res.json(Message(1, undefined, assets)))
+        .then((assets) => {
+            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300')
+            res.json(Message(1, undefined, assets))
+        })
         .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_ASSETS')));
 };
 
@@ -66,16 +72,22 @@ function assetinfo(req, res) {
         .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_ASSETS')));
 };
 
-function ethBridgeList(req,res){
+function ethBridgeList(req, res) {
     Bridge.list()
-        .then(list=>res.json(Message(1, undefined, list)))
-        .catch(()=>res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_WHITELIST')));
+        .then(list => {
+            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
+            res.json(Message(1, undefined, list))
+        })
+        .catch(() => res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_WHITELIST')));
 }
 
-function ethBridgeConfig(req,res){
+function ethBridgeConfig(req, res) {
     Bridge.config()
-        .then(list=>res.json(Message(1, undefined, list)))
-        .catch((error)=>{
+        .then(list => {
+            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
+            res.json(Message(1, undefined, list))
+        })
+        .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_CONFIG'));
         });

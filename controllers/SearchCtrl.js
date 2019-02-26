@@ -50,7 +50,8 @@ function suggest(req, res) {
                     break;
                 default:
                     console.error(error);
-            }
+            } 
+            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300')
             res.status(404).json(Message(0, error.message));
         });
 }

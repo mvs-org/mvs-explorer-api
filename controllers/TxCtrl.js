@@ -13,7 +13,7 @@ exports.Suggest = suggest;
 exports.Broadcast = broadcast;
 exports.FetchTxOutputs = outputs;
 
-function List(req,res){
+function List(req, res) {
     var page = parseInt(req.query.page) || 0;
     var filter = {
         max_time: parseInt(req.query.max_time) || undefined,
@@ -22,7 +22,10 @@ function List(req,res){
         min_height: parseInt(req.query.min_height) || undefined
     };
     Transaction.list(page, 10, filter)
-        .then((txs) => res.json(Message(1, undefined, txs)))
+        .then((txs) => {
+            res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=60')
+            res.json(Message(1, undefined, txs))
+        })
         .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_TX')));
 }
 
@@ -36,6 +39,7 @@ function suggest(req, res) {
     var limit = parseInt(req.query.limit) || 10;
     Transaction.suggest(prefix, limit)
         .then((hashes) => {
+            res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=60')
             res.json(Message(1, undefined, hashes));
         })
         .catch((error) => {
@@ -47,14 +51,20 @@ function suggest(req, res) {
 function rewards(req, res) {
     Block.height()
         .then((height) => Transaction.rewards(height))
-        .then((rewards) => res.json(Message(1, undefined, rewards)))
+        .then((rewards) => {
+            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
+            res.json(Message(1, undefined, rewards))
+        })
         .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_REWARDS')));
 };
 
 function locksum(req, res) {
     Block.height()
         .then((height) => Transaction.locksum(height))
-        .then((sum) => res.json(Message(1, undefined, sum)))
+        .then((sum) => {
+            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
+            res.json(Message(1, undefined, sum))
+        })
         .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_LOCKSUM')));
 };
 
@@ -82,8 +92,8 @@ function broadcast(req, res) {
     var tx = req.body.tx;
     Transaction.broadcast(tx)
         .then((tx) => {
-            if(tx.code==1021)
-                tx.error="Error decoding transaction";
+            if (tx.code == 1021)
+                tx.error = "Error decoding transaction";
             res.json(Message(1, undefined, tx));
         })
         .catch((error) => {
