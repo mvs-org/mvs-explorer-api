@@ -93,10 +93,12 @@ function ListBlockstats(req, res) {
  */
 function FetchHeight(req, res) {
     Block.height()
-        .then((height) => res.json(Message(1, undefined, height)))
+        .then((height) =>{
+            res.setHeader('Cache-Control', 'public, max-age=10, s-maxage=10')
+            res.json(Message(1, undefined, height))
+        })
         .catch((error) => {
             console.error(error);
-            res.setHeader('Cache-Control', 'public, max-age=10, s-maxage=10')
             res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT'))
         });
 }
