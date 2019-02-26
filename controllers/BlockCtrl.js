@@ -41,6 +41,7 @@ function Fetch(req, res) {
     Helper.checkError(!isNaN(number), 'ERR_BLOCK_NUMER_INVALID')
         .then(() => Block.fetch(number))
         .then((block) => {
+            res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300')
             return res.json(Message(1, undefined, block));
         })
         .catch((error) => res.status(404).json(Message(0, error.message)));
