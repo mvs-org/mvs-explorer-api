@@ -369,12 +369,32 @@ router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
 router.get('/pricing/tickers', shortCacheSuccess, PricingCtrl.cmc);
 
 /**
- * This function returns the mining information.
- * @route GET /mining
+ * This function returns the general mining information.
+ * @route GET /mining/general
+ * @param {number} interval.query.optional - Interval
  * @group general - General operations
  * @returns {object} 200 - Mining info
  */
-router.get('/mining', shortCacheSuccess, MiningCtrl.info);
+router.get('/mining/general', shortCacheSuccess, MiningCtrl.info);
+
+/**
+ * This function returns the PoW mining information.
+ * @route GET /mining/pow
+ * @param {number} number.query.optional - Number of blocks used to calculate the statistics
+ * @group general - General operations
+ * @returns {object} 200 - Mining info
+ */
+router.get('/mining', shortCacheSuccess, MiningCtrl.PowInfo);
+router.get('/mining/pow', shortCacheSuccess, MiningCtrl.PowInfo);
+
+/**
+ * This function returns the PoS mining information.
+ * @route GET /mining/pos
+ * @param {number} number.query.optional - Number of blocks used to calculate the statistics
+ * @group general - General operations
+ * @returns {object} 200 - Mining info
+ */
+router.get('/mining/pos', shortCacheSuccess, MiningCtrl.PosInfo);
 
 /**
  * This function returns the mining pool statistics.
@@ -384,6 +404,16 @@ router.get('/mining', shortCacheSuccess, MiningCtrl.info);
  * @returns {object} 200 - Mining pool statistics
  */
 router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
+
+/**
+ * This function returns the PoS mining statistics.
+ * @route GET /posstats
+ * @param {number} interval.query.optional - Interval
+ * @param {number} top.query.optional - Number of Avatars returned
+ * @group general - General operations
+ * @returns {object} 200 - PoS mining statistics
+ */
+router.get('/posstats', longCacheSuccess, MiningCtrl.posstats);
 
 /**
  * This function returns the sum of add deposited ETP.
@@ -428,7 +458,8 @@ router.get('/suggest/all/:prefix', SearchCtrl.Suggest);
  * Result array contains points in form [height, avg blocktime, difficulty]
  *
  * @route GET /stats/block
- * @param {number} interval.query.optional - Interval
+ * @param {number} downscale.query.optional - Downscale (integer above 1)
+ * @param {string} type.query.optional - Type of mining (pow, pos or dpos)
  * @group general - general operations
  * @returns {object} 200 - Suggestion list
  */

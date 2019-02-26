@@ -5,7 +5,8 @@ var mongo = require('../libraries/mongo.js');
 
 module.exports = {
     poolstats: poolstats,
-    pools: pools
+    pools: pools,
+    posstats: posstats
 };
 
 function pools(){
@@ -15,33 +16,57 @@ function pools(){
         .then((cursor)=>cursor.toArray());
 }
 
-function poolstats(from, to) {
+function poolstats(interval) {
     return new Promise((resolve, reject) => {
         mongo.connect()
             .then((db) => {
-                db.collection('tx').aggregate([{
+                db.collection('block').aggregate([{
                     $match: {
-                        "height": {
-                            "$gt": from,
-                            "$lt": to
-                        },
-                        "orphan": 0,
-                        "inputs.0.previous_output.hash": "0000000000000000000000000000000000000000000000000000000000000000",
-                        "outputs.0.locked_height_range": 0
+                        "version": 1,
+                        "orphan": 0
                     }
                 }, {
-                    $project: {
-                        firstoutput: {
-                            $arrayElemAt: ["$outputs", 0]
+                    $sort: {
+                        number: -1
+                    }
+                }, {
+                    $limit: interval
+                }, {
+                    $group: {
+                        _id: "$miner",
+                        'finds': {
+                            $sum: 1
                         }
                     }
                 }, {
-                    $project: {
-                        address: "$firstoutput.address"
+                    $sort: {
+                        finds: -1
+                    }
+                }], {}, (err, result) => {
+                    resolve(result);
+                });
+            });
+    });
+}
+
+function posstats(interval) {
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('block').aggregate([{
+                    $match: {
+                        "version": 2,
+                        "orphan": 0
                     }
                 }, {
+                    $sort: {
+                        number: -1
+                    }
+                }, {
+                    $limit: interval
+                }, {
                     $group: {
-                        _id: "$address",
+                        _id: "$miner",
                         'finds': {
                             $sum: 1
                         }

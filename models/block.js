@@ -8,6 +8,8 @@ exports.list = list;
 exports.blockstats = blockstats;
 exports.fetch = fetch;
 exports.fetchHash = fetchHash;
+exports.fetchDifficulty = fetchDifficulty;
+exports.statsTypeBlock = statsTypeBlock;
 exports.suggest = suggest;
 exports.list_block_txs = list_block_txs;
 
@@ -46,26 +48,77 @@ function fetchHash(blockhash) {
         }));
 }
 
-function blockstats(interval, limit) {
-    if(limit==undefined)
-        limit=0;
+function fetchDifficulty(nbr_blocks, version) {
     return mongo.connect()
         .then((db) => db.collection('block'))
-        .then((c) => c.find({
-            orphan: 0,
-            number: {
-                $mod: [interval, 0]
-            }
+        .then((collection) => collection.find({
+            version: version
         }, {
             _id: 0,
             number: 1,
-            time_stamp: 1,
-            bits: 1
+            bits: 1,
+            time_stamp: 1
         }).sort({
             number: -1
+        }).limit(nbr_blocks).toArray())
+        .then((blocks) => {
+            if (blocks)
+                return blocks;
+            else
+                throw Error("ERR_BLOCK_NOT_FOUND");
+        });
+}
+
+function statsTypeBlock(since_height) {
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('block').aggregate([{
+                    $match: {
+                        number: {
+                            $gte: since_height
+                        },
+                        orphan: 0
+                    }
+                }, {
+                    $group: {
+                        _id: "$version",
+                        'counter': {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $sort: {
+                        _id: 1
+                    }
+                }], {}, (err, result) => {
+                    resolve(result);
+                });
+            });
+    });
+}
+
+function blockstats(interval, limit, type) {
+    if(limit==undefined)
+        limit=0;
+    return mongo.connect()
+        .then((db) => db.collection('statistic'))
+        .then((c) => c.find({
+            type: type,
+            height: {
+                $mod: [interval, 0]
+            },
+            interval: 1000
+        }, {
+            _id: 0,
+            height: 1,
+            timestamp: 1,
+            value: 1
+        }).sort({
+            height: -1
         }).limit(limit).toArray())
         .then((blocks) => blocks.map((block, index) => {
-            return [block.number, (block.number == 0 || blocks[index + 1] == undefined) ? 0 : parseFloat(((block.time_stamp - blocks[index + 1].time_stamp) / interval).toFixed(3)), parseInt(block.bits)];
+            return [block.height, (block.height == 0 || blocks[index + 1] == undefined) ? 0 : parseFloat(((block.timestamp - blocks[index + 1].timestamp) / interval).toFixed(3)), block.value];
         }));
 }
 

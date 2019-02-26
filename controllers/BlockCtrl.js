@@ -41,6 +41,7 @@ function Fetch(req, res) {
     Helper.checkError(!isNaN(number), 'ERR_BLOCK_NUMER_INVALID')
         .then(() => Block.fetch(number))
         .then((block) => {
+            res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300')
             return res.json(Message(1, undefined, block));
         })
         .catch((error) => res.status(404).json(Message(0, error.message)));
@@ -61,9 +62,24 @@ function ListTxs(req, res) {
 }
 
 function ListBlockstats(req, res) {
-    var interval = parseInt(req.query.interval) || 10000;
+    var downscale = Math.max(1, parseInt(req.query.downscale)) || 10;
+    var interval = downscale*1000;
+    var type = undefined;
     var limit = parseInt(req.query.limit) || 0;
-    Block.blockstats(interval, (limit > 0) ? limit : 0)
+    switch (req.query.type) {
+        case 'pow':
+            type = 'DIFFICULTY_POW';
+            break;
+        case 'pos':
+            type = 'DIFFICULTY_POS';
+            break;
+        case 'dpos':
+            type = 'DIFFICULTY_DPOS';
+            break;
+        default:
+            type = 'DIFFICULTY_POW';
+    }
+    Block.blockstats(interval, (limit > 0) ? limit : 0, type)
         .then((times) => res.json(Message(1, undefined, times)))
         .catch((error) => {
             console.error(error);
@@ -78,10 +94,13 @@ function ListBlockstats(req, res) {
  */
 function FetchHeight(req, res) {
     Block.height()
-        .then((height) => res.json(Message(1, undefined, height)))
+        .then((height) =>{
+            res.setHeader('Cache-Control', 'public, max-age=10, s-maxage=10')
+            res.json(Message(1, undefined, height))
+        })
         .catch((error) => {
             console.error(error);
-            res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT'));
+            res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT'))
         });
 }
 
