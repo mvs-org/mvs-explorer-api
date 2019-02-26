@@ -75,7 +75,10 @@ function info(req, res) {
                     return info;
                 });
         })
-        .then((info) => res.json(Message(1, undefined, info)))
+        .then((info) => {
+            res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300')
+            res.json(Message(1, undefined, info))
+        })
         .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, 'ERR_GET_INFO'));
