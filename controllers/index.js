@@ -370,12 +370,12 @@ router.get('/pricing/tickers', shortCacheSuccess, PricingCtrl.cmc);
 
 /**
  * This function returns the general mining information.
- * @route GET /mining
+ * @route GET /mining/general
  * @param {number} interval.query.optional - Interval
  * @group general - General operations
  * @returns {object} 200 - Mining info
  */
-router.get('/mining', shortCacheSuccess, MiningCtrl.info);
+router.get('/mining/general', shortCacheSuccess, MiningCtrl.info);
 
 /**
  * This function returns the PoW mining information.
@@ -384,6 +384,7 @@ router.get('/mining', shortCacheSuccess, MiningCtrl.info);
  * @group general - General operations
  * @returns {object} 200 - Mining info
  */
+router.get('/mining', shortCacheSuccess, MiningCtrl.PowInfo);
 router.get('/mining/pow', shortCacheSuccess, MiningCtrl.PowInfo);
 
 /**
