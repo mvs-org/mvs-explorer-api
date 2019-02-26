@@ -96,7 +96,8 @@ function FetchHeight(req, res) {
         .then((height) => res.json(Message(1, undefined, height)))
         .catch((error) => {
             console.error(error);
-            res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT'));
+            res.setHeader('Cache-Control', 'public, max-age=10, s-maxage=10')
+            res.status(404).json(Message(0, 'ERR_FETCH_HEIGHT'))
         });
 }
 
