@@ -8,6 +8,7 @@ module.exports = {
 function version(req, res) {
     Fullnode.version()
         .then((version) => {
+            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
             res.json(version);
         })
         .catch((error) => {

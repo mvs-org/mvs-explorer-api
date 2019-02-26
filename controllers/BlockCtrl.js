@@ -80,7 +80,10 @@ function ListBlockstats(req, res) {
             type = 'DIFFICULTY_POW';
     }
     Block.blockstats(interval, (limit > 0) ? limit : 0, type)
-        .then((times) => res.json(Message(1, undefined, times)))
+        .then((times) => {
+            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=1800')
+            res.json(Message(1, undefined, times))
+        })
         .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, 'ERR_LIST_BLOCKTIMES'));
@@ -107,6 +110,7 @@ function FetchHeight(req, res) {
 function FetchCirculation(req, res) {
     Transaction.circulation()
         .then((result) => {
+            res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=1800')
             if (req.query.format == 'plain') {
                 res.send(result.toString());
             } else {

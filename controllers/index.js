@@ -84,7 +84,7 @@ router.post('/tx', TxCtrl.Broadcast);
  * @group transaction - Operations about transactions
  * @returns {object} 200 - Transaction details
  */
-router.get('/suggest/tx/:prefix', mediumCacheSuccess, TxCtrl.Suggest);
+router.get('/suggest/tx/:prefix', TxCtrl.Suggest);
 
 /**
  * Get information on an address.
@@ -211,7 +211,7 @@ router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
  * @group asset - Asset operations
  * @returns {object} 200 - List of assets
  */
-router.get('/stakes/:symbol', longCacheSuccess, AssetCtrl.ListStakes);
+router.get('/stakes/:symbol', AssetCtrl.ListStakes);
 
 /**
  * This function returns the list of all the asset names that start with given prefix.
@@ -219,7 +219,7 @@ router.get('/stakes/:symbol', longCacheSuccess, AssetCtrl.ListStakes);
  * @group asset - Asset operations
  * @returns {object} 200 - Search for assets
  */
-router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
+router.get('/suggest/asset/:prefix', AssetCtrl.Search);
 
 /**
  * This function returns a list of 3rd party conversion rates.
@@ -235,7 +235,7 @@ router.get('/3rd/conversion', mediumCacheSuccess, ThirdPartyCtrl.rates);
  * @group asset - Bridge operations
  * @returns {object} 200 - Bridge configurations
  */
-router.get('/bridge/config', mediumCacheSuccess, AssetCtrl.BridgeConfig);
+router.get('/bridge/config', AssetCtrl.BridgeConfig);
 
 /**
  * This function returns a whitelist of MSTs that can be swapped with an Ethereum token.
@@ -243,7 +243,7 @@ router.get('/bridge/config', mediumCacheSuccess, AssetCtrl.BridgeConfig);
  * @group asset - Bridge operations
  * @returns {object} 200 - Bridge Whitelist
  */
-router.get('/bridge/whitelist', mediumCacheSuccess, AssetCtrl.BridgeWhitelist);
+router.get('/bridge/whitelist', AssetCtrl.BridgeWhitelist);
 
 /**
  * Balances of the ETH swap relay pool.
@@ -277,7 +277,7 @@ router.get('/asset/:asset_symbol', longCacheSuccess, AssetCtrl.AssetInfo);
  * @param {string} items_per_page.query.optional - items per page (default: 50)
  * @returns {object} 200 - List of avatars
  */
-router.get('/avatars', longCacheSuccess, AvatarCtrl.ListAllAvatars);
+router.get('/avatars', AvatarCtrl.ListAllAvatars);
 
 /**
  * This function returns the list of all the avatars names that start with given prefix.
@@ -285,7 +285,7 @@ router.get('/avatars', longCacheSuccess, AvatarCtrl.ListAllAvatars);
  * @group avatar - Avatar operations
  * @returns {object} 200 - Search for avatars
  */
-router.get('/suggest/avatar/:prefix', mediumCacheSuccess, AvatarCtrl.Search);
+router.get('/suggest/avatar/:prefix', AvatarCtrl.Search);
 
 /**
  * This function returns the information about a specific avatar.
@@ -313,7 +313,7 @@ router.get('/certs', longCacheSuccess, CertCtrl.ListAllCerts);
  * @param {number} show_invalidated.query.optional - Include invalidated certificates (default: false)
  * @returns {object} 200 - Cert info
  */
-router.get('/certs/:owner', longCacheSuccess, CertCtrl.CertsInfo);
+router.get('/certs/:owner', mediumCacheSuccess, CertCtrl.CertsInfo);
 
 /**
  * This function returns the list of all the mits.
@@ -350,7 +350,7 @@ router.get('/suggest/mit/:symbol', mediumCacheSuccess, MitCtrl.Search);
  * @group general - General operations
  * @returns {object} 200 - General info
  */
-router.get('/info', longCacheSuccess, InfoCtrl.Info);
+router.get('/info', InfoCtrl.Info);
 
 /**
  * This function returns number of coins in circulation.
@@ -358,7 +358,7 @@ router.get('/info', longCacheSuccess, InfoCtrl.Info);
  * @group general - General operations
  * @returns {object} 200 - Number of coins
  */
-router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
+router.get('/circulation', BlockCtrl.FetchCirculation);
 
 /**
  * This function returns the pricing information for multiple assets.
@@ -366,7 +366,7 @@ router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
  * @group general - Pricing operations
  * @returns {object} 200 - Tickers
  */
-router.get('/pricing/tickers', shortCacheSuccess, PricingCtrl.cmc);
+router.get('/pricing/tickers', PricingCtrl.cmc);
 
 /**
  * This function returns the general mining information.
@@ -375,7 +375,7 @@ router.get('/pricing/tickers', shortCacheSuccess, PricingCtrl.cmc);
  * @group general - General operations
  * @returns {object} 200 - Mining info
  */
-router.get('/mining/general', shortCacheSuccess, MiningCtrl.info);
+router.get('/mining/general', MiningCtrl.info);
 
 /**
  * This function returns the PoW mining information.
@@ -384,8 +384,8 @@ router.get('/mining/general', shortCacheSuccess, MiningCtrl.info);
  * @group general - General operations
  * @returns {object} 200 - Mining info
  */
-router.get('/mining', shortCacheSuccess, MiningCtrl.PowInfo);
-router.get('/mining/pow', shortCacheSuccess, MiningCtrl.PowInfo);
+router.get('/mining', MiningCtrl.PowInfo);
+router.get('/mining/pow', MiningCtrl.PowInfo);
 
 /**
  * This function returns the PoS mining information.
@@ -394,7 +394,7 @@ router.get('/mining/pow', shortCacheSuccess, MiningCtrl.PowInfo);
  * @group general - General operations
  * @returns {object} 200 - Mining info
  */
-router.get('/mining/pos', shortCacheSuccess, MiningCtrl.PosInfo);
+router.get('/mining/pos', MiningCtrl.PosInfo);
 
 /**
  * This function returns the mining pool statistics.
@@ -403,7 +403,7 @@ router.get('/mining/pos', shortCacheSuccess, MiningCtrl.PosInfo);
  * @group general - General operations
  * @returns {object} 200 - Mining pool statistics
  */
-router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
+router.get('/poolstats', MiningCtrl.poolstats);
 
 /**
  * This function returns the PoS mining statistics.
@@ -413,7 +413,7 @@ router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
  * @group general - General operations
  * @returns {object} 200 - PoS mining statistics
  */
-router.get('/posstats', longCacheSuccess, MiningCtrl.posstats);
+router.get('/posstats', MiningCtrl.posstats);
 
 /**
  * This function returns the sum of add deposited ETP.
@@ -421,7 +421,7 @@ router.get('/posstats', longCacheSuccess, MiningCtrl.posstats);
  * @group general - General operations
  * @returns {object} 200 - Deposit sum
  */
-router.get('/depositsum', longCacheSuccess, TxCtrl.LockSum);
+router.get('/depositsum', TxCtrl.LockSum);
 
 /**
  * This function returns the total amount of rewards from ETP deposits.
@@ -429,7 +429,7 @@ router.get('/depositsum', longCacheSuccess, TxCtrl.LockSum);
  * @group general - General operations
  * @returns {object} 200 - Deposit rewards
  */
-router.get('/rewards', longCacheSuccess, TxCtrl.Rewards);
+router.get('/rewards', TxCtrl.Rewards);
 
 /**
  * This function returns version information on the fullnode wallet.
@@ -437,10 +437,8 @@ router.get('/rewards', longCacheSuccess, TxCtrl.Rewards);
  * @group general - General operations
  * @returns {object} 200 - Fullnode version
  */
-router.get('/fullnode/version', mediumCacheSuccess, FullnodeCtrl.version);
-router.get('/lightwallet/version', mediumCacheSuccess, LightwalletCtrl.version);
-
-router.get('/locations', mediumCacheSuccess, GeoCtrl.locations);
+router.get('/fullnode/version', FullnodeCtrl.version);
+router.get('/lightwallet/version', LightwalletCtrl.version);
 
 /**
  * Search for transactions, blocks, addresses and assets by given prefix.
@@ -463,6 +461,6 @@ router.get('/suggest/all/:prefix', SearchCtrl.Suggest);
  * @group general - general operations
  * @returns {object} 200 - Suggestion list
  */
-router.get('/stats/block', hourCacheSuccess, BlockCtrl.ListBlockstats);
+router.get('/stats/block', BlockCtrl.ListBlockstats);
 
 exports.routes = router;
