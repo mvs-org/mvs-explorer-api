@@ -31,10 +31,6 @@ function info(req, res) {
             Transaction.counttxs({}),
             Address.countaddresses(0.00000001),
             Transaction.circulation(),
-<<<<<<< HEAD
-            Mining.pools(),
-=======
->>>>>>> dev
             Mining.poolstats(1000),
             Block.fetch(Math.max(height - 1000, 1))
         ]))
