@@ -52,7 +52,8 @@ function fetchDifficulty(nbr_blocks, version) {
     return mongo.connect()
         .then((db) => db.collection('block'))
         .then((collection) => collection.find({
-            version: version
+            version: version,
+            orphan: 0
         }, {
             _id: 0,
             number: 1,
