@@ -32,7 +32,7 @@ function info(req, res) {
             Address.countaddresses(0.00000001),
             Transaction.circulation(),
             Mining.pools(),
-            Mining.poolstats(Math.max(height - 1000, 1), height),
+            Mining.poolstats(1000),
             Block.fetch(Math.max(height - 1000, 1))
         ]))
         .then((results) => {
