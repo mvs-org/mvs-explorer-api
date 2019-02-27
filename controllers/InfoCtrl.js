@@ -31,7 +31,6 @@ function info(req, res) {
             Transaction.counttxs({}),
             Address.countaddresses(0.00000001),
             Transaction.circulation(),
-            Mining.pools(),
             Mining.poolstats(1000),
             Block.fetch(Math.max(height - 1000, 1))
         ]))
@@ -40,7 +39,7 @@ function info(req, res) {
             info.height = results[0];
             info.difficulty = parseInt(results[1].bits);
             info.hashrate = Math.floor(results[1].bits / (results[1].time_stamp - results[2].time_stamp) * 100);
-            info.blocktime = (results[1].time_stamp - results[13].time_stamp) / 1000;
+            info.blocktime = (results[1].time_stamp - results[12].time_stamp) / 1000;
             info.counter = {};
             info.counter.mst = results[3];
             info.counter.mit = results[4];
@@ -52,28 +51,21 @@ function info(req, res) {
             info.etp = {};
             info.etp.total_supply = results[10];
             let pools = [];
-            return Promise.all(results[11].map((pool) => {
-                    let pool_display = {};
-                    pool_display.share = 0;
-                    pool_display.name = pool.name;
-                    return Promise.all(results[12].map((stat) => {
-                            if (pool.addresses.indexOf(stat._id) !== -1)
-                                pool_display.share += stat.finds;
-                        }))
-                        .then(() => {
-                            if (pool_display.share) {
-                                pool_display.share = parseFloat((pool_display.share / 1000 * 100).toFixed(1));
-                                pools.push(pool_display);
-                            }
-                        });
-                }))
-                .then(() => {
-                    pools.sort(function(a, b) {
-                        return b.share - a.share;
-                    });
-                    info.top_mining_pool = pools.slice(0, 3);
-                    return info;
+            return Promise.all(results[11].map((stat) => {
+                if(stat._id) {
+                    let pool_display = {}
+                    pool_display.name = stat._id;
+                    pool_display.share = stat.finds/1000*100;
+                    pools.push(pool_display)
+                }
+            }))
+            .then(() => {
+                pools.sort(function(a, b) {
+                    return b.share - a.share;
                 });
+                info.top_mining_pool = pools.slice(0, 3);
+                return info;
+            })
         })
         .then((info) => res.json(Message(1, undefined, info)))
         .catch((error) => {
