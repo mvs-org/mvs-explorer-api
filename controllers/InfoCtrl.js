@@ -32,7 +32,7 @@ function info(req, res) {
             Address.countaddresses(0.00000001),
             Transaction.circulation(),
             Mining.pools(),
-            Mining.poolstats(Math.max(height - 1000, 1), height),
+            Mining.poolstats(1000),
             Block.fetch(Math.max(height - 1000, 1))
         ]))
         .then((results) => {
@@ -56,7 +56,7 @@ function info(req, res) {
                     let pool_display = {};
                     pool_display.share = 0;
                     pool_display.name = pool.name;
-                    Promise.all(results[12].map((stat) => {
+                    return Promise.all(results[12].map((stat) => {
                             if (pool.addresses.indexOf(stat._id) !== -1)
                                 pool_display.share += stat.finds;
                         }))
