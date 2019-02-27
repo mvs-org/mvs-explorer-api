@@ -55,7 +55,7 @@ function info(req, res) {
                 if(stat._id) {
                     let pool_display = {}
                     pool_display.name = stat._id;
-                    pool_display.share = stat.finds/1000*100;
+                    pool_display.share = parseFloat((stat.finds / 1000 * 100).toFixed(1));
                     pools.push(pool_display)
                 }
             }))
