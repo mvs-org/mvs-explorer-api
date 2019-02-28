@@ -4,6 +4,7 @@
 var Message = require('../models/message.js');
 var Block = require('../models/block');
 var Transaction = require('../models/transaction');
+let Address = require('../models/address.js');
 
 let Helper = require('../libraries/helper.js');
 
@@ -105,8 +106,11 @@ function FetchHeight(req, res) {
 }
 
 function FetchCirculation(req, res) {
-    Transaction.circulation()
-        .then((result) => {
+    Block.height()
+    .then((height) => Promise.all([Transaction.circulation(), Address.balances("MSCHL3unfVqzsZbRVCJ3yVp7RgAmXiuGN3", height)]))
+        .then(([circulation, foundation_balances]) => {
+            let foundation_etp_balance = foundation_balances.info.ETP ? foundation_balances.info.ETP : 0;
+            let result = parseFloat((circulation - foundation_etp_balance/100000000).toFixed(8));
             if (req.query.format == 'plain') {
                 res.send(result.toString());
             } else {
