@@ -110,23 +110,15 @@ function poolstats(req, res) {
 function posstats(req, res) {
     var interval = parseInt(req.query.interval) || 1000;
     var top = Math.min(parseInt(req.query.top) || 25, 100)
-    if (!process.env.CALC_POS_STATS) {
-        res.json(Message(1, undefined, []))
-    } else {
-        Mining.posstats(interval)
-            .then((result) => {
-                let avatars = []
-                return Promise.all(result.map((stat) => {
-                    if (stat._id) {
-                        let avatar = {}
-                        avatar.avatar = stat._id
-                        avatar.counter = stat.finds
-                        avatars.push(avatar)
-                    }
-                }))
-                    .then(() => avatars.slice(0, top))
-            })
-            .then((mining_info) => res.json(Message(1, undefined, mining_info)))
-            .catch((error) => res.status(404).json(Message(0, error.message)));
-    }
+    Mining.posstats(interval)
+        .then((result) =>
+            Promise.all(result.map((stats) => {
+                return {
+                    avatar: stats._id,
+                    counter: stats.finds,
+                }
+            })))
+        .then((avatars) => avatars.slice(0, top))
+        .then((mining_info) => res.json(Message(1, undefined, mining_info)))
+        .catch((error) => res.status(404).json(Message(0, error.message)));
 }
