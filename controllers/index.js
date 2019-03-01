@@ -355,6 +355,7 @@ router.get('/info', longCacheSuccess, InfoCtrl.Info);
 /**
  * This function returns number of coins in circulation.
  * @route GET /circulation
+ * @param {number} adjust.query.optional - Exclude the foundation wallet (default: false)
  * @group general - General operations
  * @returns {object} 200 - Number of coins
  */
