@@ -4,7 +4,7 @@ module.exports = {
 
 function version() {
     return Promise.resolve({
-        current: "0.8.2",
-        support: "0.8.0"
+        current: "0.9.0",
+        support: "0.9.0"
     });
 }
