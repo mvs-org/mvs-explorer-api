@@ -202,7 +202,9 @@ function height() {
         mongo.connect()
             .then((db) => {
                 db.collection('block')
-                    .find()
+                    .find({
+                        orphan: 0
+                    })
                     .sort({
                         number: -1
                     })
