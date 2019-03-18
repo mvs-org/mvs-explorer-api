@@ -94,7 +94,7 @@ function PosInfo(req, res) {
 }
 
 function poolstats(req, res) {
-    var interval = Math.max(parseInt(req.query.interval) || 1000, 10000);
+    var interval = Math.min(parseInt(req.query.interval) || 1000, 10000);
     Promise.all([Mining.pools().then(pools => _.keyBy(pools, 'name')), Mining.poolstats(interval)])
         .then(([pools, stats]) => Promise.all(stats.map(stat => {
             if (pools[stat._id]) {
