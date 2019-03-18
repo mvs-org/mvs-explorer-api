@@ -11,6 +11,8 @@ module.exports = {
     PosInfo,
     poolstats,
     posstats,
+    posVotes,
+    posVotesByAddress,
 };
 
 function info(req, res) {
@@ -115,10 +117,50 @@ function posstats(req, res) {
             Promise.all(result.map((stats) => {
                 return {
                     avatar: stats._id,
+                    address: stats.miner_address,
                     counter: stats.finds,
                 }
             })))
         .then((avatars) => avatars.slice(0, top))
         .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => res.status(404).json(Message(0, error.message)));
+}
+
+async function posVotes(req, res) {
+    try {
+        var interval = parseInt(req.query.interval) || 1000;
+        const height = await Block.height()
+        const posstats = await Mining.posstats(interval)
+        const avatarRegister = _.keyBy(posstats, 'address')
+        const utxoCount = (await Mining.posVotesCount(posstats.map(m => m.address), height)).map(item=>{
+            item.avatar=avatarRegister[item._id]._id
+            item.recentBlocks = avatarRegister[item._id].finds
+            item.address = item._id
+            delete item._id
+            return item
+        })
+        res.json(Message(1, undefined, utxoCount))
+    } catch (error) {
+        res.status(404).json(Message(0, error.message))
+    }
+}
+
+async function posVotesByAddress(req, res) {
+    try {
+        const address = req.params.address
+        var interval = parseInt(req.query.interval) || 1000;
+        const height = await Block.height()
+        const posstats = await Mining.posstats(interval)
+        const avatarRegister = _.keyBy(posstats, 'address')
+        const utxoCount = (await Mining.posVotesCount( [address], height)).map(item=>{
+            item.avatar=avatarRegister[item._id]._id
+            item.recentBlocks = avatarRegister[item._id].finds
+            item.address = item._id
+            delete item._id
+            return item
+        })
+        res.json(Message(1, undefined, utxoCount.length ? utxoCount[0] : null))
+    } catch (error) {
+        res.status(404).json(Message(0, error.message))
+    }
 }
