@@ -1,21 +1,24 @@
 'use strict';
 
-var Mining = require('../models/mining_pool.js'),
+const Mining = require('../models/mining_pool.js'),
     Block = require('../models/block.js'),
+    _ = require('lodash'),
     Message = require('../models/message.js');
 
 module.exports = {
-    info: info,
-    PowInfo: PowInfo,
-    PosInfo: PosInfo,
-    poolstats: poolstats,
-    posstats: posstats
+    info,
+    PowInfo,
+    PosInfo,
+    poolstats,
+    posstats,
+    posVotes,
+    posVotesByAddress,
 };
 
 function info(req, res) {
     var interval = parseInt(req.query.interval) || 1000;
     Block.height()
-        .then((height) => Promise.all([height, Block.statsTypeBlock(height-interval+1), Block.fetch(height), Block.fetch(Math.max(height - interval, 1))]))
+        .then((height) => Promise.all([height, Block.statsTypeBlock(height - interval + 1), Block.fetch(height), Block.fetch(Math.max(height - interval, 1))]))
         .then(([height, stats, block0, block1]) => {
             var renamed_stats = [];
             Promise.all(stats.map((stat) => {
@@ -59,9 +62,9 @@ function PowInfo(req, res) {
             return {
                 height: height,
                 difficulty: parseInt(blocks[0].bits),
-                hashrate: blocks[0].bits / (blocks[0].time_stamp - blocks[blocks.length-1].time_stamp) * nbr_blocks,
+                hashrate: blocks[0].bits / (blocks[0].time_stamp - blocks[blocks.length - 1].time_stamp) * nbr_blocks,
                 last: blocks[0].number,
-                pow_blocktime: (blocks[0].time_stamp - blocks[blocks.length-1].time_stamp) / blocks.length
+                pow_blocktime: (blocks[0].time_stamp - blocks[blocks.length - 1].time_stamp) / blocks.length
             };
         })
         .then((mining_info) => res.json(Message(1, undefined, mining_info)))
@@ -80,7 +83,7 @@ function PosInfo(req, res) {
                 height: height,
                 difficulty: parseInt(blocks[0].bits),
                 last: blocks[0].number,
-                pos_blocktime: (blocks[0].time_stamp - blocks[blocks.length-1].time_stamp) / blocks.length
+                pos_blocktime: (blocks[0].time_stamp - blocks[blocks.length - 1].time_stamp) / blocks.length
             };
         })
         .then((mining_info) => res.json(Message(1, undefined, mining_info)))
@@ -91,43 +94,73 @@ function PosInfo(req, res) {
 }
 
 function poolstats(req, res) {
-    var interval = parseInt(req.query.interval) || 1000;
-    Promise.all([Mining.pools(), Mining.poolstats(interval)])
-        .then((results) => {
-            let pools = [];
-            return Promise.all(results[0].map((pool) => {
-                    pool.counter = 0;
-                    return Promise.all(results[1].map((stat) => {
-                            if (pool.name == stat._id)
-                                pool.counter = stat.finds;
-                        }))
-                        .then(() => {
-                            if (pool.counter)
-                                pools.push(pool);
-                        });
-                }))
-                .then(() => pools);
-        })
+    var interval = Math.min(parseInt(req.query.interval) || 1000, 10000);
+    Promise.all([Mining.pools().then(pools => _.keyBy(pools, 'name')), Mining.poolstats(interval)])
+        .then(([pools, stats]) => Promise.all(stats.map(stat => {
+            if (pools[stat._id]) {
+                return {
+                    ...pools[stat._id],
+                    counter: stat.finds
+                }
+            }
+        })))
+        .then(results => _.compact(results))
         .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => res.status(404).json(Message(0, error.message)));
 }
 
 function posstats(req, res) {
     var interval = parseInt(req.query.interval) || 1000;
-    var top = parseInt(req.query.top) || 25;
+    var top = Math.min(parseInt(req.query.top) || 25, 100)
     Mining.posstats(interval)
-        .then((result) => {
-            let avatars = []
-            return Promise.all(result.map((stat) => {
-                if(stat._id) {
-                    let avatar = {}
-                    avatar.avatar = stat._id
-                    avatar.counter = stat.finds
-                    avatars.push(avatar)
+        .then((result) =>
+            Promise.all(result.map((stats) => {
+                return {
+                    avatar: stats._id,
+                    address: stats.miner_address,
+                    counter: stats.finds,
                 }
-            }))
-            .then(() => avatars.slice(0, top))
-        })
+            })))
+        .then((avatars) => avatars.slice(0, top))
         .then((mining_info) => res.json(Message(1, undefined, mining_info)))
         .catch((error) => res.status(404).json(Message(0, error.message)));
+}
+
+async function posVotes(req, res) {
+    try {
+        var interval = parseInt(req.query.interval) || 1000;
+        const height = await Block.height()
+        const posstats = await Mining.posstats(interval)
+        const avatarRegister = _.keyBy(posstats, 'address')
+        const utxoCount = (await Mining.posVotesCount(posstats.map(m => m.address), height)).map(item=>{
+            item.avatar=avatarRegister[item._id]._id
+            item.recentBlocks = avatarRegister[item._id].finds
+            item.address = item._id
+            delete item._id
+            return item
+        })
+        res.json(Message(1, undefined, utxoCount))
+    } catch (error) {
+        res.status(404).json(Message(0, error.message))
+    }
+}
+
+async function posVotesByAddress(req, res) {
+    try {
+        const address = req.params.address
+        var interval = parseInt(req.query.interval) || 1000;
+        const height = await Block.height()
+        const posstats = await Mining.posstats(interval)
+        const avatarRegister = _.keyBy(posstats, 'address')
+        const utxoCount = (await Mining.posVotesCount( [address], height)).map(item=>{
+            item.avatar=avatarRegister[item._id]._id
+            item.recentBlocks = avatarRegister[item._id].finds
+            item.address = item._id
+            delete item._id
+            return item
+        })
+        res.json(Message(1, undefined, utxoCount.length ? utxoCount[0] : null))
+    } catch (error) {
+        res.status(404).json(Message(0, error.message))
+    }
 }

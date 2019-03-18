@@ -4,6 +4,7 @@
 var Message = require('../models/message.js');
 var Block = require('../models/block');
 var Transaction = require('../models/transaction');
+let Address = require('../models/address.js');
 
 let Helper = require('../libraries/helper.js');
 
@@ -63,7 +64,7 @@ function ListTxs(req, res) {
 
 function ListBlockstats(req, res) {
     var downscale = Math.max(1, parseInt(req.query.downscale)) || 10;
-    var interval = downscale*1000;
+    var interval = downscale * 1000;
     var type = undefined;
     var limit = parseInt(req.query.limit) || 0;
     switch (req.query.type) {
@@ -94,7 +95,7 @@ function ListBlockstats(req, res) {
  */
 function FetchHeight(req, res) {
     Block.height()
-        .then((height) =>{
+        .then((height) => {
             res.setHeader('Cache-Control', 'public, max-age=10, s-maxage=10')
             res.json(Message(1, undefined, height))
         })
@@ -104,19 +105,27 @@ function FetchHeight(req, res) {
         });
 }
 
-function FetchCirculation(req, res) {
-    Transaction.circulation()
-        .then((result) => {
-            if (req.query.format == 'plain') {
-                res.send(result.toString());
-            } else {
-                res.json(Message(1, undefined, result));
-            }
-        })
+async function FetchCirculation(req, res) {
+    var adjust = parseInt(req.query.adjust) > 0;
+    const format = (req.query.format === 'plain') ? 'plain' : 'json'
+
+    function getAdjustment() {
+        if (adjust) {
+            return Block.height()
+                .then(height => Address.balances("MSCHL3unfVqzsZbRVCJ3yVp7RgAmXiuGN3", height))
+                .then(balance => balance.info.ETP ? (balance.info.ETP / 100000000).toFixed(8) : 0)
+        }
+        return Promise.resolve(0)
+    }
+
+    Promise.all([Transaction.circulation(), getAdjustment()])
+        .then(([circulation, adjustment]) => parseFloat((circulation - adjustment).toFixed(8)))
+        .then(result => format === 'plain' ? res.send(result.toString()) : res.json(Message(1, undefined, result)))
         .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, 'ERR_FETCH_CIRCULATION'));
         });
+
 }
 
 /**

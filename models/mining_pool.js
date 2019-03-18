@@ -6,7 +6,8 @@ var mongo = require('../libraries/mongo.js');
 module.exports = {
     poolstats: poolstats,
     pools: pools,
-    posstats: posstats
+    posstats: posstats,
+    posVotesCount: posVotesCount,
 };
 
 function pools(){
@@ -19,8 +20,7 @@ function pools(){
 function poolstats(interval) {
     return new Promise((resolve, reject) => {
         mongo.connect()
-            .then((db) => {
-                db.collection('block').aggregate([{
+            .then((db) => db.collection('block').aggregate([{
                     $match: {
                         "version": 1,
                         "orphan": 0
@@ -44,8 +44,8 @@ function poolstats(interval) {
                     }
                 }], {}, (err, result) => {
                     resolve(result);
-                });
-            });
+                })
+            )
     });
 }
 
@@ -67,6 +67,9 @@ function posstats(interval) {
                 }, {
                     $group: {
                         _id: "$miner",
+                        address: {
+                            $first: "$miner_address",
+                        },
                         'finds': {
                             $sum: 1
                         }
@@ -74,6 +77,52 @@ function posstats(interval) {
                 }, {
                     $sort: {
                         finds: -1
+                    }
+                }], {}, (err, result) => {
+                    resolve(result);
+                });
+            });
+        })
+}
+
+function posVotesCount(addresses, height) {
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('output').aggregate([{
+                    $match: {
+                        orphaned_at: 0,
+                        address: { $in: addresses },
+                        spent_tx: 0,
+                        value: { $gte: 1000E8 }
+                    }
+                }, {
+                    $sort: {
+                        number: -1
+                    }
+                },
+                {
+                    $project: {
+                        address: 1,
+                        value: 1,
+                        waiting: { $cond: [{$gt: ['$height', height-1000]}, 1, 0]}
+                    }
+                }, {
+                    $group: {
+                        _id: "$address",
+                        max: {
+                            $max: "$value",
+                        },
+                        pendingVotes: {
+                            $sum: "$waiting"
+                        },
+                        totalVotes: {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $sort: {
+                        count: -1
                     }
                 }], {}, (err, result) => {
                     resolve(result);

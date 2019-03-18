@@ -355,6 +355,7 @@ router.get('/info', longCacheSuccess, InfoCtrl.Info);
 /**
  * This function returns number of coins in circulation.
  * @route GET /circulation
+ * @param {number} adjust.query.optional - Exclude the foundation wallet (default: false)
  * @group general - General operations
  * @returns {object} 200 - Number of coins
  */
@@ -404,6 +405,25 @@ router.get('/mining/pos', shortCacheSuccess, MiningCtrl.PosInfo);
  * @returns {object} 200 - Mining pool statistics
  */
 router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
+
+/**
+ * This function returns the count of the votes that are ready for mining.
+ * @route GET /posutxo
+ * @param {string} address.path.required - Address
+ * @param {number} interval.query.optional - Interval
+ * @group general - General operations
+ * @returns {object} 200 - PoS mining statistics
+ */
+router.get('/posvotes/:address', mediumCacheSuccess, MiningCtrl.posVotesByAddress);
+
+/**
+ * This function returns the count of the votes that are ready for mining.
+ * @route GET /posutxo
+ * @param {number} interval.query.optional - Interval
+ * @group general - General operations
+ * @returns {object} 200 - PoS mining statistics
+ */
+router.get('/posvotes', longCacheSuccess, MiningCtrl.posVotes);
 
 /**
  * This function returns the PoS mining statistics.
