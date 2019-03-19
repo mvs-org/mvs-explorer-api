@@ -132,14 +132,21 @@ async function posVotes(req, res) {
         const height = await Block.height()
         const posstats = await Mining.posstats(interval)
         const avatarRegister = _.keyBy(posstats, 'address')
+        const info = {
+            totalVotes: 0,
+            recentBlocksInterval: interval,
+            height: height,
+        }
         const utxoCount = (await Mining.posVotesCount(posstats.map(m => m.address), height)).map(item=>{
             item.avatar=avatarRegister[item._id]._id
             item.recentBlocks = avatarRegister[item._id].finds
             item.address = item._id
             delete item._id
+            info.totalVotes += item.totalVotes
             return item
         })
-        res.json(Message(1, undefined, utxoCount))
+
+        res.json(Message(1, undefined, {info, miners: utxoCount}))
     } catch (error) {
         res.status(404).json(Message(0, error.message))
     }
