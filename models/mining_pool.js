@@ -105,6 +105,7 @@ function posVotesCount(addresses, height) {
                     $project: {
                         address: 1,
                         value: 1,
+                        spendable: { $cond: [{$gt: [height, { $sum: [ '$height', '$locked_height_range']}]}, 1, 0]},
                         waiting: { $cond: [{$gt: ['$height', height-1000]}, 1, 0]}
                     }
                 }, {
@@ -117,12 +118,12 @@ function posVotesCount(addresses, height) {
                             $sum: "$waiting"
                         },
                         totalVotes: {
-                            $sum: 1
+                            $sum: '$spendable'
                         }
                     }
                 }, {
                     $sort: {
-                        count: -1
+                       totalVotes : -1
                     }
                 }], {}, (err, result) => {
                     resolve(result);
