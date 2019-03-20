@@ -106,7 +106,9 @@ function posVotesCount(addresses, height) {
                         address: 1,
                         value: 1,
                         spendable: { $cond: [{$gt: [height, { $sum: [ '$height', '$locked_height_range']}]}, 1, 0]},
-                        waiting: { $cond: [{$gt: ['$height', height-1000]}, 1, 0]}
+                        waiting: { $cond: [{$gt: ['$height', height-1000]}, 1, 0]},
+                        height: 1,
+                        confirmed_at: 1
                     }
                 }, {
                     $group: {
@@ -119,6 +121,12 @@ function posVotesCount(addresses, height) {
                         },
                         totalVotes: {
                             $sum: '$spendable'
+                        },
+                        lastBlockHeight: {
+                            $last: '$height'
+                        },
+                        lastBlockTime: {
+                            $last: '$confirmed_at'
                         }
                     }
                 }, {
