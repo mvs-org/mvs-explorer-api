@@ -12,7 +12,7 @@ module.exports = {
     poolstats,
     posstats,
     posVotes,
-    posVotesByAddress,
+    posVotesByAvatar,
 };
 
 function info(req, res) {
@@ -110,7 +110,7 @@ function poolstats(req, res) {
 }
 
 function posstats(req, res) {
-    var interval = parseInt(req.query.interval) || 1000;
+    var interval = Math.min(parseInt(req.query.interval) || 1000, 10000);
     var top = Math.min(parseInt(req.query.top) || 25, 100)
     Mining.posstats(interval)
         .then((result) =>
@@ -128,7 +128,7 @@ function posstats(req, res) {
 
 async function posVotes(req, res) {
     try {
-        var interval = parseInt(req.query.interval) || 1000;
+        var interval = Math.min(parseInt(req.query.interval) || 1000, 10000);
         const height = await Block.height()
         const posstats = await Mining.posstats(interval)
         const avatarRegister = _.keyBy(posstats, 'address')
@@ -152,17 +152,21 @@ async function posVotes(req, res) {
     }
 }
 
-async function posVotesByAddress(req, res) {
+async function posVotesByAvatar(req, res) {
     try {
-        const address = req.params.address
-        var interval = parseInt(req.query.interval) || 1000;
+        const avatar = req.params.avatar
+        var interval = Math.min(parseInt(req.query.interval) || 1000, 10000);
         const height = await Block.height()
         const posstats = await Mining.posstats(interval)
-        const avatarRegister = _.keyBy(posstats, 'address')
-        const utxoCount = (await Mining.posVotesCount( [address], height)).map(item=>{
-            item.avatar=avatarRegister[item._id]._id
-            item.recentBlocks = avatarRegister[item._id].finds
+        const avatarRegister = _.keyBy(posstats, '_id')
+        if(!avatarRegister[avatar])
+            return res.json(Message(1, undefined, null))
+        const utxoCount = (await Mining.posVotesCount( [avatarRegister[avatar].address], height)).map(item=>{
+            item.avatar = avatar
+            item.recentBlocks = avatarRegister[avatar].finds
+            item.recentBlocksInterval = interval
             item.address = item._id
+            item.height = height
             delete item._id
             return item
         })
