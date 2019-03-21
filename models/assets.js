@@ -9,7 +9,8 @@ module.exports = {
     countassets: countassets,
     suggest: suggest,
     stakelist: stakelist,
-    assetinfo: assetinfo
+    assetinfo: assetinfo,
+    minedQuantity: minedQuantity
 };
 
 /**
@@ -25,9 +26,9 @@ function listassets() {
                 $ne: 'ETP'
             }
         }, {
-            "_id": 0,
-            "type": 0
-        }))
+                "_id": 0,
+                "type": 0
+            }))
         .then(cursor => cursor.toArray());
 }
 
@@ -56,20 +57,20 @@ function suggest(prefix, limit) {
         .then((db) => db.collection('asset'))
         .then((collection) => collection.find({
             '$and': [{
-                    symbol: {
-                        $regex: new RegExp(prefix.toUpperCase())
-                    }
-                },
-                {
-                    symbol: {
-                        $ne: 'ETP'
-                    }
+                symbol: {
+                    $regex: new RegExp(prefix.toUpperCase())
                 }
+            },
+            {
+                symbol: {
+                    $ne: 'ETP'
+                }
+            }
             ]
         }, {
-            symbol: 1,
-            _id: 0
-        }).toArray())
+                symbol: 1,
+                _id: 0
+            }).toArray())
         .then((result) => result.slice(0, limit))
         .then((result) => result.map((item) => item.symbol));
 }
@@ -82,10 +83,10 @@ function stakelist(symbol, limit, min) {
                 $gt: min
             }
         }, {
-            ["value." + symbol]: 1
-        }).sort({
-            ["value." + symbol]: -1
-        }).limit(limit).toArray())
+                ["value." + symbol]: 1
+            }).sort({
+                ["value." + symbol]: -1
+            }).limit(limit).toArray())
         .then((result) => result.map((stake) => {
             return {
                 a: stake._id,
@@ -96,21 +97,29 @@ function stakelist(symbol, limit, min) {
 
 /**
  * Get the information of an asset.
- * @param {} hash
+ * @param {} symbol string
  * @returns {}
  */
 function assetinfo(symbol) {
-    return new Promise((resolve, reject) => {
-        mongo.connect()
-            .then((db) => {
-                db.collection('asset').find({
-                    "symbol": symbol
-                }, {
-                    "_id": 0,
-                    "type": 0
-                }).toArray((err, docs) => {
-                    resolve(docs);
-                });
-            });
-    });
+    return mongo.connect()
+        .then((db) => db.collection('asset').findOne({
+            "symbol": symbol
+        }, {
+                "_id": 0,
+                "type": 0,
+            })
+        );
+}
+
+/**
+ * Get the mined quantity of an asset.
+ * @param {} symbol string
+ * @returns {}
+ */
+function minedQuantity(symbol) {
+    return mongo.connect()
+        .then((db) => db.collection('address_balances').findOne({
+            _id: "coinbase",
+        }))
+        .then(coinbase => coinbase ? -coinbase.value[symbol.replace(/\./g, '_')] || 0 : 0)
 }
