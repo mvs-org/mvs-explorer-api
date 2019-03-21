@@ -138,8 +138,10 @@ async function posVotes(req, res) {
             height: height,
         }
         const utxoCount = (await Mining.posVotesCount(posstats.map(m => m.address), height)).map(item=>{
-            item.avatar=avatarRegister[item._id]._id
+            item.avatar = avatarRegister[item._id]._id
             item.recentBlocks = avatarRegister[item._id].finds
+            if(avatarRegister[item._id].mst_mining)
+                item.mstMining = avatarRegister[item._id].mst_mining
             item.address = item._id
             delete item._id
             info.totalVotes += item.totalVotes
@@ -165,6 +167,8 @@ async function posVotesByAvatar(req, res) {
             item.avatar = avatar
             item.recentBlocks = avatarRegister[avatar].finds
             item.recentBlocksInterval = interval
+            if(avatarRegister[avatar].mst_mining)
+                item.mstMining = avatarRegister[avatar].mst_mining
             item.address = item._id
             item.height = height
             delete item._id
