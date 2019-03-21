@@ -68,7 +68,10 @@ function posstats(interval) {
                     $group: {
                         _id: "$miner",
                         address: {
-                            $first: "$miner_address",
+                            $last: "$miner_address",
+                        },
+                        mst_mining: {
+                            $last: "$mst_mining",
                         },
                         'finds': {
                             $sum: 1
