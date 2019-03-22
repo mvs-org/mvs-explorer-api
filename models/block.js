@@ -120,7 +120,7 @@ function statsMstMining(since_height) {
                     }
                 }, {
                     $sort: {
-                        counter: -1
+                        blocks: -1
                     }
                 }], {}, (err, result) => {
                     resolve(result);
