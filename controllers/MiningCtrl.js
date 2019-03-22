@@ -13,6 +13,7 @@ module.exports = {
     posstats,
     posVotes,
     posVotesByAvatar,
+    mstMiningStats,
 };
 
 function info(req, res) {
@@ -55,7 +56,7 @@ function info(req, res) {
 }
 
 function PowInfo(req, res) {
-    var nbr_blocks = parseInt(req.query.number) || 100;
+    var nbr_blocks = Math.min(parseInt(req.query.interval) || 1000, 10000);
     var block_version = 1;
     Promise.all([Block.height(), Block.fetchDifficulty(nbr_blocks, block_version)])
         .then(([height, blocks]) => {
@@ -75,7 +76,7 @@ function PowInfo(req, res) {
 }
 
 function PosInfo(req, res) {
-    var nbr_blocks = parseInt(req.query.number) || 100;
+    var nbr_blocks = Math.min(parseInt(req.query.interval) || 1000, 10000);
     var block_version = 2;
     Promise.all([Block.height(), Block.fetchDifficulty(nbr_blocks, block_version)])
         .then(([height, blocks]) => {
@@ -175,6 +176,27 @@ async function posVotesByAvatar(req, res) {
             return item
         })
         res.json(Message(1, undefined, utxoCount.length ? utxoCount[0] : null))
+    } catch (error) {
+        res.status(404).json(Message(0, error.message))
+    }
+}
+
+
+async function mstMiningStats(req, res) {
+    try {
+        var interval = Math.min(parseInt(req.query.interval) || 1000, 10000);
+        const height = await Block.height()
+        const mstStats = (await Block.statsMstMining(height - interval + 1)).map(item=>{
+            item.mst = item._id
+            delete item._id
+            return item
+        })
+        var result = {
+            height: height,
+            interval: interval,
+            counters: mstStats
+        }
+        res.json(Message(1, undefined, result))
     } catch (error) {
         res.status(404).json(Message(0, error.message))
     }

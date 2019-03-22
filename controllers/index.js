@@ -436,6 +436,15 @@ router.get('/posvotes', longCacheSuccess, MiningCtrl.posVotes);
 router.get('/posstats', longCacheSuccess, MiningCtrl.posstats);
 
 /**
+ * This function returns the MST mining statistics.
+ * @route GET /mstmining
+ * @param {number} interval.query.optional - Interval
+ * @group general - General operations
+ * @returns {object} 200 - MST mining statistics
+ */
+router.get('/mstmining', longCacheSuccess, MiningCtrl.mstMiningStats);
+
+/**
  * This function returns the sum of add deposited ETP.
  * @route GET /depositsum
  * @group general - General operations

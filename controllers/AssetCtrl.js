@@ -33,7 +33,7 @@ function listStakes(req, res) {
     let symbol = req.params.symbol;
     let limit = parseInt(req.query.limit) || 20;
     let min = parseInt(req.query.min) || 0;
-    Assets.stakelist(symbol.replace(/\./g,'_'), limit, min)
+    Assets.stakelist(symbol.replace(/\./g, '_'), limit, min)
         .then((list) => res.json(Message(1, undefined, list)))
         .catch((error) => {
             console.error(error);
@@ -61,21 +61,26 @@ function search(req, res) {
  */
 function assetinfo(req, res) {
     var symbol = req.params.asset_symbol;
-    Assets.assetinfo(symbol.toUpperCase())
-        .then((assets) => res.json(Message(1, undefined, assets)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_ASSETS')));
+    Promise.all([Assets.assetinfo(symbol.toUpperCase()), Assets.minedQuantity(symbol.toUpperCase())])
+        .then(([asset, minedQuantity]) => {
+            if (asset)
+                res.json(Message(1, undefined, { minedQuantity, ...asset }))
+            else
+                throw Error('Not found')
+        })
+        .catch((error) => res.status(404).json(Message(0, 'ERR_GET_ASSET')));
 };
 
-function ethBridgeList(req,res){
+function ethBridgeList(req, res) {
     Bridge.list()
-        .then(list=>res.json(Message(1, undefined, list)))
-        .catch(()=>res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_WHITELIST')));
+        .then(list => res.json(Message(1, undefined, list)))
+        .catch(() => res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_WHITELIST')));
 }
 
-function ethBridgeConfig(req,res){
+function ethBridgeConfig(req, res) {
     Bridge.config()
-        .then(list=>res.json(Message(1, undefined, list)))
-        .catch((error)=>{
+        .then(list => res.json(Message(1, undefined, list)))
+        .catch((error) => {
             console.error(error);
             res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_CONFIG'));
         });
