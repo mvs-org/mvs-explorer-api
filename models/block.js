@@ -10,6 +10,7 @@ exports.fetch = fetch;
 exports.fetchHash = fetchHash;
 exports.fetchDifficulty = fetchDifficulty;
 exports.statsTypeBlock = statsTypeBlock;
+exports.statsMstMining = statsMstMining;
 exports.suggest = suggest;
 exports.list_block_txs = list_block_txs;
 
@@ -91,6 +92,35 @@ function statsTypeBlock(since_height) {
                 }, {
                     $sort: {
                         _id: 1
+                    }
+                }], {}, (err, result) => {
+                    resolve(result);
+                });
+            });
+    });
+}
+
+function statsMstMining(since_height) {
+    return new Promise((resolve, reject) => {
+        mongo.connect()
+            .then((db) => {
+                db.collection('block').aggregate([{
+                    $match: {
+                        number: {
+                            $gte: since_height
+                        },
+                        orphan: 0
+                    }
+                }, {
+                    $group: {
+                        _id: "$mst_mining",
+                        'blocks': {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $sort: {
+                        counter: -1
                     }
                 }], {}, (err, result) => {
                     resolve(result);
