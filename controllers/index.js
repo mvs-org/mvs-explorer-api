@@ -373,7 +373,7 @@ router.get('/pricing/tickers', shortCacheSuccess, PricingCtrl.cmc);
  * This function returns the general mining information.
  * @route GET /mining/general
  * @param {number} interval.query.optional - Interval
- * @group general - General operations
+ * @group mining - Mining operations
  * @returns {object} 200 - Mining info
  */
 router.get('/mining/general', shortCacheSuccess, MiningCtrl.info);
@@ -382,7 +382,7 @@ router.get('/mining/general', shortCacheSuccess, MiningCtrl.info);
  * This function returns the PoW mining information.
  * @route GET /mining/pow
  * @param {number} number.query.optional - Number of blocks used to calculate the statistics
- * @group general - General operations
+ * @group mining - Mining operations
  * @returns {object} 200 - Mining info
  */
 router.get('/mining', shortCacheSuccess, MiningCtrl.PowInfo);
@@ -392,7 +392,7 @@ router.get('/mining/pow', shortCacheSuccess, MiningCtrl.PowInfo);
  * This function returns the PoS mining information.
  * @route GET /mining/pos
  * @param {number} number.query.optional - Number of blocks used to calculate the statistics
- * @group general - General operations
+ * @group mining - Mining operations
  * @returns {object} 200 - Mining info
  */
 router.get('/mining/pos', shortCacheSuccess, MiningCtrl.PosInfo);
@@ -401,7 +401,7 @@ router.get('/mining/pos', shortCacheSuccess, MiningCtrl.PosInfo);
  * This function returns the mining pool statistics.
  * @route GET /poolstats
  * @param {number} interval.query.optional - Interval
- * @group general - General operations
+ * @group mining - Mining operations
  * @returns {object} 200 - Mining pool statistics
  */
 router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
@@ -411,7 +411,7 @@ router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
  * @route GET /posvotes/{avatar}
  * @param {string} avatar.path.required - Avatar
  * @param {number} interval.query.optional - Interval
- * @group general - General operations
+ * @group mining - Mining operations
  * @returns {object} 200 - PoS mining statistics
  */
 router.get('/posvotes/:avatar', mediumCacheSuccess, MiningCtrl.posVotesByAvatar);
@@ -420,7 +420,7 @@ router.get('/posvotes/:avatar', mediumCacheSuccess, MiningCtrl.posVotesByAvatar)
  * This function returns the count of the votes that are ready for mining.
  * @route GET /posvotes
  * @param {number} interval.query.optional - Interval
- * @group general - General operations
+ * @group mining - Mining operations
  * @returns {object} 200 - PoS mining statistics
  */
 router.get('/posvotes', longCacheSuccess, MiningCtrl.posVotes);
@@ -430,7 +430,7 @@ router.get('/posvotes', longCacheSuccess, MiningCtrl.posVotes);
  * @route GET /posstats
  * @param {number} interval.query.optional - Interval
  * @param {number} top.query.optional - Number of Avatars returned
- * @group general - General operations
+ * @group mining - Mining operations
  * @returns {object} 200 - PoS mining statistics
  */
 router.get('/posstats', longCacheSuccess, MiningCtrl.posstats);
@@ -439,10 +439,18 @@ router.get('/posstats', longCacheSuccess, MiningCtrl.posstats);
  * This function returns the MST mining statistics.
  * @route GET /mstmining
  * @param {number} interval.query.optional - Interval
- * @group general - General operations
+ * @group mining - Mining operations
  * @returns {object} 200 - MST mining statistics
  */
 router.get('/mstmining', longCacheSuccess, MiningCtrl.mstMiningStats);
+
+/**
+ * This function returns the list of MST that can be mined.
+ * @route GET /mstmininglist
+ * @group mining - Mining operations
+ * @returns {object} 200 - MST mining list
+ */
+router.get('/mstmininglist', longCacheSuccess, MiningCtrl.listMstMining);
 
 /**
  * This function returns the sum of add deposited ETP.

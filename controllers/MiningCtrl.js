@@ -2,6 +2,7 @@
 
 const Mining = require('../models/mining_pool.js'),
     Block = require('../models/block.js'),
+    Certs = require('../models/certs.js'),
     _ = require('lodash'),
     Message = require('../models/message.js');
 
@@ -14,6 +15,7 @@ module.exports = {
     posVotes,
     posVotesByAvatar,
     mstMiningStats,
+    listMstMining,
 };
 
 function info(req, res) {
@@ -201,3 +203,10 @@ async function mstMiningStats(req, res) {
         res.status(404).json(Message(0, error.message))
     }
 }
+
+function listMstMining(req, res) {
+    Certs.listMstMining()
+        .then((certs) => certs.map(c => c.attachment.symbol).sort())
+        .then((symbols) => res.json(Message(1, undefined, symbols)))
+        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_CERTS')));
+};
