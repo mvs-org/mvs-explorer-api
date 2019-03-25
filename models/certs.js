@@ -7,7 +7,8 @@ var mongo = require('../libraries/mongo.js');
 module.exports = {
     listcerts: listcerts,
     countcerts: countcerts,
-    certsinfo: certsinfo
+    certsinfo: certsinfo,
+    listMstMining,
 };
 
 /**
@@ -56,6 +57,25 @@ function certsinfo(owner, show_invalidated) {
     if(!show_invalidated){
         query.spent_tx = 0;
     }
+    return mongo.connect()
+        .then((db) => db.collection('output'))
+        .then(collection => collection.find(query, {
+            "_id": 0,
+            "type": 0
+        }))
+        .then(cursor => cursor.toArray());
+}
+
+/**
+ * Get the full list of MST that can be mined.
+ * @returns {Array<Output>}
+ */
+function listMstMining() {
+    let query = {
+        'attachment.type': "asset-cert",
+        'attachment.cert': "mining",
+        orphaned_at: 0
+    };
     return mongo.connect()
         .then((db) => db.collection('output'))
         .then(collection => collection.find(query, {
