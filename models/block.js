@@ -129,17 +129,17 @@ function statsMstMining(since_height) {
     });
 }
 
-function blockstats(interval, limit, type) {
+function blockstats(limit, type, interval, scale) {
     if(limit==undefined)
         limit=0;
     return mongo.connect()
         .then((db) => db.collection('statistic'))
         .then((c) => c.find({
             type: type,
-            height: {
-                $mod: [interval, 0]
-            },
-            interval: 1000
+            ...( scale && {height: {
+                $mod: [scale, 0]
+            }}),
+            interval: interval,
         }, {
             _id: 0,
             height: 1,

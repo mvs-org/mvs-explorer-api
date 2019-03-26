@@ -63,24 +63,38 @@ function ListTxs(req, res) {
 }
 
 function ListBlockstats(req, res) {
-    var downscale = Math.max(1, parseInt(req.query.downscale)) || 10;
-    var interval = downscale * 1000;
-    var type = undefined;
+
+    // get base of calculation. can be height or time. default: height
+    var base = (req.query.base || 'height').toString().toUpperCase()
     var limit = parseInt(req.query.limit) || 0;
+
+    var type = undefined;
     switch (req.query.type) {
+        case 'count':
+            type = 'COUNT_' + base
+            break;
+        case 'blocktime':
+            type = 'BLOCKTIME_' + base
+            break;
+        case 'txcount':
+            type = 'TX_COUNT_' + base
+            break;
         case 'pow':
-            type = 'DIFFICULTY_POW';
+            type = 'DIFFICULTY_POW_' + base
             break;
         case 'pos':
-            type = 'DIFFICULTY_POS';
+            type = 'DIFFICULTY_POS_' + base
             break;
         case 'dpos':
-            type = 'DIFFICULTY_DPOS';
+            type = 'DIFFICULTY_DPOS_' + base
             break;
         default:
-            type = 'DIFFICULTY_POW';
+            type = 'DIFFICULTY_POW_' + base
     }
-    Block.blockstats(interval, (limit > 0) ? limit : 0, type)
+
+    let interval = base == 'HEIGHT' ? 1000 : 86400
+    var downscale = Math.max(1, parseInt(req.query.downscale)) || 10
+    Block.blockstats((limit > 0) ? limit : 0, type, interval, base == 'HEIGHT' ? downscale * interval : undefined)
         .then((times) => res.json(Message(1, undefined, times)))
         .catch((error) => {
             console.error(error);
