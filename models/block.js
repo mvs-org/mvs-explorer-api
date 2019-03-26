@@ -149,7 +149,7 @@ function blockstats(limit, type, interval, scale) {
             height: -1
         }).limit(limit).toArray())
         .then((blocks) => blocks.map((block, index) => {
-            return [block.height, (block.height == 0 || blocks[index + 1] == undefined) ? 0 : parseFloat(((block.timestamp - blocks[index + 1].timestamp) / interval).toFixed(3)), block.value];
+            return [block.height, (block.height == 0 || blocks[index + 1] == undefined) ? 0 : parseFloat(((block.timestamp - blocks[index + 1].timestamp) / scale).toFixed(3)), block.value];
         }));
 }
 
