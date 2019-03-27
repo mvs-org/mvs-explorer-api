@@ -12,6 +12,7 @@ exports.ListBlocks = ListBlocks;
 exports.FetchHeight = FetchHeight;
 exports.Fetch = Fetch;
 exports.ListBlockstats = ListBlockstats;
+exports.ListBlockstatsByDate = ListBlockstatsByDate;
 exports.FetchHash = FetchHash;
 exports.ListTxs = ListTxs;
 exports.Suggest = Suggest;
@@ -64,37 +65,72 @@ function ListTxs(req, res) {
 
 function ListBlockstats(req, res) {
 
-    // get base of calculation. can be height or time. default: height
-    var base = (req.query.base || 'height').toString().toUpperCase()
     var limit = parseInt(req.query.limit) || 0;
+    var downscale = Math.max(1, parseInt(req.query.downscale)) || 10
+
+    let interval = 1000
 
     var type = undefined;
     switch (req.query.type) {
         case 'count':
-            type = 'COUNT_' + base
+            type = 'COUNT_HEIGHT'
             break;
         case 'blocktime':
-            type = 'BLOCKTIME_' + base
+            type = 'BLOCKTIME_HEIGHT'
             break;
         case 'txcount':
-            type = 'TX_COUNT_' + base
+            type = 'TX_COUNT_HEIGHT'
             break;
         case 'pow':
-            type = 'DIFFICULTY_POW_' + base
+            type = 'DIFFICULTY_POW_HEIGHT'
             break;
         case 'pos':
-            type = 'DIFFICULTY_POS_' + base
+            type = 'DIFFICULTY_POS_HEIGHT'
             break;
         case 'dpos':
-            type = 'DIFFICULTY_DPOS_' + base
+            type = 'DIFFICULTY_DPOS_HEIGHT'
             break;
         default:
-            type = 'DIFFICULTY_POW_' + base
+            type = 'DIFFICULTY_POW_HEIGHT'
     }
+    
+    Block.blockstats((limit > 0) ? limit : 0, type, interval, downscale * interval)
+        .then((times) => res.json(Message(1, undefined, times)))
+        .catch((error) => {
+            console.error(error);
+            res.status(404).json(Message(0, 'ERR_LIST_BLOCKTIMES'));
+        });
+}
 
-    let interval = base == 'HEIGHT' ? 1000 : 86400
-    var downscale = Math.max(1, parseInt(req.query.downscale)) || 10
-    Block.blockstats((limit > 0) ? limit : 0, type, interval, base == 'HEIGHT' ? downscale * interval : undefined)
+function ListBlockstatsByDate(req, res) {
+
+    var limit = parseInt(req.query.limit) || 0;
+    let interval = 86400
+
+    var type = undefined;
+    switch (req.query.type) {
+        case 'count':
+            type = 'COUNT_TIME'
+            break;
+        case 'blocktime':
+            type = 'BLOCKTIME_TIME'
+            break;
+        case 'txcount':
+            type = 'TX_COUNT_TIME'
+            break;
+        case 'pow':
+            type = 'DIFFICULTY_POW_TIME'
+            break;
+        case 'pos':
+            type = 'DIFFICULTY_POS_TIME'
+            break;
+        case 'dpos':
+            type = 'DIFFICULTY_DPOS_TIME'
+            break;
+        default:
+            type = 'DIFFICULTY_POW_TIME'
+    }
+    Block.blockstatsbydate((limit > 0) ? limit : 0, type, interval)
         .then((times) => res.json(Message(1, undefined, times)))
         .catch((error) => {
             console.error(error);

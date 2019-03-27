@@ -420,6 +420,18 @@ router.get('/suggest/all/:prefix', SearchCtrl.Suggest);
 router.get('/stats/block', hourCacheSuccess, BlockCtrl.ListBlockstats);
 
 /**
+ * List block statistics by date.
+ *
+ * Result array contains points in form [date, value]
+ *
+ * @route GET /stats/date
+ * @param {string} type.query.optional - Type of data (txcount, count, pow, pos or dpos)
+ * @group general - general operations
+ * @returns {object} 200 - Suggestion list
+ */
+router.get('/stats/date', hourCacheSuccess, BlockCtrl.ListBlockstatsByDate);
+
+/**
  * This function returns the general mining information.
  * @route GET /mining/general
  * @param {number} interval.query.optional - Interval
