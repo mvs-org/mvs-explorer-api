@@ -6,6 +6,7 @@ var mongo = require('../libraries/mongo.js');
 exports.height = height;
 exports.list = list;
 exports.blockstats = blockstats;
+exports.blockstatsbydate = blockstatsbydate;
 exports.fetch = fetch;
 exports.fetchHash = fetchHash;
 exports.fetchDifficulty = fetchDifficulty;
@@ -129,17 +130,17 @@ function statsMstMining(since_height) {
     });
 }
 
-function blockstats(interval, limit, type) {
+function blockstats(limit, type, interval, scale) {
     if(limit==undefined)
         limit=0;
     return mongo.connect()
         .then((db) => db.collection('statistic'))
         .then((c) => c.find({
             type: type,
-            height: {
-                $mod: [interval, 0]
-            },
-            interval: 1000
+            ...( scale && {height: {
+                $mod: [scale, 0]
+            }}),
+            interval: interval,
         }, {
             _id: 0,
             height: 1,
@@ -149,7 +150,27 @@ function blockstats(interval, limit, type) {
             height: -1
         }).limit(limit).toArray())
         .then((blocks) => blocks.map((block, index) => {
-            return [block.height, (block.height == 0 || blocks[index + 1] == undefined) ? 0 : parseFloat(((block.timestamp - blocks[index + 1].timestamp) / interval).toFixed(3)), block.value];
+            return [block.height, (block.height == 0 || blocks[index + 1] == undefined) ? 0 : parseFloat(((block.timestamp - blocks[index + 1].timestamp) / scale).toFixed(3)), block.value];
+        }));
+}
+
+function blockstatsbydate(limit, type, interval, scale) {
+    if(limit==undefined)
+        limit=0;
+    return mongo.connect()
+        .then((db) => db.collection('statistic'))
+        .then((c) => c.find({
+            type: type,
+            interval: interval,
+        }, {
+            _id: 0,
+            date: 1,
+            value: 1
+        }).sort({
+            date: -1
+        }).limit(limit).toArray())
+        .then((blocks) => blocks.map((block, index) => {
+            return [block.date, block.value];
         }));
 }
 
