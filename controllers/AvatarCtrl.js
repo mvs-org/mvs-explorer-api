@@ -18,7 +18,10 @@ function listavatars(req, res) {
     var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 100;
     Avatars.listavatars(page, items_per_page)
         .then((avatars) => res.json(Message(1, undefined, avatars)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_AVATARS')));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_LIST_AVATARS'))
+        });
 };
 
 /**
@@ -31,7 +34,10 @@ function search(req, res) {
     var limit = parseInt(req.query.limit) || 10;
     Avatars.suggest(prefix, limit)
         .then((avatars) => res.json(Message(1, undefined, avatars)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_AVATARS')));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_SEARCH_AVATARS'))
+        });
 };
 
 /**
@@ -44,7 +50,10 @@ function avatarinfo(req, res) {
     let search = (isAddress(symbol)) ? Avatars.avatarInfoByAddress : Avatars.avatarinfo
     search(symbol)
         .then((avatars) => res.json(Message(1, undefined, avatars)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_GET_AVATAR')));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_GET_AVATAR'))
+        });
 };
 
 function isAddress(address) {

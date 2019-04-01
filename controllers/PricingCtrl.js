@@ -12,6 +12,6 @@ function cmc(req, res) {
         .then((tickers) => res.json(Message(1, undefined, tickers)))
         .catch((error) => {
             console.error(error)
-            res.status(404).json(Message(0, 'ERR_GET_TICKERS'))
+            res.status(400).json(Message(0, 'ERR_GET_TICKERS'))
         })
 }

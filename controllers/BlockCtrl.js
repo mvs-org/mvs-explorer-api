@@ -30,7 +30,10 @@ function FetchHash(req, res) {
         .then((block) => {
             return res.json(Message(1, undefined, block));
         })
-        .catch((error) => res.status(404).json(Message(0, error.message)));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_FETCH_BLOCK'))
+        });
 }
 
 /**
@@ -46,7 +49,10 @@ function Fetch(req, res) {
             res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300')
             return res.json(Message(1, undefined, block));
         })
-        .catch((error) => res.status(404).json(Message(0, error.message)));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_FETCH_BLOCK'))
+        });
 }
 
 function ListTxs(req, res) {
@@ -60,7 +66,10 @@ function ListTxs(req, res) {
     };
     Transaction.list(page, 10, filter)
         .then((txs) => res.json(Message(1, undefined, txs)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_BLOCK_TXS')));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_LIST_BLOCK_TXS'))
+        });
 }
 
 function ListBlockstats(req, res) {
@@ -189,7 +198,10 @@ function ListBlocks(req, res) {
     Helper.checkError(items_per_page >= 1 && items_per_page <= 100, 'ERR_INVALID_PAGE_SIZE')
         .then(() => Block.list(page, items_per_page))
         .then((blocks) => res.json(Message(1, undefined, blocks)))
-        .catch((error) => res.status(404).json(Message(0, error.message)));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_LIST_BLOCK_TXS'))
+        });
 }
 
 /**

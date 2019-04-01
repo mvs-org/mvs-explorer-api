@@ -5,6 +5,8 @@ var express = require('express');
 var app = express();
 app.disable('x-powered-by');
 
+const message = require('./models/message')
+
 const expressSwagger = require('express-swagger-generator')(app);
 
 let options = {
@@ -91,6 +93,7 @@ if (config.app.logging.enable) {
 var methodOverride = require('method-override');
 app.use(methodOverride());
 app.use((err, req, res, next) => {
+    console.error(err)
     res.status(500).json(message(0, 'ERR_SERVER_ERROR'));
 });
 
