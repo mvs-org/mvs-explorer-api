@@ -19,7 +19,10 @@ function listmits(req, res) {
     var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 50;
     Mits.listmits(show_invalidated, page, items_per_page)
         .then((mits) => res.json(Message(1, undefined, mits)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_MITS')));
+        .catch((error) => {
+            console.error(error)
+            res.status(400).json(Message(0, 'ERR_LIST_MITS'))
+        });
 };
 
 /**
@@ -32,7 +35,10 @@ function mitsinfo(req, res) {
     var show_invalidated = req.query.show_invalidated>0;
     Mits.mitsinfo(symbol, show_invalidated)
         .then((mits) => res.json(Message(1, undefined, mits)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_MITS_INFO')));
+        .catch((error) => {
+            console.error(error)
+            res.status(400).json(Message(0, 'ERR_MITS_INFO'))
+        });
 };
 
 /**
@@ -44,5 +50,8 @@ function search(req, res) {
     let symbol = req.params.symbol;
     Mits.suggest(symbol)
         .then((mit) => res.json(Message(1, undefined, mit)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_MIT')));
+        .catch((error) => {
+            console.error(error)
+            res.status(400).json(Message(0, 'ERR_SEARCH_MIT'))
+        });
 };

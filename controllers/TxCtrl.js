@@ -23,7 +23,10 @@ function List(req,res){
     };
     Transaction.list(page, 10, filter)
         .then((txs) => res.json(Message(1, undefined, txs)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_TX')));
+        .catch((error) => {
+            console.error(error);
+            res.status(400).json(Message(0, 'ERR_SEARCH_TX'));
+        });
 }
 
 /**
@@ -40,7 +43,7 @@ function suggest(req, res) {
         })
         .catch((error) => {
             console.error(error);
-            res.status(404).json(Message(0, 'ERR_SUGGEST_TRANSACTIONS'));
+            res.status(400).json(Message(0, 'ERR_SUGGEST_TRANSACTIONS'));
         });
 }
 
@@ -48,14 +51,20 @@ function rewards(req, res) {
     Block.height()
         .then((height) => Transaction.rewards(height))
         .then((rewards) => res.json(Message(1, undefined, rewards)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_REWARDS')));
+        .catch((error) => {
+            console.error(error);
+            res.status(400).json(Message(0, 'ERR_FETCH_REWARDS'));
+        });
 };
 
 function locksum(req, res) {
     Block.height()
         .then((height) => Transaction.locksum(height))
         .then((sum) => res.json(Message(1, undefined, sum)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_LOCKSUM')));
+        .catch((error) => {
+            console.error(error);
+            res.status(400).json(Message(0, 'ERR_FETCH_LOCKSUM'));
+        });
 };
 
 /**
@@ -70,7 +79,10 @@ function fetch(req, res) {
             res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60')
             res.json(Message(1, undefined, tx))
         })
-        .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_TX')));
+        .catch((error) => {
+            console.error(error);
+            res.status(400).json(Message(0, 'ERR_FETCH_TX'));
+        });
 };
 
 /**
@@ -88,7 +100,7 @@ function broadcast(req, res) {
         })
         .catch((error) => {
             console.error(error);
-            res.status(404).json(Message(0, 'ERR_BROADCAST_TX'));
+            res.status(400).json(Message(0, 'ERR_BROADCAST_TX'));
         });
 };
 
@@ -101,5 +113,8 @@ function outputs(req, res) {
     var hash = req.params.hash;
     Transaction.outputs(hash)
         .then((outputs) => res.json(Message(1, undefined, outputs)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_FETCH_TX_OUTPUTS')));
+        .catch((error) => {
+            console.error(error);
+            res.status(400).json(Message(0, 'ERR_FETCH_TX_OUTPUTS'));
+        });
 };

@@ -109,7 +109,10 @@ function poolstats(req, res) {
         })))
         .then(results => _.compact(results))
         .then((mining_info) => res.json(Message(1, undefined, mining_info)))
-        .catch((error) => res.status(404).json(Message(0, error.message)));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_GET_POOLSTATS'))
+        });
 }
 
 function posstats(req, res) {
@@ -126,7 +129,10 @@ function posstats(req, res) {
             })))
         .then((avatars) => avatars.slice(0, top))
         .then((mining_info) => res.json(Message(1, undefined, mining_info)))
-        .catch((error) => res.status(404).json(Message(0, error.message)));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_GET_POSSTATS'))
+        });
 }
 
 async function posVotes(req, res) {
@@ -153,7 +159,8 @@ async function posVotes(req, res) {
 
         res.json(Message(1, undefined, {info, miners: utxoCount}))
     } catch (error) {
-        res.status(404).json(Message(0, error.message))
+        console.log(error)
+        res.status(400).json(Message(0, 'ERR_POS_VOTES'))
     }
 }
 
@@ -179,7 +186,8 @@ async function posVotesByAvatar(req, res) {
         })
         res.json(Message(1, undefined, utxoCount.length ? utxoCount[0] : null))
     } catch (error) {
-        res.status(404).json(Message(0, error.message))
+        console.log(error)
+        res.status(400).json(Message(0, 'ERR_POS_VOTES'))
     }
 }
 
@@ -200,7 +208,8 @@ async function mstMiningStats(req, res) {
         }
         res.json(Message(1, undefined, result))
     } catch (error) {
-        res.status(404).json(Message(0, error.message))
+        console.log(error)
+        res.status(400).json(Message(0, 'ERR_MST_MINING_STATS'))
     }
 }
 
@@ -208,5 +217,8 @@ function listMstMining(req, res) {
     Certs.listMstMining()
         .then((certs) => certs.map(c => c.attachment.symbol).sort())
         .then((symbols) => res.json(Message(1, undefined, symbols)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_CERTS')));
+        .catch((error) => {
+            console.error(error)
+            res.status(400).json(Message(0, 'ERR_LIST_MINING_MST'))
+        });
 };

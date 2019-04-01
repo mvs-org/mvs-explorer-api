@@ -21,7 +21,10 @@ exports.BridgeConfig = ethBridgeConfig;
 function listassets(req, res) {
     Assets.listassets()
         .then((assets) => res.json(Message(1, undefined, assets)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_LIST_ASSETS')));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_LIST_ASSETS'))
+        });
 };
 
 /**
@@ -51,7 +54,10 @@ function search(req, res) {
     var limit = parseInt(req.query.limit) || 10;
     Assets.suggest(prefix, limit)
         .then((assets) => res.json(Message(1, undefined, assets)))
-        .catch((error) => res.status(404).json(Message(0, 'ERR_SEARCH_ASSETS')));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_SEARCH_ASSETS'))
+        });
 };
 
 /**
@@ -68,13 +74,19 @@ function assetinfo(req, res) {
             else
                 throw Error('Not found')
         })
-        .catch((error) => res.status(404).json(Message(0, 'ERR_GET_ASSET')));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_GET_ASSET'))
+        });
 };
 
 function ethBridgeList(req, res) {
     Bridge.list()
         .then(list => res.json(Message(1, undefined, list)))
-        .catch(() => res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_WHITELIST')));
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_ETH_BRIDGE_WHITELIST'))
+        });
 }
 
 function ethBridgeConfig(req, res) {
