@@ -133,15 +133,14 @@ function list(page, items_per_page, filter) {
         if (filter.min_height)
             query.height.$gte = filter.min_height;
     }
-    return mongo.find_and_count(query, {
-        "_id": 0,
-        "rawtx": 0,
-        "inputs": {
-            "$slice": 5
-        }
-    }, 'tx', {
-        "height": -1
-    }, page, items_per_page);
+    return mongo.connect()
+        .then((db) => db.collection('tx'))
+        .then(collection => collection.find(query, {
+            "_id": 0,
+            "rawtx": 0,
+        })).sort({
+            height: -1,
+        }).toArray()
 }
 
 
