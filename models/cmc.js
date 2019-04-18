@@ -4,7 +4,7 @@ module.exports = {
     tickers: tickers
 };
 
-let assets = ["ETP", "MVS.ZGC"];
+let assets = ["ETP"];
 let bases = ["BTC", "USD", "CNY", "JPY", "EUR", "GBP"];
 
 function getQuote(asset, base) {
@@ -12,9 +12,6 @@ function getQuote(asset, base) {
     switch (asset) {
         case "ETP":
             id = 1703;
-            break;
-        case "MVS.ZGC":
-            id = 1695;
             break;
         default:
             throw Error('Error illegal asset for quote query');
