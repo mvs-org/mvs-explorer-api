@@ -138,9 +138,9 @@ function list(page, items_per_page, filter) {
         .then(collection => collection.find(query, {
             "_id": 0,
             "rawtx": 0,
-        })).sort({
+        }).sort({
             height: -1,
-        }).toArray()
+        }).toArray())
 }
 
 
