@@ -1,14 +1,14 @@
 'use strict'
 
-let CMC = require('../models/cmc.js'),
+let CoinGecko = require('../models/coingecko'),
     Message = require('../models/message.js')
 
 module.exports = {
-    cmc: cmc,
+    tickers,
 }
 
-function cmc(req, res) {
-    CMC.tickers()
+function tickers(req, res) {
+    CoinGecko.tickers()
         .then((tickers) => res.json(Message(1, undefined, tickers)))
         .catch((error) => {
             console.error(error)
