@@ -367,7 +367,7 @@ router.get('/circulation', hourCacheSuccess, BlockCtrl.FetchCirculation);
  * @group general - Pricing operations
  * @returns {object} 200 - Tickers
  */
-router.get('/pricing/tickers', shortCacheSuccess, PricingCtrl.cmc);
+router.get('/pricing/tickers', mediumCacheSuccess, PricingCtrl.tickers);
 
 /**
  * This function returns the sum of add deposited ETP.
