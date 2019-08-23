@@ -109,6 +109,7 @@ function broadcast(req, res) {
         })))
         .then(() => Transaction.broadcast(tx))
         .then((tx) => {
+            console.log('new transaction', tx)
             if (tx.code == 1021)
                 tx.error = "Error decoding transaction";
             res.json(Message(1, undefined, tx));
