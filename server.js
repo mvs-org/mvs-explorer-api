@@ -68,12 +68,9 @@ if (config.app.logging.enable) {
     let transports = [];
     switch (config.app.logging.type) {
         case 'elasticsearch':
-            var Elasticsearch = require('winston-elasticsearch');
-            transports.push(
-                new Elasticsearch({
-                    index: 'explorer-api'
-                }))
-            break;
+            console.error('elasticsearch not supported anymore')
+            process.exit(1)
+            break
         default:
             transports.push(new winston.transports.Console())
     }

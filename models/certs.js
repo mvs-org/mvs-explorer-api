@@ -5,6 +5,7 @@ var mongo = require('../libraries/mongo.js');
 
 
 module.exports = {
+    get: cert,
     listcerts: listcerts,
     countcerts: countcerts,
     certsinfo: certsinfo,
@@ -40,6 +41,28 @@ function countcerts() {
     return mongo.connect()
         .then((db) => db.collection('output'))
         .then(collection => collection.count(query, {}))
+}
+
+/**
+ * Get the information of a certificate.
+ * @param {string} type type
+ * @param {string} symbol symbol
+ * @returns {Array<Output>}
+ */
+function cert(type, symbol) {
+    let query = {
+        'attachment.type': "asset-cert",
+        spent_tx: 0,
+        'attachment.cert': type,
+        'attachment.symbol': symbol,
+    };
+    return mongo.connect()
+        .then((db) => db.collection('output'))
+        .then(collection => collection.find(query, {
+            "_id": 0,
+            "type": 0
+        }))
+        .then(cursor => cursor.toArray());
 }
 
 /**

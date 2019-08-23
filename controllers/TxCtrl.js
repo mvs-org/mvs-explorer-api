@@ -3,6 +3,7 @@
 //Load Models
 var Message = require('../models/message.js');
 var Transaction = require('../models/transaction');
+var Certificate = require('../models/certs');
 var Block = require('../models/block');
 
 exports.FetchTx = fetch;
@@ -13,7 +14,7 @@ exports.Suggest = suggest;
 exports.Broadcast = broadcast;
 exports.FetchTxOutputs = outputs;
 
-function List(req,res){
+function List(req, res) {
     var page = parseInt(req.query.page) || 0;
     var filter = {
         max_time: parseInt(req.query.max_time) || undefined,
@@ -92,10 +93,24 @@ function fetch(req, res) {
  */
 function broadcast(req, res) {
     var tx = req.body.tx;
-    Transaction.broadcast(tx)
+    Transaction.decode(tx)
+        .then((decodedTx) => Promise.all(decodedTx.outputs.map(async output => {
+            if (output.attachment &&
+                output.attachment.type === 5 && // type certificate
+                output.attachment.cert === 2 && // cert type domain
+                output.attachment.status === 3 // issued
+            ) {
+                const certs = await Certificate.get('domain', output.attachment.symbol)
+                if (certs.length) {
+                    console.log(output.attachment)
+                    throw Error('ERR_DOMAIN_CERT_EXISTS')
+                }
+            }
+        })))
+        .then(() => Transaction.broadcast(tx))
         .then((tx) => {
-            if(tx.code==1021)
-                tx.error="Error decoding transaction";
+            if (tx.code == 1021)
+                tx.error = "Error decoding transaction";
             res.json(Message(1, undefined, tx));
         })
         .catch((error) => {

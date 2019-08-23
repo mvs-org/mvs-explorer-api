@@ -2,6 +2,7 @@
 
 //Set up database
 var mongo = require('../libraries/mongo.js');
+var metaversejs = require('metaversejs')
 
 const mvsd_config = require('../config/mvsd.js'),
     rp = require('request-promise');
@@ -17,7 +18,8 @@ module.exports = {
     counttxs: counttxs,
     rewards: rewards,
     broadcast: broadcast,
-    outputs: outputs
+    outputs: outputs,
+    decode: decode,
 };
 
 /**
@@ -273,6 +275,10 @@ function circulation() {
             _id: "coinbase"
         }))
         .then((result) => -result.value["ETP"] * Math.pow(10, -8));
+}
+
+async function decode(rawTx){
+    return metaversejs.transaction.decode(rawTx)
 }
 
 function broadcast(tx) {
