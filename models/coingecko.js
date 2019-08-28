@@ -4,7 +4,15 @@ module.exports = {
     tickers: tickers
 };
 
-let bases = ["BTC", "USD", "CNY", "JPY", "EUR", "GBP"];
+let bases = [
+    "BTC",
+    "USD",
+    "CNY",
+    "JPY",
+    "EUR",
+    "GBP",
+    "CAD",
+];
 
 function tickers() {
     return requestify.get(`https://api.coingecko.com/api/v3/simple/price?ids=metaverse-etp%2Czengold&vs_currencies=${bases.join('%2C')}`)
