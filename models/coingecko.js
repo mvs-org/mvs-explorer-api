@@ -22,7 +22,7 @@ function tickers() {
             const res = { ETP: {}, "MVS.ZGC": {}, };
             Object.entries(result['metaverse-etp']).forEach(([currency, price]) => res['ETP'][currency.toUpperCase()] = { price, })
             Object.entries(result.zengold).forEach(([currency, price]) => res['MVS.ZGC'][currency.toUpperCase()] = { price, })
-            return requestify.get(`https://api.rightbtc.pro/v1/pub/ticker/DNAUSDT`)
+            return requestify.get(`https://api.rightbtc.com/v1/pub/ticker/DNAUSDT`)
                 .then(dna => dna.getBody())
                 .then(dna => {
                     dnaRightBtcResponse = dna
