@@ -33,7 +33,8 @@ function fetch(hash) {
             "hash": hash
         }).sort({
             orphan: 1
-        }).limit(1).toArray())
+        }).toArray())
+        .then((result) => result[0])
         .then((tx) => {
             if (tx == null)
                 throw Error('ERR_TX_NOT_FOUND');
