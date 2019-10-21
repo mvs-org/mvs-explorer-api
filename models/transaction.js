@@ -29,13 +29,16 @@ module.exports = {
  */
 function fetch(hash) {
     return mongo.connect()
-        .then((db) => db.collection('tx').findOne({
+        .then((db) => db.collection('tx').find({
             "hash": hash
-        }).then((tx) => {
+        }).sort({
+            orphan: 1
+        }).limit(1).toArray())
+        .then((tx) => {
             if (tx == null)
                 throw Error('ERR_TX_NOT_FOUND');
             return tx;
-        }));
+        });
 }
 
 function listall(filter) {
