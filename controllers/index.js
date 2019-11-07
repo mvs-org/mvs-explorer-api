@@ -203,6 +203,14 @@ router.get('/block/:block_no([0-9]{1,10})', longCacheSuccess, BlockCtrl.Fetch);
 router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
 
 /**
+ * This function returns the list of all the assets with icons.
+ * @route GET /assets/icons
+ * @group mst - Mst operations
+ * @returns {object} 200 - List of assets
+ */
+router.get('/assets/icons', longCacheSuccess, AssetCtrl.ListIcons);
+
+/**
  * This function returns the list of all the assets stakeholders ordered by stake.
  * @route GET /stakes/{symbol}
  * @param {string} symbol.path.required - Asset symbol

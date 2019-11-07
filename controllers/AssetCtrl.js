@@ -7,6 +7,7 @@ var Assets = require('../models/assets.js'),
     Message = require('../models/message.js');
 
 exports.ListAllAssets = listassets;
+exports.ListIcons = listIcons;
 exports.ListStakes = listStakes;
 exports.AssetInfo = assetinfo;
 exports.Search = search;
@@ -25,6 +26,15 @@ function listassets(req, res) {
             console.error(error)
             res.status(404).json(Message(0, 'ERR_LIST_ASSETS'))
         });
+};
+
+/**
+ * Get the list of all the assets with an icon.
+ * @param {} req
+ * @param {} res
+ */
+function listIcons(req, res) {
+    res.json(Message(1, undefined, ['ETP', 'MVS.ZGC', 'MVS.ZDC', 'CSD.CSD', 'PARCELX.GPX', 'PARCELX.TEST', 'SDG', 'META', 'MVS.HUG', 'RIGHTBTC.RT', 'TIPLR.TPC', 'PANDO', 'VALOTY', 'KOALA.KT', 'DNA', 'GKC']))
 };
 
 /**
