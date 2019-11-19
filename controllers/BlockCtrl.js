@@ -56,7 +56,6 @@ function Fetch(req, res) {
 }
 
 function ListTxs(req, res) {
-    var number = req.params.block_no;
     var page = parseInt(req.query.page) || 0;
     var filter = {
         allow_orphan: true,

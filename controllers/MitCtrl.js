@@ -16,7 +16,7 @@ exports.Search = search;
 function listmits(req, res) {
     var show_invalidated = req.query.show_invalidated > 0;
     var page = parseInt(req.query.page) || 0;
-    var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 50;
+    var items_per_page = Math.min(parseInt(req.query.items_per_page) || 50, 100)
     Mits.listmits(show_invalidated, page, items_per_page)
         .then((mits) => res.json(Message(1, undefined, mits)))
         .catch((error) => {

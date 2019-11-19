@@ -60,7 +60,7 @@ function ListAddressesTxs(req, res) {
  */
 function ListTxs(req, res) {
     var page = parseInt(req.query.page) || 0
-    var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 10
+    var items_per_page = Math.min(parseInt(req.query.items_per_page) || 10, 100)
     var filter = {
         address: req.params.address,
         max_time: parseInt(req.query.max_time) || undefined,

@@ -13,7 +13,7 @@ exports.CertsInfo = certsinfo;
  * @param {} res
  */
 function listcerts(req, res) {
-    var show_invalidated = req.query.show_invalidated>0;
+    var show_invalidated = req.query.show_invalidated > 0;
     var page = parseInt(req.query.page) || 0;
     var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 50;
     Certs.listcerts(show_invalidated, page, items_per_page)
