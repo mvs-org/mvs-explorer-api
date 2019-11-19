@@ -231,7 +231,8 @@ router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
 
 /**
  * This function returns the information about a specific asset.
- * @route GET /asset/{asset_name}
+ * @route GET /asset/{asset_symbol}
+ * @param {string} asset_symbol.path.required - Asset symbol
  * @group mst - Mst operations
  * @returns {object} 200 - Asset info
  */

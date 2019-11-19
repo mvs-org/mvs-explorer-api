@@ -211,7 +211,7 @@ function ListBlocks(req, res) {
  */
 function Suggest(req, res) {
     var prefix = req.params.prefix;
-    var limit = parseInt(req.query.limit) || 10;
+    let limit = Math.min(parseInt(req.query.limit) || 10, 100)
     Block.suggest(prefix, limit)
         .then((hashes) => {
             res.json(Message(1, undefined, hashes));

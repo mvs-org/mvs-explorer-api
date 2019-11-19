@@ -84,7 +84,7 @@ function ListTxs(req, res) {
 
 function Suggest(req, res) {
     let prefix = req.params.prefix
-    let limit = 10
+    let limit = Math.min(parseInt(req.query.limit) || 10, 100)
     let includeTxCount = false
     Address.suggest(prefix, limit, includeTxCount)
         .then((addresses) => res.status(200).json(Message(1, undefined, addresses)))
