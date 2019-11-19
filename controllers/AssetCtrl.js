@@ -80,10 +80,10 @@ function search(req, res) {
  */
 function assetinfo(req, res) {
     var symbol = req.params.asset_symbol;
-    Promise.all([Assets.assetinfo(symbol.toUpperCase()), Assets.minedQuantity(symbol.toUpperCase())])
-        .then(([asset, minedQuantity]) => {
+    Promise.all([Assets.assetinfo(symbol.toUpperCase()), Assets.minedQuantity(symbol.toUpperCase()), Assets.burnedQuantity(symbol.toUpperCase())])
+        .then(([asset, minedQuantity, burnedQuantity]) => {
             if (asset)
-                res.json(Message(1, undefined, { minedQuantity, ...asset }))
+                res.json(Message(1, undefined, { minedQuantity, burnedQuantity, ...asset }))
             else
                 throw Error('Not found')
         })

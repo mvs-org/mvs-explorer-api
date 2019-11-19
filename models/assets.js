@@ -10,7 +10,8 @@ module.exports = {
     suggest: suggest,
     stakelist: stakelist,
     assetinfo: assetinfo,
-    minedQuantity: minedQuantity
+    minedQuantity: minedQuantity,
+    burnedQuantity: burnedQuantity
 };
 
 /**
@@ -122,4 +123,17 @@ function minedQuantity(symbol) {
             _id: "coinbase",
         }))
         .then(coinbase => coinbase ? -coinbase.value[symbol.replace(/\./g, '_')] || 0 : 0)
+}
+
+/**
+ * Get the burned quantity of an asset.
+ * @param {} symbol string
+ * @returns {}
+ */
+function burnedQuantity(symbol) {
+    return mongo.connect()
+        .then((db) => db.collection('address_balances').findOne({
+            _id: "1111111111111111111114oLvT2",
+        }))
+        .then(burned => burned ? burned.value[symbol.replace(/\./g, '_')] || 0 : 0)
 }
