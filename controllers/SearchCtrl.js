@@ -19,7 +19,7 @@ exports.Suggest = suggest;
  */
 function suggest(req, res) {
     var prefix = req.params.prefix;
-    var limit = parseInt(req.query.limit) || 10;
+    let limit = Math.min(parseInt(req.query.limit) || 10, 100)
 
     Promise.all([
             Helper.checkError(limit <= 20, 'ERR_LIMIT_RANGE'),

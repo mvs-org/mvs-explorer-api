@@ -7,6 +7,7 @@ var Assets = require('../models/assets.js'),
     Message = require('../models/message.js');
 
 exports.ListAllAssets = listassets;
+exports.ListIcons = listIcons;
 exports.ListStakes = listStakes;
 exports.AssetInfo = assetinfo;
 exports.Search = search;
@@ -25,6 +26,18 @@ function listassets(req, res) {
             console.error(error)
             res.status(404).json(Message(0, 'ERR_LIST_ASSETS'))
         });
+};
+
+/**
+ * Get the list of all the assets with an icon.
+ * @param {} req
+ * @param {} res
+ */
+function listIcons(req, res) {
+    let result = {
+        MST: ['ETP', 'MVS.ZGC', 'MVS.ZDC', 'CSD.CSD', 'PARCELX.GPX', 'PARCELX.TEST', 'SDG', 'META', 'MVS.HUG', 'RIGHTBTC.RT', 'TIPLR.TPC', 'PANDO', 'VALOTY', 'KOALA.KT', 'DNA', 'GKC']
+    }
+    res.json(Message(1, undefined, result))
 };
 
 /**
@@ -51,7 +64,7 @@ function listStakes(req, res) {
  */
 function search(req, res) {
     let prefix = req.params.prefix;
-    var limit = parseInt(req.query.limit) || 10;
+    let limit = Math.min(parseInt(req.query.limit) || 10, 100)
     Assets.suggest(prefix, limit)
         .then((assets) => res.json(Message(1, undefined, assets)))
         .catch((error) => {
@@ -67,10 +80,10 @@ function search(req, res) {
  */
 function assetinfo(req, res) {
     var symbol = req.params.asset_symbol;
-    Promise.all([Assets.assetinfo(symbol.toUpperCase()), Assets.minedQuantity(symbol.toUpperCase())])
-        .then(([asset, minedQuantity]) => {
+    Promise.all([Assets.assetinfo(symbol.toUpperCase()), Assets.minedQuantity(symbol.toUpperCase()), Assets.burnedQuantity(symbol.toUpperCase())])
+        .then(([asset, minedQuantity, burnedQuantity]) => {
             if (asset)
-                res.json(Message(1, undefined, { minedQuantity, ...asset }))
+                res.json(Message(1, undefined, { minedQuantity, burnedQuantity, ...asset }))
             else
                 throw Error('Not found')
         })

@@ -37,7 +37,7 @@ function List(req, res) {
  */
 function suggest(req, res) {
     var prefix = req.params.prefix;
-    var limit = parseInt(req.query.limit) || 10;
+    let limit = Math.min(parseInt(req.query.limit) || 10, 100)
     Transaction.suggest(prefix, limit)
         .then((hashes) => {
             res.json(Message(1, undefined, hashes));

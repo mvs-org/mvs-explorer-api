@@ -56,7 +56,6 @@ function Fetch(req, res) {
 }
 
 function ListTxs(req, res) {
-    var number = req.params.block_no;
     var page = parseInt(req.query.page) || 0;
     var filter = {
         allow_orphan: true,
@@ -211,7 +210,7 @@ function ListBlocks(req, res) {
  */
 function Suggest(req, res) {
     var prefix = req.params.prefix;
-    var limit = parseInt(req.query.limit) || 10;
+    let limit = Math.min(parseInt(req.query.limit) || 10, 100)
     Block.suggest(prefix, limit)
         .then((hashes) => {
             res.json(Message(1, undefined, hashes));

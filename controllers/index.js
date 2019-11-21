@@ -80,7 +80,7 @@ router.post('/tx', TxCtrl.Broadcast);
  * Search for transaction hash.
  * @route GET /suggest/tx/{prefix}
  * @param {string} prefix.path.required - Transaction hash prefix
- * @param {number} limit.query.required - Number of results
+ * @param {number} limit.query.optional - Number of results (default: 10)
  * @group transaction - Operations about transactions
  * @returns {object} 200 - Transaction details
  */
@@ -109,7 +109,7 @@ router.get('/address/balance/:symbol/:address', shortCacheSuccess, AddressCtrl.G
  * Search for addresses.
  * @route GET /suggest/address/{prefix}
  * @param {string} prefix.path.required - Address prefix
- * @param {number} limit.query.required - Number of results
+ * @param {number} limit.query.optional - Number of results (default: 10)
  * @group address - Operations about addresses
  * @returns {object} 200 - Address suggestion
  */
@@ -119,8 +119,8 @@ router.get('/suggest/address/:prefix', AddressCtrl.Suggest);
  * Get the transactions of an address.
  * @route GET /address/txs/{address}
  * @param {string} address.path.required - address
- * @param {string} page.query.optional - page
- * @param {string} items_per_page.query.optional - items per page
+ * @param {string} page.query.optional - page (default: 0)
+ * @param {string} items_per_page.query.optional - items per page (default: 10, max: 100)
  * @param {number} min_time.query.optional - From timestamp
  * @param {number} max_time.query.optional - To timestamp
  * @param {number} min_height.query.optional - From height
@@ -134,13 +134,13 @@ router.get('/address/:address', mediumCacheSuccess, AddressCtrl.ListTxs);
 /**
  * Get the transactions of multiple addresses.
  * @route GET /addresses/txs
- * @param {string} page.query.optional - page
- * @param {string} items_per_page.query.optional - items per page
+ * @param {Array<string>} addresses.query.required - Addresses
+ * @param {string} page.query.optional - Page
+ * @param {string} items_per_page.query.optional - Items per page
  * @param {number} min_time.query.optional - From timestamp
  * @param {number} max_time.query.optional - To timestamp
  * @param {number} min_height.query.optional - From height
  * @param {number} max_height.query.optional - To height
- * @param {Array<string>} addresses.query.required - Addresses
  * @group address - Operations about addresses
  * @returns {object} 200 - Transaction array
  */
@@ -158,8 +158,8 @@ router.get('/height', shortCacheSuccess, BlockCtrl.FetchHeight);
  * List blocks.
  * @route GET /blocks/{page}
  * @group block - Operations about blocks
- * @param {string} page.query.optional - page (default: 0)
- * @param {string} items_per_page.query.optional - items per page (default: 50)
+ * @param {string} page.query.optional - Page (default: 0)
+ * @param {string} items_per_page.query.optional - Items per page (default: 50)
  * @returns {object} 200 - Block data
  */
 router.get('/blocks', shortCacheSuccess, BlockCtrl.ListBlocks);
@@ -169,7 +169,7 @@ router.get('/blocks', shortCacheSuccess, BlockCtrl.ListBlocks);
  * @route GET /block/txs/{blockhash}
  * @group block - Operations about blocks
  * @param {string} blockhash.path.required - Hash of block
- * @param {number} page.query.required - Page
+ * @param {number} page.query.optional - Page (default: 0)
  * @returns {object} 200 - Block data
  */
 router.get('/block/txs/:blockhash', shortCacheSuccess, BlockCtrl.ListTxs);
@@ -179,7 +179,7 @@ router.get('/block/txs/:blockhash', shortCacheSuccess, BlockCtrl.ListTxs);
  * @route GET /suggest/blocks/{prefix}
  * @group block - Operations about blocks
  * @param {string} prefix.path.required - Prefix
- * @param {number} limit.query.required - Number of results
+ * @param {number} limit.query.optional - Number of results (default: 10, max: 100)
  * @returns {object} 200 - Block data
  */
 router.get('/suggest/blocks/:prefix', shortCacheSuccess, BlockCtrl.Suggest);
@@ -203,10 +203,18 @@ router.get('/block/:block_no([0-9]{1,10})', longCacheSuccess, BlockCtrl.Fetch);
 router.get('/assets', longCacheSuccess, AssetCtrl.ListAllAssets);
 
 /**
+ * This function returns the list of all the assets with icons.
+ * @route GET /assets/icons
+ * @group mst - Mst operations
+ * @returns {object} 200 - List of assets
+ */
+router.get('/assets/icons', longCacheSuccess, AssetCtrl.ListIcons);
+
+/**
  * This function returns the list of all the assets stakeholders ordered by stake.
  * @route GET /stakes/{symbol}
  * @param {string} symbol.path.required - Asset symbol
- * @param {number} limit.query.optional - Number of results
+ * @param {number} limit.query.optional - Number of results (default: 20)
  * @param {number} min.query.optional - Minimum balance (default 0)
  * @group mst - Mst operations
  * @returns {object} 200 - List of assets
@@ -216,6 +224,7 @@ router.get('/stakes/:symbol', longCacheSuccess, AssetCtrl.ListStakes);
 /**
  * This function returns the list of all the asset names that start with given prefix.
  * @route GET /suggest/asset/{prefix}
+ * @param {string} prefix.path.required - Prefix asset symbol
  * @group mst - Mst operations
  * @returns {object} 200 - Search for assets
  */
@@ -223,7 +232,8 @@ router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
 
 /**
  * This function returns the information about a specific asset.
- * @route GET /asset/{asset_name}
+ * @route GET /asset/{asset_symbol}
+ * @param {string} asset_symbol.path.required - Asset symbol
  * @group mst - Mst operations
  * @returns {object} 200 - Asset info
  */
@@ -301,7 +311,7 @@ router.get('/avatar/:avatar_symbol', longCacheSuccess, AvatarCtrl.AvatarInfo);
  * @group cert - Cert operations
  * @param {number} show_invalidated.query.optional - Include invalidated certificates (default: false)
  * @param {string} page.query.optional - page (default: 0)
- * @param {string} items_per_page.query.optional - items per page (default: 50)
+ * @param {string} items_per_page.query.optional - items per page (default: 50, max: 100)
  * @returns {object} 200 - List of certs
  */
 router.get('/certs', longCacheSuccess, CertCtrl.ListAllCerts);
@@ -321,7 +331,7 @@ router.get('/certs/:owner', longCacheSuccess, CertCtrl.CertsInfo);
  * @group mit - Mit operations
  * @param {number} show_invalidated.query.optional - Include invalidated mits (default: false)
  * @param {string} page.query.optional - page (default: 0)
- * @param {string} items_per_page.query.optional - items per page (default: 50)
+ * @param {string} items_per_page.query.optional - items per page (default: 50, max: 100)
  * @returns {object} 200 - List of mits
  */
 router.get('/mits', mediumCacheSuccess, MitCtrl.ListAllMits);
@@ -400,7 +410,7 @@ router.get('/locations', mediumCacheSuccess, GeoCtrl.locations);
  * Search for transactions, blocks, addresses and assets by given prefix.
  * @route GET /suggest/all/{prefix}
  * @param {string} prefix.path.required - Target prefix
- * @param {number} limit.query.required - Number of result for each group
+ * @param {number} limit.query.optional - Number of result for each group (default: 10, max: 100)
  * @group general - General operations
  * @returns {object} 200 - Suggestion list
  */
@@ -425,7 +435,7 @@ router.get('/stats/block', hourCacheSuccess, BlockCtrl.ListBlockstats);
  * Result array contains points in form [date, value]
  *
  * @route GET /stats/date
- * @param {string} type.query.optional - Type of data (txcount, count, pow, pos or dpos)
+ * @param {string} type.query.optional - Type of data (txcount, count, pow, pos or dpos. Default: pow)
  * @group general - general operations
  * @returns {object} 200 - Suggestion list
  */
@@ -434,7 +444,7 @@ router.get('/stats/date', hourCacheSuccess, BlockCtrl.ListBlockstatsByDate);
 /**
  * This function returns the general mining information.
  * @route GET /mining/general
- * @param {number} interval.query.optional - Interval
+ * @param {number} interval.query.optional - Interval (default: 1000)
  * @group mining - Mining operations
  * @returns {object} 200 - Mining info
  */
@@ -443,7 +453,7 @@ router.get('/mining/general', shortCacheSuccess, MiningCtrl.info);
 /**
  * This function returns the PoW mining information.
  * @route GET /mining/pow
- * @param {number} number.query.optional - Number of blocks used to calculate the statistics
+ * @param {number} number.query.optional - Number of blocks used to calculate the statistics (default: 1000, max: 10000)
  * @group mining - Mining operations
  * @returns {object} 200 - Mining info
  */
@@ -453,7 +463,7 @@ router.get('/mining/pow', shortCacheSuccess, MiningCtrl.PowInfo);
 /**
  * This function returns the PoS mining information.
  * @route GET /mining/pos
- * @param {number} number.query.optional - Number of blocks used to calculate the statistics
+ * @param {number} number.query.optional - Number of blocks used to calculate the statistics (default: 1000, max: 10000)
  * @group mining - Mining operations
  * @returns {object} 200 - Mining info
  */
@@ -462,7 +472,7 @@ router.get('/mining/pos', shortCacheSuccess, MiningCtrl.PosInfo);
 /**
  * This function returns the mining pool statistics.
  * @route GET /poolstats
- * @param {number} interval.query.optional - Interval
+ * @param {number} interval.query.optional - Interval (default: 1000, max: 10000)
  * @group mining - Mining operations
  * @returns {object} 200 - Mining pool statistics
  */
@@ -472,7 +482,7 @@ router.get('/poolstats', longCacheSuccess, MiningCtrl.poolstats);
  * This function returns the count of the votes that are ready for mining.
  * @route GET /posvotes/{avatar}
  * @param {string} avatar.path.required - Avatar
- * @param {number} interval.query.optional - Interval
+ * @param {number} interval.query.optional - Interval (default: 1000, max: 10000)
  * @group mining - Mining operations
  * @returns {object} 200 - PoS mining statistics
  */
@@ -481,7 +491,7 @@ router.get('/posvotes/:avatar', mediumCacheSuccess, MiningCtrl.posVotesByAvatar)
 /**
  * This function returns the count of the votes that are ready for mining.
  * @route GET /posvotes
- * @param {number} interval.query.optional - Interval
+ * @param {number} interval.query.optional - Interval (default: 1000, max: 10000)
  * @group mining - Mining operations
  * @returns {object} 200 - PoS mining statistics
  */
@@ -490,8 +500,8 @@ router.get('/posvotes', longCacheSuccess, MiningCtrl.posVotes);
 /**
  * This function returns the PoS mining statistics.
  * @route GET /posstats
- * @param {number} interval.query.optional - Interval
- * @param {number} top.query.optional - Number of Avatars returned
+ * @param {number} interval.query.optional - Interval (default: 1000, max: 10000)
+ * @param {number} top.query.optional - Number of Avatars returned (default: 25, max: 100)
  * @group mining - Mining operations
  * @returns {object} 200 - PoS mining statistics
  */
@@ -500,7 +510,7 @@ router.get('/posstats', longCacheSuccess, MiningCtrl.posstats);
 /**
  * This function returns the MST mining statistics.
  * @route GET /mstmining
- * @param {number} interval.query.optional - Interval
+ * @param {number} interval.query.optional - Interval (default: 1000, max: 10000)
  * @group mining - Mining operations
  * @returns {object} 200 - MST mining statistics
  */
