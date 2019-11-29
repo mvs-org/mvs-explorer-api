@@ -11,6 +11,7 @@ exports.ListAddressesTxs = ListAddressesTxs
 exports.Suggest = Suggest
 exports.GetBalance = GetBalance
 exports.ListBalances = ListBalances
+exports.CountAddresses = CountAddresses
 
 /**
  * List transactions for given addresses.
@@ -142,5 +143,16 @@ function GetBalance(req, res) {
         .catch((error) => {
             console.error(error)
             res.status(404).json(Message(0, 'ERR_LIST_BALANCES'))
+        })
+}
+
+async function CountAddresses(req, res) {
+    const format = (req.query.format === 'plain') ? 'plain' : 'json'
+
+    Address.countaddresses(0.00000001)
+        .then(result => format === 'plain' ? res.send(result.toString()) : res.json(Message(1, undefined, result)))
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_ADDRESSES_COUNT'))
         })
 }
