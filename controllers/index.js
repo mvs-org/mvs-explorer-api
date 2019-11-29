@@ -147,6 +147,15 @@ router.get('/address/:address', mediumCacheSuccess, AddressCtrl.ListTxs);
 router.get('/addresses/txs', shortCacheSuccess, AddressCtrl.ListAddressesTxs);
 
 /**
+ * Count the number of addresses with an ETP balance.
+ * @route GET /addresses/count
+ * @param {number} format.query.optional - plain or json (default: json)
+ * @group address - Operations about addresses
+ * @returns {object} 200 - Transaction array
+ */
+router.get('/addresses/count', longCacheSuccess, AddressCtrl.CountAddresses);
+
+/**
  * Get latest block number.
  * @route GET /height
  * @group block - Operations about blocks
