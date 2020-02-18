@@ -273,12 +273,15 @@ function rewards(height) {
         });
 }
 
-function circulation() {
+function circulation(symbol) {
+    if(symbol==='DNA'){
+        return 100000000000
+    }
     return mongo.connect()
         .then((db) => db.collection('address_balances').findOne({
             _id: "coinbase"
         }))
-        .then((result) => -result.value["ETP"] * Math.pow(10, -8));
+        .then((result) => -result.value[symbol] * Math.pow(10, -8));
 }
 
 async function decode(rawTx){

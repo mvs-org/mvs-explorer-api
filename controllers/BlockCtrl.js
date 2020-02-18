@@ -166,17 +166,33 @@ function FetchHeight(req, res) {
 async function FetchCirculation(req, res) {
     var adjust = parseInt(req.query.adjust) > 0;
     const format = (req.query.format === 'plain') ? 'plain' : 'json'
+    const symbol = req.query.symbol || 'ETP'
 
-    function getAdjustment() {
-        if (adjust) {
-            return Block.height()
-                .then(height => Address.balances("MSCHL3unfVqzsZbRVCJ3yVp7RgAmXiuGN3", height))
-                .then(balance => balance.info.ETP ? (balance.info.ETP / 100000000).toFixed(8) : 0)
+    async function getAdjustment(symbol) {
+        const height = await Block.height()
+        if (symbol === 'ETP' && adjust) {
+            const balance = await Address.balances("MSCHL3unfVqzsZbRVCJ3yVp7RgAmXiuGN3", height)
+            return balance.info.ETP ? (balance.info.ETP / 100000000).toFixed(8) : 0
+        } else if(symbol==='DNA'){
+            const balances = await Promise.all([
+                await Address.balances("MEruoraUVWwWUs8GRPz5f5EhG1G7PeiHHV", height)
+                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                await Address.balances("MJ4t3K2pykxXkwxkCXxWwCHUWqdDDpqQFi", height)
+                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                await Address.balances("MSTMxz2kykshMEQiLnmxQy1QXYMsiNBkoj", height)
+                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                await Address.balances("MWA22ayfLUys4PMkranHowY21tkDas6HRJ", height)
+                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                await Address.balances("MLMJcRB8LzioAXRUaay9eUm1Yi5Ka37tQi", height)
+                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                await Address.balances("MKYELpVDRfmJjkM4xaqhwJihpoNCxEAU77", height)
+                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+            ])
+            return balances.reduce((acc, cur)=>acc+cur, 0)
         }
-        return Promise.resolve(0)
+        return 0
     }
-
-    Promise.all([Transaction.circulation(), getAdjustment()])
+    Promise.all([Transaction.circulation(symbol), getAdjustment(symbol)])
         .then(([circulation, adjustment]) => parseFloat((circulation - adjustment).toFixed(8)))
         .then(result => format === 'plain' ? res.send(result.toString()) : res.json(Message(1, undefined, result)))
         .catch((error) => {
