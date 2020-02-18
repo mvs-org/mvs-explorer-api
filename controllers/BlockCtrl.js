@@ -168,32 +168,34 @@ async function FetchCirculation(req, res) {
     const format = (req.query.format === 'plain') ? 'plain' : 'json'
     const symbol = req.query.symbol || 'ETP'
 
+    const decimals = symbol === 'DNA' ? 4 : 8
+
+
+    function getMSTBalance(address, symbol, height){
+        return Address.balances(address, height)
+            .then(balance => balance.tokens && balance.tokens[symbol] ? (balance.tokens[symbol] / Math.pow(10, decimals)) : 0) 
+    }
+
     async function getAdjustment(symbol) {
         const height = await Block.height()
         if (symbol === 'ETP' && adjust) {
             const balance = await Address.balances("MSCHL3unfVqzsZbRVCJ3yVp7RgAmXiuGN3", height)
-            return balance.info.ETP ? (balance.info.ETP / 100000000).toFixed(8) : 0
+            return balance.info.ETP ? (balance.info.ETP / Math.pow(10, decimals)) : 0
         } else if(symbol==='DNA'){
             const balances = await Promise.all([
-                await Address.balances("MEruoraUVWwWUs8GRPz5f5EhG1G7PeiHHV", height)
-                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
-                await Address.balances("MJ4t3K2pykxXkwxkCXxWwCHUWqdDDpqQFi", height)
-                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
-                await Address.balances("MSTMxz2kykshMEQiLnmxQy1QXYMsiNBkoj", height)
-                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
-                await Address.balances("MWA22ayfLUys4PMkranHowY21tkDas6HRJ", height)
-                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
-                await Address.balances("MLMJcRB8LzioAXRUaay9eUm1Yi5Ka37tQi", height)
-                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
-                await Address.balances("MKYELpVDRfmJjkM4xaqhwJihpoNCxEAU77", height)
-                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
+                getMSTBalance("MEruoraUVWwWUs8GRPz5f5EhG1G7PeiHHV", symbol, height),
+                getMSTBalance("MJ4t3K2pykxXkwxkCXxWwCHUWqdDDpqQFi", symbol, height),
+                getMSTBalance("MSTMxz2kykshMEQiLnmxQy1QXYMsiNBkoj", symbol, height),
+                getMSTBalance("MWA22ayfLUys4PMkranHowY21tkDas6HRJ", symbol, height),
+                getMSTBalance("MLMJcRB8LzioAXRUaay9eUm1Yi5Ka37tQi", symbol, height),
+                getMSTBalance("MKYELpVDRfmJjkM4xaqhwJihpoNCxEAU77", symbol, height),
             ])
             return balances.reduce((acc, cur)=>acc+cur, 0)
         }
         return 0
     }
     Promise.all([Transaction.circulation(symbol), getAdjustment(symbol)])
-        .then(([circulation, adjustment]) => parseFloat((circulation - adjustment).toFixed(8)))
+        .then(([circulation, adjustment]) => parseFloat((circulation - adjustment).toFixed(decimals)))
         .then(result => format === 'plain' ? res.send(result.toString()) : res.json(Message(1, undefined, result)))
         .catch((error) => {
             console.error(error);
