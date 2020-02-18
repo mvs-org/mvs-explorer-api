@@ -176,17 +176,17 @@ async function FetchCirculation(req, res) {
         } else if(symbol==='DNA'){
             const balances = await Promise.all([
                 await Address.balances("MEruoraUVWwWUs8GRPz5f5EhG1G7PeiHHV", height)
-                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
                 await Address.balances("MJ4t3K2pykxXkwxkCXxWwCHUWqdDDpqQFi", height)
-                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
                 await Address.balances("MSTMxz2kykshMEQiLnmxQy1QXYMsiNBkoj", height)
-                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
                 await Address.balances("MWA22ayfLUys4PMkranHowY21tkDas6HRJ", height)
-                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
                 await Address.balances("MLMJcRB8LzioAXRUaay9eUm1Yi5Ka37tQi", height)
-                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
                 await Address.balances("MKYELpVDRfmJjkM4xaqhwJihpoNCxEAU77", height)
-                    .then(balance => balance.info.DNA ? (balance.info.DNA / 1000).toFixed(4) : 0),
+                    .then(balance => balance.tokens.DNA ? (balance.tokens.DNA / 1000).toFixed(4) : 0),
             ])
             return balances.reduce((acc, cur)=>acc+cur, 0)
         }
