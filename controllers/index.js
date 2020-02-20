@@ -149,7 +149,7 @@ router.get('/addresses/txs', shortCacheSuccess, AddressCtrl.ListAddressesTxs);
 /**
  * Count the number of addresses with an ETP balance.
  * @route GET /addresses/count
- * @param {number} format.query.optional - plain or json (default: json)
+ * @param {string} format.query.optional - plain or json (default: json)
  * @group address - Operations about addresses
  * @returns {object} 200 - Transaction array
  */
@@ -243,10 +243,20 @@ router.get('/suggest/asset/:prefix', mediumCacheSuccess, AssetCtrl.Search);
  * This function returns the information about a specific asset.
  * @route GET /asset/{asset_symbol}
  * @param {string} asset_symbol.path.required - Asset symbol
+ * @param {string} format.query.optional - plain or json (default: json)
  * @group mst - Mst operations
  * @returns {object} 200 - Asset info
  */
 router.get('/asset/:asset_symbol', longCacheSuccess, AssetCtrl.AssetInfo);
+
+/**
+ * This function returns the initial total supply about a specific asset.
+ * @route GET /asset/totalsupply/{asset_symbol}
+ * @param {string} asset_symbol.path.required - Asset symbol
+ * @group mst - Mst operations
+ * @returns {object} 200 - Asset info
+ */
+router.get('/asset/totalsupply/:asset_symbol', longCacheSuccess, AssetCtrl.AssetTotalSupply);
 
 /**
  * This function returns a list of 3rd party conversion rates.

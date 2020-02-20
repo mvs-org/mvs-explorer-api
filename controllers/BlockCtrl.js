@@ -101,7 +101,7 @@ function ListBlockstats(req, res) {
         default:
             type = 'DIFFICULTY_POW_HEIGHT'
     }
-    
+
     Block.blockstats((limit > 0) ? limit : 0, type, interval, downscale * interval)
         .then((times) => res.json(Message(1, undefined, times)))
         .catch((error) => {
@@ -171,9 +171,9 @@ async function FetchCirculation(req, res) {
     const decimals = symbol === 'DNA' ? 4 : 8
 
 
-    function getMSTBalance(address, symbol, height){
+    function getMSTBalance(address, symbol, height) {
         return Address.balances(address, height)
-            .then(balance => balance.tokens && balance.tokens[symbol] ? (balance.tokens[symbol] / Math.pow(10, decimals)) : 0) 
+            .then(balance => balance.tokens && balance.tokens[symbol] ? (balance.tokens[symbol] / Math.pow(10, decimals)) : 0)
     }
 
     async function getAdjustment(symbol) {
@@ -181,7 +181,7 @@ async function FetchCirculation(req, res) {
         if (symbol === 'ETP' && adjust) {
             const balance = await Address.balances("MSCHL3unfVqzsZbRVCJ3yVp7RgAmXiuGN3", height)
             return balance.info.ETP ? (balance.info.ETP / Math.pow(10, decimals)) : 0
-        } else if(symbol==='DNA'){
+        } else if (symbol === 'DNA') {
             const balances = await Promise.all([
                 getMSTBalance("MEruoraUVWwWUs8GRPz5f5EhG1G7PeiHHV", symbol, height),
                 getMSTBalance("MJ4t3K2pykxXkwxkCXxWwCHUWqdDDpqQFi", symbol, height),
@@ -190,7 +190,7 @@ async function FetchCirculation(req, res) {
                 getMSTBalance("MLMJcRB8LzioAXRUaay9eUm1Yi5Ka37tQi", symbol, height),
                 getMSTBalance("MKYELpVDRfmJjkM4xaqhwJihpoNCxEAU77", symbol, height),
             ])
-            return balances.reduce((acc, cur)=>acc+cur, 0)
+            return balances.reduce((acc, cur) => acc + cur, 0)
         }
         return 0
     }
