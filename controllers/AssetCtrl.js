@@ -10,6 +10,7 @@ exports.ListAllAssets = listassets;
 exports.ListIcons = listIcons;
 exports.ListStakes = listStakes;
 exports.AssetInfo = assetinfo;
+exports.AssetTotalSupply = totalsupply;
 exports.Search = search;
 exports.BridgeWhitelist = ethBridgeList;
 exports.BridgeConfig = ethBridgeConfig;
@@ -92,6 +93,26 @@ function assetinfo(req, res) {
             res.status(404).json(Message(0, 'ERR_GET_ASSET'))
         });
 };
+
+function totalsupply(req, res) {
+    const format = (req.query.format === 'plain') ? 'plain' : 'json'
+    const symbol = req.params.asset_symbol || 'ETP'
+
+    Assets.assetinfo(symbol.toUpperCase())
+        .then(asset => {
+            if (asset) {
+                let result = asset.quantity / Math.pow(10, asset.decimals)
+                format === 'plain' ? res.send(result.toString()) : res.json(Message(1, undefined, result))
+            } else {
+                throw Error('Asset not found')
+            }
+        })
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_GET_ASSET'))
+        });
+
+}
 
 function ethBridgeList(req, res) {
     Bridge.list()
