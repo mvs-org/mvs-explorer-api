@@ -116,22 +116,6 @@ router.get('/address/balance/:symbol/:address', shortCacheSuccess, AddressCtrl.G
 router.get('/suggest/address/:prefix', AddressCtrl.Suggest);
 
 /**
- * Get the transactions of an address.
- * @route GET /address/txs/{address}
- * @param {string} address.path.required - address
- * @param {string} page.query.optional - page (default: 0)
- * @param {string} items_per_page.query.optional - items per page (default: 10, max: 100)
- * @param {number} min_time.query.optional - From timestamp
- * @param {number} max_time.query.optional - To timestamp
- * @param {number} min_height.query.optional - From height
- * @param {number} max_height.query.optional - To height
- * @group address - Operations about addresses
- * @returns {object} 200 - Transaction array
- */
-router.get('/address/txs/:address', mediumCacheSuccess, AddressCtrl.ListTxs);
-router.get('/address/:address', mediumCacheSuccess, AddressCtrl.ListTxs);
-
-/**
  * Count the number of addresses with an ETP balance.
  * @route GET /addresses/count
  * @param {string} format.query.optional - plain or json (default: json)
