@@ -6,40 +6,10 @@ let Asset = require('../models/assets.js')
 let Block = require('../models/block.js')
 let Tx = require('../models/transaction.js')
 
-exports.ListTxs = ListTxs
 exports.Suggest = Suggest
 exports.GetBalance = GetBalance
 exports.ListBalances = ListBalances
 exports.CountAddresses = CountAddresses
-
-/**
- * List transactions for given address.
- * @param {} req
- * @param {} res
- */
-function ListTxs(req, res) {
-    var page = parseInt(req.query.page) || 0
-    var items_per_page = Math.min(parseInt(req.query.items_per_page) || 10, 100)
-    var filter = {
-        address: req.params.address,
-        max_time: parseInt(req.query.max_time) || undefined,
-        min_time: parseInt(req.query.min_time) || undefined,
-        max_height: parseInt(req.query.max_height) || undefined,
-        min_height: parseInt(req.query.min_height) || undefined,
-    }
-    Tx.list(page, items_per_page, filter)
-        .then((txs_data) => {
-            res.json(Message(1, undefined, {
-                transactions: txs_data.result,
-                count: txs_data.count,
-                items_per_page: items_per_page,
-            }))
-        })
-        .catch((error) => {
-            console.error('Error listing txs for address : ' + error.message)
-            res.status(404).json(Message(0, 'ERR_LIST_TRANSACTIONS'))
-        })
-}
 
 function Suggest(req, res) {
     let prefix = req.params.prefix
