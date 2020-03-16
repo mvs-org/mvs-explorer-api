@@ -7,52 +7,10 @@ let Block = require('../models/block.js')
 let Tx = require('../models/transaction.js')
 
 exports.ListTxs = ListTxs
-exports.ListAddressesTxs = ListAddressesTxs
 exports.Suggest = Suggest
 exports.GetBalance = GetBalance
 exports.ListBalances = ListBalances
 exports.CountAddresses = CountAddresses
-
-/**
- * List transactions for given addresses.
- * @param {} req
- * @param {} res
- */
-function ListAddressesTxs(req, res) {
-    var filter = {
-        addresses: (Array.isArray(req.query.addresses)) ? req.query.addresses : [req.query.addresses,],
-        max_time: parseInt(req.query.max_time) || undefined,
-        min_time: parseInt(req.query.min_time) || undefined,
-        max_height: parseInt(req.query.max_height) || undefined,
-        min_height: parseInt(req.query.min_height) || undefined,
-    }
-    let filter_inouts = req.query.filter_inouts
-    Tx.listall(filter)
-        .then((txs) => (filter_inouts) ? Promise.all(txs.map((tx) => {
-            let inp = [],
-                outp = []
-            tx.inputs.forEach((input) => {
-                if (filter.addresses.indexOf(input.address) !== -1)
-                    inp.push(input)
-            })
-            tx.outputs.forEach((output) => {
-                if (filter.addresses.indexOf(output.address) !== -1)
-                    outp.push(output)
-            })
-            tx.inputs = inp
-            tx.outputs = outp
-            return tx
-        })) : txs)
-        .then((txs_data) => {
-            res.json(Message(1, undefined, {
-                transactions: txs_data,
-            }))
-        })
-        .catch((error) => {
-            console.error('Error listing txs for address : ' + error.message)
-            res.status(404).json(Message(0, 'ERR_LIST_TRANSACTIONS'))
-        })
-}
 
 /**
  * List transactions for given address.
