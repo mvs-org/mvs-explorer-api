@@ -14,7 +14,6 @@ module.exports = {
     circulation: circulation,
     suggest: suggest,
     list: list,
-    listall: listall,
     counttxs: counttxs,
     rewards: rewards,
     broadcast: broadcast,
@@ -42,51 +41,6 @@ function fetch(hash) {
         });
 }
 
-function listall(filter) {
-    let query = {};
-    if (!filter.allow_orphan) {
-        query.orphan = 0;
-    }
-    if (filter.blockhash)
-        query.block = filter.blockhash;
-    if (filter.addresses) {
-        query.$or = [{
-            'inputs.address': {
-                $in: filter.addresses
-            }
-        }, {
-            'outputs.address': {
-                $in: filter.addresses
-            }
-        }];
-    }
-    if (filter.min_time || filter.max_time) {
-        query.confirmed_at = {};
-        if (filter.max_time)
-            query.confirmed_at.$lte = filter.max_time;
-        if (filter.min_time)
-            query.confirmed_at.$gte = filter.min_time;
-    }
-    if (filter.min_height || filter.max_height) {
-        query.height = {};
-        if (filter.max_height)
-            query.height.$lte = filter.max_height;
-        if (filter.min_height)
-            query.height.$gte = filter.min_height;
-    }
-    return mongo.connect()
-        .then((db) => db.collection('tx').find(query, {
-            "hash": 1,
-            "inputs": 1,
-            "outputs": 1,
-            confirmed_at: 1,
-            height: 1,
-            "_id": 0
-        }).sort({
-            height: -1
-        }))
-        .then((result) => result.toArray());
-}
 /**
  * List all transactions that meet the filter criteria.
  * Possible filter options are:

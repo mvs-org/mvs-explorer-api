@@ -132,21 +132,6 @@ router.get('/address/txs/:address', mediumCacheSuccess, AddressCtrl.ListTxs);
 router.get('/address/:address', mediumCacheSuccess, AddressCtrl.ListTxs);
 
 /**
- * Get the transactions of multiple addresses.
- * @route GET /addresses/txs
- * @param {Array<string>} addresses.query.required - Addresses
- * @param {string} page.query.optional - Page
- * @param {string} items_per_page.query.optional - Items per page
- * @param {number} min_time.query.optional - From timestamp
- * @param {number} max_time.query.optional - To timestamp
- * @param {number} min_height.query.optional - From height
- * @param {number} max_height.query.optional - To height
- * @group address - Operations about addresses
- * @returns {object} 200 - Transaction array
- */
-router.get('/addresses/txs', shortCacheSuccess, AddressCtrl.ListAddressesTxs);
-
-/**
  * Count the number of addresses with an ETP balance.
  * @route GET /addresses/count
  * @param {string} format.query.optional - plain or json (default: json)
