@@ -93,8 +93,16 @@ function fetch(req, res) {
  */
 function broadcast(req, res) {
     var tx = req.body.tx;
+    const modelExtractor = /^\[ (\w+) \]/
     Transaction.decode(tx)
         .then((decodedTx) => Promise.all(decodedTx.outputs.map(async output => {
+            if (output.script.indexOf('OP_CHECKATTENUATIONVERIFY') && modelExtractor.test(output.script)) {
+                //check attenuation model
+                const modelString = Buffer.from(output.script.match(modelExtractor)[1],'hex').toString()
+                if(modelString.indexOf('NaN')!==-1){
+                    throw Error('Invalid attenuation model params: '+modelString)
+                }
+            }
             if (output.attachment &&
                 output.attachment.type === 5 && // type certificate
                 output.attachment.cert === 2 && // cert type domain
