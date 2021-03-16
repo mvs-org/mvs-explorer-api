@@ -96,6 +96,15 @@ router.get('/suggest/tx/:prefix', mediumCacheSuccess, TxCtrl.Suggest);
 router.get('/address/info/:address', shortCacheSuccess, AddressCtrl.ListBalances);
 
 /**
+ * Get public key on an address.
+ * @route GET /address/pubkey/{address}
+ * @param {string} address.path.required - address
+ * @group address - Operations about addresses
+ * @returns {object} 200 - Address details
+ */
+router.get('/address/pubkey/:address', longCacheSuccess, AddressCtrl.GetPublicKey);
+
+/**
  * Get balance of an address.
  * @route GET /address/balance/{symbol}/{address}
  * @param {string} symbol.path.required - symbol

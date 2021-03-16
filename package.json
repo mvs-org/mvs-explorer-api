@@ -17,6 +17,8 @@
   "dependencies": {
     "apicache": "^0.8.3",
     "body-parser": "^1.16.0",
+    "crypto-js": "^4.0.0",
+    "ethereum-public-key-to-address": "0.0.5",
     "express": "^4.16.4",
     "express-limiter": "^1.6.1",
     "express-swagger-generator": "^1.1.9",

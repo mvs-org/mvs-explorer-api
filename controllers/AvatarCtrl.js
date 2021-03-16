@@ -1,8 +1,11 @@
-'use strict';
+"use strict";
+
+const publicKeyToAddress = require('ethereum-public-key-to-address')
 
 //Load Models
-var Avatars = require('../models/avatars.js'),
-    Message = require('../models/message.js');
+var Avatars = require("../models/avatars.js"),
+    Address = require("../models/address.js"),
+    Message = require("../models/message.js");
 
 exports.ListAllAvatars = listavatars;
 exports.Search = search;
@@ -15,14 +18,16 @@ exports.AvatarInfo = avatarinfo;
  */
 function listavatars(req, res) {
     var page = parseInt(req.query.page) || 0;
-    var items_per_page = (req.query.items_per_page) ? parseInt(req.query.items_per_page) : 100;
+    var items_per_page = req.query.items_per_page
+        ? parseInt(req.query.items_per_page)
+        : 100;
     Avatars.listavatars(page, items_per_page)
         .then((avatars) => res.json(Message(1, undefined, avatars)))
         .catch((error) => {
-            console.error(error)
-            res.status(404).json(Message(0, 'ERR_LIST_AVATARS'))
+        console.error(error);
+        res.status(404).json(Message(0, "ERR_LIST_AVATARS"));
         });
-};
+}
 
 /**
  * Search for avatars names.
@@ -31,14 +36,14 @@ function listavatars(req, res) {
  */
 function search(req, res) {
     let prefix = req.params.prefix;
-    let limit = Math.min(parseInt(req.query.limit) || 10, 100)
+    let limit = Math.min(parseInt(req.query.limit) || 10, 100);
     Avatars.suggest(prefix, limit)
         .then((avatars) => res.json(Message(1, undefined, avatars)))
         .catch((error) => {
-            console.error(error)
-            res.status(404).json(Message(0, 'ERR_SEARCH_AVATARS'))
+        console.error(error);
+        res.status(404).json(Message(0, "ERR_SEARCH_AVATARS"));
         });
-};
+}
 
 /**
  * Get the information of an avatar.
@@ -47,15 +52,27 @@ function search(req, res) {
  */
 function avatarinfo(req, res) {
     var symbol = req.params.avatar_symbol;
-    let search = (isAddress(symbol)) ? Avatars.avatarInfoByAddress : Avatars.avatarinfo
+    
+    let search = isAddress(symbol)
+    ? Avatars.avatarInfoByAddress
+    : Avatars.avatarinfo;
     search(symbol)
-        .then((avatars) => res.json(Message(1, undefined, avatars)))
+    .then(async (avatar) => {
+        const pubkey = await Address.getPublicKey(avatar.address);
+        const vmaddress = publicKeyToAddress(pubkey)
+        return res.json(Message(1, undefined, { ...avatar, pubkey, vmaddress }));
+        })
         .catch((error) => {
-            console.error(error)
-            res.status(404).json(Message(0, 'ERR_GET_AVATAR'))
+        console.error(error);
+        res.status(404).json(Message(0, "ERR_GET_AVATAR"));
         });
-};
+}
 
 function isAddress(address) {
-    return (address.length == 34) && (address.charAt(0) == 'M' || address.charAt(0) == 't' || address.charAt(0) == '3');
-};
+    return (
+        address.length == 34 &&
+        (address.charAt(0) == "M" ||
+        address.charAt(0) == "t" ||
+        address.charAt(0) == "3")
+    );
+    }
