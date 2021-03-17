@@ -10,6 +10,7 @@ exports.Suggest = Suggest
 exports.GetBalance = GetBalance
 exports.ListBalances = ListBalances
 exports.CountAddresses = CountAddresses
+exports.GetPublicKey = GetPublicKey
 
 function Suggest(req, res) {
     let prefix = req.params.prefix
@@ -79,6 +80,16 @@ async function CountAddresses(req, res) {
 
     Address.countaddresses(0.00000001)
         .then(result => format === 'plain' ? res.send(result.toString()) : res.json(Message(1, undefined, result)))
+        .catch((error) => {
+            console.error(error)
+            res.status(404).json(Message(0, 'ERR_ADDRESSES_COUNT'))
+        })
+}
+
+async function GetPublicKey(req, res) {
+    let address = req.params.address
+    Address.getPublicKey(address)
+        .then(result => res.json(Message(1, undefined, result)))
         .catch((error) => {
             console.error(error)
             res.status(404).json(Message(0, 'ERR_ADDRESSES_COUNT'))

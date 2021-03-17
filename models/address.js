@@ -11,8 +11,28 @@ module.exports = {
     balances: listBalances,
     suggest: suggest,
     listAddressIds: listAddressIds,
+    getPublicKey,
     countaddresses: countaddresses
 };
+
+async function getPublicKey(address){
+    const pubkeyRegex = /\[ .{144} \] \[ (.{66}) \]/
+    const tx = await mongo.findOne({
+        'inputs.address': address,
+        "orphan": 0,
+    }, {
+        'inputs.address': 1,
+        'inputs.script': 1
+    }, 'tx')
+    if(tx != null){
+        for(let input of tx.inputs){
+            if(input.address===address && pubkeyRegex.test(input.script)) {
+                return input.script.match(pubkeyRegex)[1]
+            }
+        }
+    }
+    return null
+}
 
 function listTxsData(address, from, to) {
     return mongo.find({
