@@ -28,7 +28,7 @@
     "lodash": "^4.17.15",
     "metaversejs": "^0.3.71",
     "method-override": "^2.3.7",
-    "mongodb": "^2.2.36",
+    "mongodb": "^3.1.13",
     "path": "^0.12.7",
     "redis": "^2.7.1",
     "request": "^2.88.0",
