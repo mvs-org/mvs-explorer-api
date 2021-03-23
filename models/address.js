@@ -16,7 +16,7 @@ module.exports = {
 };
 
 async function getPublicKey(address){
-    const pubkeyRegex = /\[ .{144} \] \[ (.{66}) \]/
+    const pubkeyRegex = /\[ [a-fA-F0-9]{142,144} \] \[ ([a-fA-F0-9]{66}) \]/
     const tx = await mongo.findOne({
         'inputs.address': address,
         "orphan": 0,
