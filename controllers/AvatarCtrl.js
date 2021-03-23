@@ -59,7 +59,7 @@ function avatarinfo(req, res) {
     search(symbol)
     .then(async (avatar) => {
         const pubkey = await Address.getPublicKey(avatar.address);
-        const vmaddress = publicKeyToAddress(pubkey)
+        const vmaddress = pubkey ? publicKeyToAddress(pubkey) : ''
         return res.json(Message(1, undefined, { ...avatar, pubkey, vmaddress }));
         })
         .catch((error) => {
